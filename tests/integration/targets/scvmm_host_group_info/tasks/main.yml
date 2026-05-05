@@ -1,0 +1,34 @@
+---
+- name: Test gathering information about all Host Groups
+  microsoft.scvmm.scvmm_host_group_info:
+  register: all_host_groups
+
+- name: Assert output for all Host Groups
+  assert:
+    that:
+      - not all_host_groups.changed
+      - all_host_groups.host_groups is defined
+      - all_host_groups.host_groups | type_debug == 'list'
+
+- name: Test check mode
+  microsoft.scvmm.scvmm_host_group_info:
+  check_mode: yes
+  register: check_mode_result
+
+- name: Assert check mode result
+  assert:
+    that:
+      - not check_mode_result.changed
+      - check_mode_result.host_groups is defined
+
+- name: Test gathering information about a nonexistent Host Group
+  microsoft.scvmm.scvmm_host_group_info:
+    name: "NonExistentHostGroup12345"
+  register: missing_host_group
+
+- name: Assert output for nonexistent Host Group
+  assert:
+    that:
+      - not missing_host_group.changed
+      - missing_host_group.host_groups is defined
+      - missing_host_group.host_groups | length == 0

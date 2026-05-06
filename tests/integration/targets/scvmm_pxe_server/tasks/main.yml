@@ -1,0 +1,113 @@
+---
+- name: Set test variables
+  set_fact:
+    test_pxe_server: "pxe-test-{{ 1000 | random }}.contoso.com"
+    test_run_as_account: "PXE Admin Account"
+
+- name: Gather initial info (expect success even if empty)
+  microsoft.scvmm.scvmm_pxe_server_info:
+  register: pxe_info_initial
+
+- name: Test PXE server creation (expect failure if Run As Account doesn't exist)
+  microsoft.scvmm.scvmm_pxe_server:
+    computer_name: "{{ test_pxe_server }}"
+    state: present
+    credential:
+      name: "{{ test_run_as_account }}"
+    description: "Initial description"
+  register: pxe_create
+  ignore_errors: true
+
+- name: Check if creation succeeded or failed as expected
+  debug:
+    msg: "PXE server creation {{ 'succeeded' if pxe_create.changed else 'failed (expected in some environments)' }}"
+
+- name: If PXE server exists (succeeded or already there), test idempotency and updates
+  when: pxe_create.changed or (not pxe_create.failed and pxe_create.pxe_server is defined)
+  block:
+    - name: Test idempotency (no changes expected)
+      microsoft.scvmm.scvmm_pxe_server:
+        computer_name: "{{ test_pxe_server }}"
+        state: present
+        credential:
+          name: "{{ test_run_as_account }}"
+        description: "Initial description"
+      register: pxe_idempotent
+
+    - name: Assert idempotency
+      assert:
+        that:
+          - not pxe_idempotent.changed
+
+    - name: Test update (check mode)
+      microsoft.scvmm.scvmm_pxe_server:
+        computer_name: "{{ test_pxe_server }}"
+        state: present
+        description: "Updated description"
+      check_mode: true
+      register: pxe_update_check
+
+    - name: Assert update check mode
+      assert:
+        that:
+          - pxe_update_check.changed
+
+    - name: Test info gathering for specific server
+      microsoft.scvmm.scvmm_pxe_server_info:
+        computer_name: "{{ test_pxe_server }}"
+      register: pxe_info_specific
+
+    - name: Assert info gathering
+      assert:
+        that:
+          - pxe_info_specific.pxe_servers | length >= 1
+
+    - name: Test delete (check mode)
+      microsoft.scvmm.scvmm_pxe_server:
+        computer_name: "{{ test_pxe_server }}"
+        state: absent
+        force: true
+      check_mode: true
+      register: pxe_delete_check
+
+    - name: Assert delete check mode
+      assert:
+        that:
+          - pxe_delete_check.changed
+
+    - name: Test delete
+      microsoft.scvmm.scvmm_pxe_server:
+        computer_name: "{{ test_pxe_server }}"
+        state: absent
+        force: true
+      register: pxe_delete
+
+    - name: Assert delete
+      assert:
+        that:
+          - pxe_delete.changed
+
+    - name: Test delete idempotency
+      microsoft.scvmm.scvmm_pxe_server:
+        computer_name: "{{ test_pxe_server }}"
+        state: absent
+        force: true
+      register: pxe_delete_idempotent
+
+    - name: Assert delete idempotency
+      assert:
+        that:
+          - not pxe_delete_idempotent.changed
+
+- name: Test error case - missing credential
+  microsoft.scvmm.scvmm_pxe_server:
+    computer_name: "fail.contoso.com"
+    state: present
+  register: pxe_fail_cred
+  ignore_errors: true
+
+- name: Assert failure due to missing credential
+  assert:
+    that:
+      - pxe_fail_cred.failed
+      - "'A credential with a Run As Account name is required' in pxe_fail_cred.msg"

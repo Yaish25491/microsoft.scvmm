@@ -1,0 +1,81 @@
+---
+- name: Set up test variables
+  set_fact:
+    test_vm_name: "TestVM_CheckpointInfo"
+    test_checkpoint_name: "InfoTestCheckpoint"
+
+- name: Ensure VM exists (Setup)
+  microsoft.scvmm.scvmm_vm:
+    name: "{{ test_vm_name }}"
+    state: present
+  ignore_errors: yes
+
+- block:
+    - name: Ensure checkpoint exists
+      microsoft.scvmm.scvmm_vm_checkpoint:
+        name: "{{ test_checkpoint_name }}"
+        vm_name: "{{ test_vm_name }}"
+        state: present
+
+    - name: Gather info for all checkpoints
+      microsoft.scvmm.scvmm_vm_checkpoint_info:
+      register: all_info
+
+    - name: Assert all_info
+      assert:
+        that:
+          - all_info.checkpoints is defined
+          - all_info.checkpoints | length >= 1
+
+    - name: Gather info for specific VM
+      microsoft.scvmm.scvmm_vm_checkpoint_info:
+        vm_name: "{{ test_vm_name }}"
+      register: vm_info
+
+    - name: Assert vm_info
+      assert:
+        that:
+          - vm_info.checkpoints is defined
+          - vm_info.checkpoints | length >= 1
+          - vm_info.checkpoints[0].vm_name == test_vm_name
+
+    - name: Gather info by checkpoint name
+      microsoft.scvmm.scvmm_vm_checkpoint_info:
+        name: "{{ test_checkpoint_name }}"
+      register: name_info
+
+    - name: Assert name_info
+      assert:
+        that:
+          - name_info.checkpoints is defined
+          - name_info.checkpoints | length >= 1
+          - name_info.checkpoints[0].name == test_checkpoint_name
+
+    - name: Gather info by name pattern
+      microsoft.scvmm.scvmm_vm_checkpoint_info:
+        name: "InfoTest*"
+      register: pattern_info
+
+    - name: Assert pattern_info
+      assert:
+        that:
+          - pattern_info.checkpoints is defined
+          - pattern_info.checkpoints | length >= 1
+
+    - name: Gather info for non-existent checkpoint
+      microsoft.scvmm.scvmm_vm_checkpoint_info:
+        name: "NonExistentCheckpoint"
+      register: non_existent_info
+
+    - name: Assert non_existent_info
+      assert:
+        that:
+          - non_existent_info.checkpoints | length == 0
+
+  always:
+    - name: Cleanup checkpoint
+      microsoft.scvmm.scvmm_vm_checkpoint:
+        name: "{{ test_checkpoint_name }}"
+        vm_name: "{{ test_vm_name }}"
+        state: absent
+      ignore_errors: yes

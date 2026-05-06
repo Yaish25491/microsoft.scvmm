@@ -1,0 +1,68 @@
+---
+# tasks file for scvmm_job_info
+
+- name: Gather all jobs
+  microsoft.scvmm.scvmm_job_info:
+  register: all_jobs
+
+- name: Assert all jobs info is gathered and changed is false
+  assert:
+    that:
+      - not all_jobs.changed
+      - all_jobs.jobs is defined
+
+- name: Gather jobs with status 'Running'
+  microsoft.scvmm.scvmm_job_info:
+    status: Running
+  register: running_jobs
+
+- name: Assert running jobs info is gathered
+  assert:
+    that:
+      - not running_jobs.changed
+      - running_jobs.jobs is defined
+
+- name: Gather job by specific ID (Non-existent)
+  microsoft.scvmm.scvmm_job_info:
+    id: "00000000-0000-0000-0000-000000000000"
+  register: job_by_id
+
+- name: Assert job by non-existent ID returns empty list
+  assert:
+    that:
+      - not job_by_id.changed
+      - job_by_id.jobs | length == 0
+
+- name: Gather job by name (Non-existent)
+  microsoft.scvmm.scvmm_job_info:
+    name: "NonExistentJob_12345"
+  register: job_by_name
+
+- name: Assert job by non-existent name returns empty list
+  assert:
+    that:
+      - not job_by_name.changed
+      - job_by_name.jobs | length == 0
+
+- name: Check Error Handling (Invalid input for id)
+  microsoft.scvmm.scvmm_job_info:
+    id:
+      invalid: type
+  register: fail_info
+  ignore_errors: true
+
+- name: Assert module fails with invalid input
+  assert:
+    that:
+      - fail_info.failed is true
+
+- name: Run in Check Mode
+  microsoft.scvmm.scvmm_job_info:
+  check_mode: true
+  register: check_mode_info
+
+- name: Assert check mode does not change state and returns jobs
+  assert:
+    that:
+      - not check_mode_info.changed
+      - check_mode_info.jobs is defined

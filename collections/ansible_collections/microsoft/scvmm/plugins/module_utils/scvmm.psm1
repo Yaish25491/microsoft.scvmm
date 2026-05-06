@@ -113,5 +113,33 @@ function Get-SCVMMTemplateInfo {
     return $info
 }
 
+function Get-SCVMMCheckpointInfo {
+    <#
+    .SYNOPSIS
+    Converts a SCVMM Checkpoint object to a hashtable.
+    .DESCRIPTION
+    Extracts relevant properties from a VMCheckpoint object and returns a standardized hashtable.
+    .PARAMETER Checkpoint
+    The SCVMCheckpoint object to convert.
+    #>
+    param(
+        [Parameter(Mandatory = $true)]
+        [Object]$Checkpoint
+    )
+
+    $info = @{
+        name = $Checkpoint.Name
+        id = $Checkpoint.ID.Guid
+        description = $Checkpoint.Description
+        added_time = $Checkpoint.AddedTime
+        vm_name = if ($Checkpoint.VM) { $Checkpoint.VM.Name } else { $null }
+        vm_id = if ($Checkpoint.VM) { $Checkpoint.VM.ID.Guid } else { $null }
+        is_parent = $Checkpoint.IsParent
+        parent_checkpoint_id = if ($Checkpoint.ParentCheckpointID) { $Checkpoint.ParentCheckpointID.Guid } else { $null }
+    }
+
+    return $info
+}
+
 # Export functions
-Export-ModuleMember -Function Import-SCVMMModule, Get-SCVMMVMInfo, Get-SCVMMCloudInfo, Get-SCVMMTemplateInfo
+Export-ModuleMember -Function Import-SCVMMModule, Get-SCVMMVMInfo, Get-SCVMMCloudInfo, Get-SCVMMTemplateInfo, Get-SCVMMCheckpointInfo

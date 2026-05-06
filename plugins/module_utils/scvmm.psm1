@@ -489,8 +489,12 @@ function Get-SCVMMUplinkPortProfileInfo {
         name = $UplinkPortProfile.Name
         id = $UplinkPortProfile.ID.Guid
         description = $UplinkPortProfile.Description
-        lbfo_load_balancing_algorithm = if ($UplinkPortProfile.LBFOLoadBalancingAlgorithm) { $UplinkPortProfile.LBFOLoadBalancingAlgorithm.ToString() } else { $null }
-        lbfo_teaming_mode = if ($UplinkPortProfile.LBFOTeamingMode) { $UplinkPortProfile.LBFOTeamingMode.ToString() } else { $null }
+        lbfo_load_balancing_algorithm = if ($UplinkPortProfile.LBFOLoadBalancingAlgorithm) {
+            $UplinkPortProfile.LBFOLoadBalancingAlgorithm.ToString()
+        } else { $null }
+        lbfo_teaming_mode = if ($UplinkPortProfile.LBFOTeamingMode) {
+            $UplinkPortProfile.LBFOTeamingMode.ToString()
+        } else { $null }
         enable_network_virtualization = $UplinkPortProfile.EnableNetworkVirtualization
         logical_network_definitions = $UplinkPortProfile.LogicalNetworkDefinitions | ForEach-Object { $_.Name }
     }
@@ -733,5 +737,90 @@ function Get-SCVMMIPPoolInfo {
     return $info
 }
 
+function Get-SCVMMJobInfo {
+    <#
+    .SYNOPSIS
+    Converts a SCVMM Job object to a hashtable.
+    .DESCRIPTION
+    Extracts relevant properties from a Job object and returns a standardized hashtable.
+    .PARAMETER Job
+    The Task object to convert.
+    #>
+    param(
+        [Parameter(Mandatory = $true)]
+        [Object]$Job
+    )
+
+    $info = @{
+        name = $Job.Name
+        id = $Job.ID.Guid
+        status = if ($Job.Status) { $Job.Status.ToString() } else { $null }
+        description = $Job.Description
+        owner = $Job.Owner
+        start_time = $Job.StartTime
+        end_time = $Job.EndTime
+        is_cancellable = $Job.IsCancellable
+        is_restartable = $Job.IsRestartable
+        result_object_name = $Job.ResultObjectName
+        result_object_id = if ($Job.ResultObjectID) { $Job.ResultObjectID.Guid } else { $null }
+        progress = $Job.Progress
+        error_code = $Job.ErrorCode
+        error_summary = $Job.ErrorSummary
+    }
+
+    return $info
+}
+
+function Get-SCPXEServerInfo {
+    <#
+    .SYNOPSIS
+    Converts a SCVMM PXE Server object to a hashtable.
+    .DESCRIPTION
+    Extracts relevant properties from a SCPXEServer object and returns a standardized hashtable.
+    .PARAMETER PXEServer
+    The SCPXEServer object to convert.
+    #>
+    param(
+        [Parameter(Mandatory = $true)]
+        [Object]$PXEServer
+    )
+
+    $info = @{
+        computer_name = $PXEServer.ComputerName
+        id = $PXEServer.ID.Guid
+        description = $PXEServer.Description
+        is_connected = $PXEServer.IsConnected
+        version = $PXEServer.Version
+    }
+
+    return $info
+}
+
+function Get-SCVMMVMCheckpointInfo {
+    <#
+    .SYNOPSIS
+    Converts a SCVMM VM Checkpoint object to a hashtable.
+    .DESCRIPTION
+    Extracts relevant properties from a VMCheckpoint object and returns a standardized hashtable.
+    .PARAMETER Checkpoint
+    The VMCheckpoint object to convert.
+    #>
+    param(
+        [Parameter(Mandatory = $true)]
+        [Object]$Checkpoint
+    )
+
+    $info = @{
+        name = $Checkpoint.Name
+        description = $Checkpoint.Description
+        added_time = $Checkpoint.AddedTime.ToString("yyyy-MM-ddTHH:mm:ssZ")
+        id = $Checkpoint.CheckpointID.ToString()
+        vm_name = if ($Checkpoint.VM) { $Checkpoint.VM.Name } else { $null }
+        is_latest = $Checkpoint.IsLatest
+    }
+
+    return $info
+}
+
 # Export functions
-Export-ModuleMember -Function Import-SCVMMModule, Get-SCVMMVMInfo, Get-SCVMMCloudInfo, Get-SCVMMTemplateInfo, Get-SCVMMHostClusterInfo, Get-SCVMMHostInfo, Get-SCVMMVMNetworkInfo, Get-SCVMMLogicalNetworkInfo, Get-SCVMMLogicalNetworkDefinitionInfo, Get-SCVMMLogicalSwitchInfo, Get-SCVMMLogicalSwitchExtensionInfo, Get-SCVMMIPPoolInfo, Get-SCVMMVMSubnetInfo, Get-SCVMMVirtualHardDiskInfo, Get-SCVMMMACAddressPoolInfo, Get-SCVMMUplinkPortProfileInfo, Get-SCVMMPortClassificationInfo, Get-SCVMMHostNetworkAdapterInfo, Get-SCVMMStorageProviderInfo, Get-SCVMMStorageFileShareInfo, Get-SCVMMStoragePoolInfo, Get-SCVMMStorageClassificationInfo, Get-SCVMMCustomPropertyInfo, Get-SCVMMVirtualNetworkAdapterInfo, Get-SCVMMLoadBalancerInfo
+Export-ModuleMember -Function Import-SCVMMModule, Get-SCVMMVMInfo, Get-SCVMMCloudInfo, Get-SCVMMTemplateInfo, Get-SCVMMHostClusterInfo, Get-SCVMMHostInfo, Get-SCVMMVMNetworkInfo, Get-SCVMMLogicalNetworkInfo, Get-SCVMMLogicalNetworkDefinitionInfo, Get-SCVMMLogicalSwitchInfo, Get-SCVMMLogicalSwitchExtensionInfo, Get-SCVMMIPPoolInfo, Get-SCVMMVMSubnetInfo, Get-SCVMMVirtualHardDiskInfo, Get-SCVMMMACAddressPoolInfo, Get-SCVMMUplinkPortProfileInfo, Get-SCVMMPortClassificationInfo, Get-SCVMMHostNetworkAdapterInfo, Get-SCVMMStorageProviderInfo, Get-SCVMMStorageFileShareInfo, Get-SCVMMStoragePoolInfo, Get-SCVMMStorageClassificationInfo, Get-SCVMMCustomPropertyInfo, Get-SCVMMVirtualNetworkAdapterInfo, Get-SCVMMLoadBalancerInfo, Get-SCVMMJobInfo, Get-SCPXEServerInfo, Get-SCVMMVMCheckpointInfo

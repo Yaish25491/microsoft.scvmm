@@ -1,0 +1,49 @@
+---
+- name: Migrate VM to a specific host (Check Mode)
+  microsoft.scvmm.scvmm_vm_migrate:
+    name: "{{ scvmm_vm_name }}"
+    vm_host: "{{ scvmm_target_host }}"
+  register: migrate_check
+  check_mode: yes
+
+- name: Assert Check Mode
+  assert:
+    that:
+      - migrate_check.changed == true
+      - migrate_check.vm.name == scvmm_vm_name
+
+- name: Migrate VM to a specific host
+  microsoft.scvmm.scvmm_vm_migrate:
+    name: "{{ scvmm_vm_name }}"
+    vm_host: "{{ scvmm_target_host }}"
+  register: migrate_result
+
+- name: Assert Migration
+  assert:
+    that:
+      - migrate_result.changed == true
+      - migrate_result.vm.vm_host == scvmm_target_host
+
+- name: Migrate VM to the same host (Idempotency)
+  microsoft.scvmm.scvmm_vm_migrate:
+    name: "{{ scvmm_vm_name }}"
+    vm_host: "{{ scvmm_target_host }}"
+  register: migrate_idempotency
+
+- name: Assert Idempotency
+  assert:
+    that:
+      - migrate_idempotency.changed == false
+      - migrate_idempotency.vm.vm_host == scvmm_target_host
+
+- name: Migrate VM back to original host
+  microsoft.scvmm.scvmm_vm_migrate:
+    name: "{{ scvmm_vm_name }}"
+    vm_host: "{{ scvmm_original_host }}"
+  register: migrate_back
+
+- name: Assert Migration Back
+  assert:
+    that:
+      - migrate_back.changed == true
+      - migrate_back.vm.vm_host == scvmm_original_host

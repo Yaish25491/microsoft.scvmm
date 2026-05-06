@@ -1,0 +1,116 @@
+---
+- name: Set up test variables
+  set_fact:
+    test_vm_name: "TestVM_Checkpoint"
+    test_checkpoint_name: "AnsibleTestCheckpoint"
+    test_checkpoint_desc: "Created by Ansible integration test"
+    test_checkpoint_desc_updated: "Updated by Ansible integration test"
+
+- name: Ensure VM exists (Setup)
+  microsoft.scvmm.scvmm_vm:
+    name: "{{ test_vm_name }}"
+    state: present
+    # Add other mandatory parameters for scvmm_vm if needed, 
+    # but assuming environment has a template or existing VM for testing.
+  register: vm_setup
+  ignore_errors: yes
+
+- block:
+    - name: Create checkpoint (Initial Change)
+      microsoft.scvmm.scvmm_vm_checkpoint:
+        name: "{{ test_checkpoint_name }}"
+        vm_name: "{{ test_vm_name }}"
+        description: "{{ test_checkpoint_desc }}"
+        state: present
+      register: create_checkpoint
+
+    - name: Assert creation was successful
+      assert:
+        that:
+          - create_checkpoint.changed == true
+          - create_checkpoint.checkpoint.name == test_checkpoint_name
+          - create_checkpoint.checkpoint.description == test_checkpoint_desc
+
+    - name: Create checkpoint (Idempotency)
+      microsoft.scvmm.scvmm_vm_checkpoint:
+        name: "{{ test_checkpoint_name }}"
+        vm_name: "{{ test_vm_name }}"
+        description: "{{ test_checkpoint_desc }}"
+        state: present
+      register: create_idempotency
+
+    - name: Assert idempotency
+      assert:
+        that:
+          - create_idempotency.changed == false
+
+    - name: Update checkpoint description
+      microsoft.scvmm.scvmm_vm_checkpoint:
+        name: "{{ test_checkpoint_name }}"
+        vm_name: "{{ test_vm_name }}"
+        description: "{{ test_checkpoint_desc_updated }}"
+        state: present
+      register: update_checkpoint
+
+    - name: Assert update was successful
+      assert:
+        that:
+          - update_checkpoint.changed == true
+          - update_checkpoint.checkpoint.description == test_checkpoint_desc_updated
+
+    - name: Check mode test (Absent)
+      microsoft.scvmm.scvmm_vm_checkpoint:
+        name: "{{ test_checkpoint_name }}"
+        vm_name: "{{ test_vm_name }}"
+        state: absent
+      check_mode: yes
+      register: check_mode_absent
+
+    - name: Assert check mode (Absent)
+      assert:
+        that:
+          - check_mode_absent.changed == true
+
+    - name: Restore checkpoint
+      microsoft.scvmm.scvmm_vm_checkpoint:
+        name: "{{ test_checkpoint_name }}"
+        vm_name: "{{ test_vm_name }}"
+        state: restored
+      register: restore_checkpoint
+
+    - name: Assert restoration
+      assert:
+        that:
+          - restore_checkpoint.changed == true
+
+    - name: Remove checkpoint
+      microsoft.scvmm.scvmm_vm_checkpoint:
+        name: "{{ test_checkpoint_name }}"
+        vm_name: "{{ test_vm_name }}"
+        state: absent
+      register: remove_checkpoint
+
+    - name: Assert removal
+      assert:
+        that:
+          - remove_checkpoint.changed == true
+
+    - name: Remove checkpoint (Idempotency)
+      microsoft.scvmm.scvmm_vm_checkpoint:
+        name: "{{ test_checkpoint_name }}"
+        vm_name: "{{ test_vm_name }}"
+        state: absent
+      register: remove_idempotency
+
+    - name: Assert removal idempotency
+      assert:
+        that:
+          - remove_idempotency.changed == false
+
+  always:
+    - name: Final cleanup
+      microsoft.scvmm.scvmm_vm_checkpoint:
+        name: "{{ test_checkpoint_name }}"
+        vm_name: "{{ test_vm_name }}"
+        state: absent
+      ignore_errors: yes

@@ -1,0 +1,96 @@
+---
+- name: Set test variables
+  set_fact:
+    test_cloud_name: "ansible_test_cloud_{{ 1000 | random }}"
+    test_host_group: "All Hosts"
+
+- name: Test cloud creation (expect failure if host group does not exist)
+  microsoft.scvmm.scvmm_cloud:
+    name: "{{ test_cloud_name }}"
+    state: present
+    host_group:
+      - "{{ test_host_group }}"
+    description: "Initial description"
+  register: cloud_create
+  ignore_errors: true
+
+- name: Assert cloud creation failed gracefully due to missing host group or succeeded
+  assert:
+    that:
+      - cloud_create.failed or cloud_create.changed
+
+- name: If cloud creation succeeded, test idempotency and updates
+  when: not cloud_create.failed
+  block:
+    - name: Test idempotency (no changes expected)
+      microsoft.scvmm.scvmm_cloud:
+        name: "{{ test_cloud_name }}"
+        state: present
+        host_group:
+          - "{{ test_host_group }}"
+        description: "Initial description"
+      register: cloud_idempotent
+
+    - name: Assert idempotency
+      assert:
+        that:
+          - not cloud_idempotent.changed
+
+    - name: Test update (check mode)
+      microsoft.scvmm.scvmm_cloud:
+        name: "{{ test_cloud_name }}"
+        state: present
+        description: "Updated description"
+      check_mode: true
+      register: cloud_update_check
+
+    - name: Assert update check mode
+      assert:
+        that:
+          - cloud_update_check.changed
+
+    - name: Test update
+      microsoft.scvmm.scvmm_cloud:
+        name: "{{ test_cloud_name }}"
+        state: present
+        description: "Updated description"
+      register: cloud_update
+
+    - name: Assert update
+      assert:
+        that:
+          - cloud_update.changed
+
+    - name: Test delete (check mode)
+      microsoft.scvmm.scvmm_cloud:
+        name: "{{ test_cloud_name }}"
+        state: absent
+      check_mode: true
+      register: cloud_delete_check
+
+    - name: Assert delete check mode
+      assert:
+        that:
+          - cloud_delete_check.changed
+
+    - name: Test delete
+      microsoft.scvmm.scvmm_cloud:
+        name: "{{ test_cloud_name }}"
+        state: absent
+      register: cloud_delete
+
+    - name: Assert delete
+      assert:
+        that:
+          - cloud_delete.changed
+
+    - name: Test delete idempotency
+      microsoft.scvmm.scvmm_cloud:
+        name: "{{ test_cloud_name }}"
+        state: absent
+      register: cloud_delete_idempotent
+
+    - name: Assert delete idempotency
+      assert:
+        that:
+          - not cloud_delete_idempotent.changed

@@ -20,7 +20,7 @@ schedules:
 
 variables:
   - name: checkoutPath
-    value: ansible_collections/microsoft/scvmm
+    value: ansible_collections/microsoft/hyperv
   - name: coverageBranches
     value: main
   - name: entryPoint

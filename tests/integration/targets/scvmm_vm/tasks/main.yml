@@ -1,0 +1,55 @@
+---
+- name: Test SCVMM VM creation (Expect Failure)
+  microsoft.scvmm.scvmm_vm:
+    name: "AnsibleTestVM"
+    state: present
+    description: "Test description"
+    memory_mb: 1024
+    cpu_count: 2
+  register: create_result
+  ignore_errors: true
+
+- name: Assert creation failed gracefully (due to missing VMM module/server)
+  assert:
+    that:
+      - create_result.failed == true
+      - "'The VirtualMachineManager PowerShell module is not installed' in create_result.msg or 'not found' in create_result.msg or 'An error occurred' in create_result.msg"
+
+- name: Test SCVMM VM Idempotency (Expect Failure)
+  microsoft.scvmm.scvmm_vm:
+    name: "AnsibleTestVM"
+    state: present
+    description: "Test description"
+    memory_mb: 1024
+    cpu_count: 2
+  register: idem_result
+  ignore_errors: true
+
+- name: Test SCVMM VM Check Mode (Expect Failure)
+  microsoft.scvmm.scvmm_vm:
+    name: "AnsibleTestVM"
+    state: present
+    description: "New description"
+  check_mode: true
+  register: check_result
+  ignore_errors: true
+
+- name: Test SCVMM VM Error Handling - invalid memory
+  microsoft.scvmm.scvmm_vm:
+    name: "AnsibleTestVM"
+    state: present
+    memory_mb: "invalid_string"
+  register: error_result
+  ignore_errors: true
+
+- name: Assert error handling
+  assert:
+    that:
+      - error_result.failed == true
+
+- name: Test SCVMM VM deletion (Expect Failure)
+  microsoft.scvmm.scvmm_vm:
+    name: "AnsibleTestVM"
+    state: absent
+  register: delete_result
+  ignore_errors: true

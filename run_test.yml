@@ -1,0 +1,19 @@
+---
+- name: Run Integration Tests directly
+  hosts: windows
+  gather_facts: false
+  tasks:
+    - name: Run scvmm_vm_state tests
+      include_role:
+        name: tests/integration/targets/scvmm_vm_state
+      tags: scvmm_vm_state
+      
+    - name: Run scvmm_vm_info tests
+      include_role:
+        name: tests/integration/targets/scvmm_vm_info
+      tags: scvmm_vm_info
+
+    - name: Run scvmm_host_group_info tests
+      include_role:
+        name: tests/integration/targets/scvmm_host_group_info
+      tags: scvmm_host_group_info

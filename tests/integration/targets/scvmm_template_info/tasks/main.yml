@@ -1,0 +1,46 @@
+---
+# tasks file for scvmm_template_info
+
+- name: Gather VM Template info (All Templates)
+  microsoft.scvmm.scvmm_template_info:
+  register: all_templates_info
+
+- name: Assert all templates info is gathered and changed is false
+  assert:
+    that:
+      - not all_templates_info.changed
+      - all_templates_info.templates is defined
+
+- name: Gather VM Template info (Specific Template - Non-existent)
+  microsoft.scvmm.scvmm_template_info:
+    name: "NonExistentTemplate_12345"
+  register: specific_template_info
+
+- name: Assert specific template info returns empty list
+  assert:
+    that:
+      - not specific_template_info.changed
+      - specific_template_info.templates | length == 0
+
+- name: Check Error Handling (Invalid input type for name)
+  microsoft.scvmm.scvmm_template_info:
+    name:
+      invalid: type
+  register: fail_info
+  ignore_errors: true
+
+- name: Assert module fails with invalid input
+  assert:
+    that:
+      - fail_info.failed is true
+
+- name: Run in Check Mode
+  microsoft.scvmm.scvmm_template_info:
+  check_mode: true
+  register: check_mode_info
+
+- name: Assert check mode does not change state and returns templates
+  assert:
+    that:
+      - not check_mode_info.changed
+      - check_mode_info.templates is defined

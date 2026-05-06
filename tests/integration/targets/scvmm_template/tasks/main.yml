@@ -1,0 +1,54 @@
+---
+- name: Test SCVMM Template (Expect Failure - Template Not Found)
+  microsoft.scvmm.scvmm_template:
+    name: "NonExistentTemplate"
+    state: present
+    description: "Test description"
+    owner: "CONTOSO\\Admin"
+  register: present_result
+  ignore_errors: true
+
+- name: Assert failure for non-existent template
+  assert:
+    that:
+      - present_result.failed == true
+      - "'not found' in present_result.msg"
+
+- name: Test SCVMM Template Check Mode (Expect Failure)
+  microsoft.scvmm.scvmm_template:
+    name: "NonExistentTemplate"
+    state: present
+    description: "New description"
+  check_mode: true
+  register: check_result
+  ignore_errors: true
+
+- name: Assert check mode failure
+  assert:
+    that:
+      - check_result.failed == true
+
+- name: Test SCVMM Template Absent (Idempotent for non-existent)
+  microsoft.scvmm.scvmm_template:
+    name: "NonExistentTemplate"
+    state: absent
+  register: absent_result
+  ignore_errors: true
+
+- name: Assert absent success for non-existent (if VMM module exists)
+  assert:
+    that:
+      - absent_result.failed == false or 'The VirtualMachineManager PowerShell module is not installed' in absent_result.msg
+      - absent_result.changed == false or 'The VirtualMachineManager PowerShell module is not installed' in absent_result.msg
+
+- name: Test SCVMM Template Error Handling - invalid name type
+  microsoft.scvmm.scvmm_template:
+    name: 12345
+    state: present
+  register: error_result
+  ignore_errors: true
+
+- name: Assert error handling for invalid input
+  assert:
+    that:
+      - error_result.failed == true

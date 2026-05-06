@@ -260,5 +260,124 @@ function Get-SCVMMLogicalNetworkDefinitionInfo {
     return $info
 }
 
+function Get-SCVMMLogicalSwitchInfo {
+    <#
+    .SYNOPSIS
+    Converts a SCVMM Logical Switch object to a hashtable.
+    .DESCRIPTION
+    Extracts relevant properties from a LogicalSwitch object and returns a standardized hashtable.
+    .PARAMETER LogicalSwitch
+    The LogicalSwitch object to convert.
+    #>
+    param(
+        [Parameter(Mandatory = $true)]
+        [Object]$LogicalSwitch
+    )
+
+    $info = @{
+        name = $LogicalSwitch.Name
+        id = $LogicalSwitch.ID.Guid
+        description = $LogicalSwitch.Description
+        enable_sriov = $LogicalSwitch.EnableSriov
+        switch_uplink_mode = if ($LogicalSwitch.SwitchUplinkMode) { $LogicalSwitch.SwitchUplinkMode.ToString() } else { $null }
+        minimum_bandwidth_mode = if ($LogicalSwitch.MinimumBandwidthMode) { $LogicalSwitch.MinimumBandwidthMode.ToString() } else { $null }
+        enable_packet_direct = $LogicalSwitch.EnablePacketDirect
+        virtual_switch_extensions = $LogicalSwitch.VirtualSwitchExtensions | ForEach-Object { Get-SCVMMLogicalSwitchExtensionInfo -Extension $_ }
+    }
+
+    return $info
+}
+
+function Get-SCVMMLogicalSwitchExtensionInfo {
+    <#
+    .SYNOPSIS
+    Converts a SCVMM Virtual Switch Extension object to a hashtable.
+    .DESCRIPTION
+    Extracts relevant properties from a VirtualSwitchExtension object and returns a standardized hashtable.
+    .PARAMETER Extension
+    The VirtualSwitchExtension object to convert.
+    #>
+    param(
+        [Parameter(Mandatory = $true)]
+        [Object]$Extension
+    )
+
+    $info = @{
+        name = $Extension.Name
+        id = $Extension.ID.Guid
+        description = $Extension.Description
+        vendor = $Extension.Vendor
+        version = $Extension.Version
+        extension_type = if ($Extension.ExtensionType) { $Extension.ExtensionType.ToString() } else { $null }
+    }
+
+    return $info
+}
+
+function Get-SCVMMVMSubnetInfo {
+    <#
+    .SYNOPSIS
+    Converts a SCVMM VM Subnet object to a hashtable.
+    .DESCRIPTION
+    Extracts relevant properties from a VMSubnet object and returns a standardized hashtable.
+    .PARAMETER VMSubnet
+    The VMSubnet object to convert.
+    #>
+    param(
+        [Parameter(Mandatory = $true)]
+        [Object]$VMSubnet
+    )
+
+    $info = @{
+        name = $VMSubnet.Name
+        id = $VMSubnet.ID.Guid
+        description = $VMSubnet.Description
+        vm_network = if ($VMSubnet.VMNetwork) { $VMSubnet.VMNetwork.Name } else { $null }
+        subnet_vlans = $VMSubnet.SubnetVLans | ForEach-Object {
+            @{
+                subnet = $_.Subnet
+                vlan = $_.VLanID
+            }
+        }
+        max_number_of_ports = $VMSubnet.MaxNumberOfPorts
+        port_acl = if ($VMSubnet.PortACL) { $VMSubnet.PortACL.Name } else { $null }
+    }
+
+    return $info
+}
+
+function Get-SCVMMVirtualHardDiskInfo {
+    <#
+    .SYNOPSIS
+    Converts a SCVMM Virtual Hard Disk object to a hashtable.
+    .DESCRIPTION
+    Extracts relevant properties from a SCVirtualHardDisk object and returns a standardized hashtable.
+    .PARAMETER VirtualHardDisk
+    The SCVirtualHardDisk object to convert.
+    #>
+    param(
+        [Parameter(Mandatory = $true)]
+        [Object]$VirtualHardDisk
+    )
+
+    $info = @{
+        name = $VirtualHardDisk.Name
+        id = $VirtualHardDisk.ID.Guid
+        file_name = $VirtualHardDisk.FileName
+        size = $VirtualHardDisk.Size
+        maximum_size = $VirtualHardDisk.MaximumSize
+        vhd_type = if ($VirtualHardDisk.VHDType) { $VirtualHardDisk.VHDType.ToString() } else { $null }
+        host_path = $VirtualHardDisk.HostPath
+        library_server = if ($VirtualHardDisk.LibraryServer) { $VirtualHardDisk.LibraryServer.Name } else { $null }
+        operating_system = if ($VirtualHardDisk.OperatingSystem) { $VirtualHardDisk.OperatingSystem.Name } else { $null }
+        enabled = $VirtualHardDisk.Enabled
+        description = $VirtualHardDisk.Description
+        owner = $VirtualHardDisk.Owner
+        virtualization_platform = if ($VirtualHardDisk.VirtualizationPlatform) { $VirtualHardDisk.VirtualizationPlatform.ToString() } else { $null }
+    }
+
+    return $info
+}
+
 # Export functions
-Export-ModuleMember -Function Import-SCVMMModule, Get-SCVMMVMInfo, Get-SCVMMCloudInfo, Get-SCVMMTemplateInfo, Get-SCVMMHostClusterInfo, Get-SCVMMHostInfo, Get-SCVMMVMNetworkInfo, Get-SCVMMLogicalNetworkInfo, Get-SCVMMLogicalNetworkDefinitionInfo
+Export-ModuleMember -Function Import-SCVMMModule, Get-SCVMMVMInfo, Get-SCVMMCloudInfo, Get-SCVMMTemplateInfo, Get-SCVMMHostClusterInfo, Get-SCVMMHostInfo, Get-SCVMMVMNetworkInfo, Get-SCVMMLogicalNetworkInfo, Get-SCVMMLogicalNetworkDefinitionInfo, Get-SCVMMLogicalSwitchInfo, Get-SCVMMLogicalSwitchExtensionInfo, Get-SCVMMVMSubnetInfo, Get-SCVMMVirtualHardDiskInfo

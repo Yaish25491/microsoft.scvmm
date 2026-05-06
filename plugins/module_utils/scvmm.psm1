@@ -113,5 +113,67 @@ function Get-SCVMMTemplateInfo {
     return $info
 }
 
+function Get-SCVMMHostInfo {
+    <#
+    .SYNOPSIS
+    Converts a SCVMM VM Host object to a hashtable.
+    .DESCRIPTION
+    Extracts relevant properties from a Host object and returns a standardized hashtable.
+    .PARAMETER VMHost
+    The SCVMHost object to convert.
+    #>
+    param(
+        [Parameter(Mandatory = $true)]
+        [Object]$VMHost
+    )
+
+    $info = @{
+        name = $VMHost.Name
+        id = $VMHost.ID.Guid
+        description = $VMHost.Description
+        host_group = if ($VMHost.VMHostGroup) { $VMHost.VMHostGroup.Name } else { $null }
+        virtualization_platform = $VMHost.VirtualizationPlatform.ToString()
+        operating_system = if ($VMHost.OperatingSystem) { $VMHost.OperatingSystem.Name } else { $null }
+        overall_state = $VMHost.OverallState.ToString()
+        total_memory = $VMHost.TotalMemory
+        available_memory = $VMHost.AvailableMemory
+        cpu_count = $VMHost.CPUCount
+        cpu_utilization = $VMHost.CPUUtilization
+        is_connected = $VMHost.IsConnected
+    }
+
+    return $info
+}
+
+function Get-SCVMMHostClusterInfo {
+    <#
+    .SYNOPSIS
+    Converts a SCVMM Host Cluster object to a hashtable.
+    .DESCRIPTION
+    Extracts relevant properties from a VMHostCluster object and returns a standardized hashtable.
+    .PARAMETER Cluster
+    The VMHostCluster object to convert.
+    #>
+    param(
+        [Parameter(Mandatory = $true)]
+        [Object]$Cluster
+    )
+
+    $info = @{
+        name = $Cluster.Name
+        id = $Cluster.ID.Guid
+        cluster_reserve = $Cluster.ClusterReserve
+        is_over_committed = $Cluster.IsOverCommitted
+        nodes = $Cluster.Nodes | ForEach-Object { $_.Name }
+        vm_host_group = if ($Cluster.VMHostGroup) { $Cluster.VMHostGroup.Name } else { $null }
+        vm_paths = $Cluster.VMPaths
+        remote_connect_enabled = $Cluster.RemoteConnectEnabled
+        remote_connect_port = $Cluster.RemoteConnectPort
+        virtualization_platform = if ($Cluster.VirtualizationPlatform) { $Cluster.VirtualizationPlatform.ToString() } else { $null }
+    }
+
+    return $info
+}
+
 # Export functions
-Export-ModuleMember -Function Import-SCVMMModule, Get-SCVMMVMInfo, Get-SCVMMCloudInfo, Get-SCVMMTemplateInfo
+Export-ModuleMember -Function Import-SCVMMModule, Get-SCVMMVMInfo, Get-SCVMMCloudInfo, Get-SCVMMTemplateInfo, Get-SCVMMHostClusterInfo, Get-SCVMMHostInfo

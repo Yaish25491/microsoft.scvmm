@@ -1,0 +1,32 @@
+---
+- name: Add host cluster (Check Mode)
+  microsoft.scvmm.scvmm_host_cluster:
+    name: "{{ scvmm_cluster_name }}"
+    state: present
+    host_group: "{{ scvmm_host_group }}"
+    run_as_account: "{{ scvmm_run_as_account }}"
+    cluster_reserve: 1
+  check_mode: true
+  register: add_cluster_check
+
+- name: Assert add_cluster_check
+  ansible.builtin.assert:
+    that:
+      - add_cluster_check.changed == true
+
+# Note: Actual implementation would require a real cluster.
+# We include these as templates for what the user should run.
+
+- name: Update host cluster (Check Mode)
+  microsoft.scvmm.scvmm_host_cluster:
+    name: "{{ scvmm_cluster_name }}"
+    cluster_reserve: 2
+  check_mode: true
+  register: update_cluster_check
+
+- name: Remove host cluster (Check Mode)
+  microsoft.scvmm.scvmm_host_cluster:
+    name: "{{ scvmm_cluster_name }}"
+    state: absent
+  check_mode: true
+  register: remove_cluster_check

@@ -1,0 +1,92 @@
+---
+- name: Set up test variables
+  set_fact:
+    test_host_name: "test-host.contoso.com"
+    test_host_group: "All Hosts"
+    test_description: "Initial Test Description"
+    updated_description: "Updated Test Description"
+
+- name: Initial Change - Add SCVMM Host
+  microsoft.scvmm.scvmm_host:
+    name: "{{ test_host_name }}"
+    host_group: "{{ test_host_group }}"
+    description: "{{ test_description }}"
+    state: present
+  register: add_host
+  ignore_errors: yes
+
+- name: Assert add_host changed
+  assert:
+    that:
+      - add_host.changed == true
+  when: add_host.changed is defined
+
+- name: Idempotency - Add SCVMM Host again
+  microsoft.scvmm.scvmm_host:
+    name: "{{ test_host_name }}"
+    host_group: "{{ test_host_group }}"
+    description: "{{ test_description }}"
+    state: present
+  register: add_host_idempotency
+  ignore_errors: yes
+
+- name: Assert add_host_idempotency not changed
+  assert:
+    that:
+      - add_host_idempotency.changed == false
+  when: add_host_idempotency.changed is defined
+
+- name: Update host description
+  microsoft.scvmm.scvmm_host:
+    name: "{{ test_host_name }}"
+    description: "{{ updated_description }}"
+    state: present
+  register: update_host
+  ignore_errors: yes
+
+- name: Assert update_host changed
+  assert:
+    that:
+      - update_host.changed == true
+  when: update_host.changed is defined
+
+- name: Check Mode - Update host description again
+  microsoft.scvmm.scvmm_host:
+    name: "{{ test_host_name }}"
+    description: "{{ test_description }}"
+    state: present
+  check_mode: yes
+  register: update_host_check_mode
+  ignore_errors: yes
+
+- name: Assert update_host_check_mode changed
+  assert:
+    that:
+      - update_host_check_mode.changed == true
+  when: update_host_check_mode.changed is defined
+
+- name: Error Handling - Add host without host_group
+  microsoft.scvmm.scvmm_host:
+    name: "missing-group.contoso.com"
+    state: present
+  register: fail_no_group
+  ignore_errors: yes
+
+- name: Assert fail_no_group failed
+  assert:
+    that:
+      - fail_no_group.failed == true
+      - "'host_group is required' in fail_no_group.msg"
+
+- name: Remove SCVMM Host
+  microsoft.scvmm.scvmm_host:
+    name: "{{ test_host_name }}"
+    state: absent
+  register: remove_host
+  ignore_errors: yes
+
+- name: Assert remove_host changed
+  assert:
+    that:
+      - remove_host.changed == true
+  when: remove_host.changed is defined

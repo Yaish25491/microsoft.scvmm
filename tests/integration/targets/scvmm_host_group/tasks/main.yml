@@ -1,0 +1,89 @@
+---
+- name: Set up test variables
+  set_fact:
+    hg_name: "AnsibleTestHG_{{ 9999 | random }}"
+    parent_hg: "All Hosts"
+
+- block:
+    - name: Create Host Group (Initial Change)
+      microsoft.scvmm.scvmm_host_group:
+        name: "{{ hg_name }}"
+        parent_group: "{{ parent_hg }}"
+        description: "Test Host Group"
+        state: present
+      register: create_result
+
+    - name: Assert Create Host Group
+      assert:
+        that:
+          - create_result.changed == true
+          - create_result.host_group.name == hg_name
+          - create_result.host_group.description == "Test Host Group"
+
+    - name: Create Host Group (Idempotency)
+      microsoft.scvmm.scvmm_host_group:
+        name: "{{ hg_name }}"
+        parent_group: "{{ parent_hg }}"
+        description: "Test Host Group"
+        state: present
+      register: idempotency_result
+
+    - name: Assert Idempotency
+      assert:
+        that:
+          - idempotency_result.changed == false
+
+    - name: Update Host Group
+      microsoft.scvmm.scvmm_host_group:
+        name: "{{ hg_name }}"
+        description: "Updated Test Host Group"
+        state: present
+      register: update_result
+
+    - name: Assert Update
+      assert:
+        that:
+          - update_result.changed == true
+          - update_result.host_group.description == "Updated Test Host Group"
+
+    - name: Update Host Group (Check Mode)
+      microsoft.scvmm.scvmm_host_group:
+        name: "{{ hg_name }}"
+        description: "Check Mode Test"
+        state: present
+      check_mode: true
+      register: check_mode_result
+
+    - name: Assert Check Mode
+      assert:
+        that:
+          - check_mode_result.changed == true
+
+    - name: Remove Host Group
+      microsoft.scvmm.scvmm_host_group:
+        name: "{{ hg_name }}"
+        state: absent
+      register: remove_result
+
+    - name: Assert Remove
+      assert:
+        that:
+          - remove_result.changed == true
+
+    - name: Remove Host Group (Idempotency)
+      microsoft.scvmm.scvmm_host_group:
+        name: "{{ hg_name }}"
+        state: absent
+      register: remove_idempotency_result
+
+    - name: Assert Remove Idempotency
+      assert:
+        that:
+          - remove_idempotency_result.changed == false
+
+  always:
+    - name: Cleanup Host Group
+      microsoft.scvmm.scvmm_host_group:
+        name: "{{ hg_name }}"
+        state: absent
+      ignore_errors: true

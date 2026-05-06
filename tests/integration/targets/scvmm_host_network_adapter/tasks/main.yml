@@ -1,0 +1,56 @@
+---
+- name: Gather info about host network adapters (initial)
+  microsoft.scvmm.scvmm_host_network_adapter_info:
+    vm_host: "{{ scvmm_host }}"
+  register: initial_info
+
+- name: Set logical network on host network adapter (check mode)
+  microsoft.scvmm.scvmm_host_network_adapter:
+    vm_host: "{{ scvmm_host }}"
+    name: "{{ scvmm_host_adapter_name }}"
+    logical_network: "{{ scvmm_logical_network }}"
+  check_mode: yes
+  register: check_mode_result
+
+- name: Verify check mode result
+  ansible.builtin.assert:
+    that:
+      - check_mode_result.changed == true
+      - check_mode_result.host_network_adapter is defined
+
+- name: Set logical network on host network adapter (actual)
+  microsoft.scvmm.scvmm_host_network_adapter:
+    vm_host: "{{ scvmm_host }}"
+    name: "{{ scvmm_host_adapter_name }}"
+    logical_network: "{{ scvmm_logical_network }}"
+  register: actual_change_result
+
+- name: Verify actual change result
+  ansible.builtin.assert:
+    that:
+      - actual_change_result.changed == true
+      - scvmm_logical_network in actual_change_result.host_network_adapter.logical_networks
+
+- name: Set logical network on host network adapter (idempotency)
+  microsoft.scvmm.scvmm_host_network_adapter:
+    vm_host: "{{ scvmm_host }}"
+    name: "{{ scvmm_host_adapter_name }}"
+    logical_network: "{{ scvmm_logical_network }}"
+  register: idempotency_result
+
+- name: Verify idempotency result
+  ansible.builtin.assert:
+    that:
+      - idempotency_result.changed == false
+
+- name: Gather info for a specific adapter
+  microsoft.scvmm.scvmm_host_network_adapter_info:
+    vm_host: "{{ scvmm_host }}"
+    name: "{{ scvmm_host_adapter_name }}"
+  register: specific_adapter_info
+
+- name: Verify specific adapter info
+  ansible.builtin.assert:
+    that:
+      - specific_adapter_info.host_network_adapters | length == 1
+      - specific_adapter_info.host_network_adapters[0].name == scvmm_host_adapter_name

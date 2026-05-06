@@ -1,0 +1,107 @@
+---
+- name: Setup - Ensure MAC address pool is absent
+  microsoft.scvmm.scvmm_mac_address_pool:
+    name: "{{ pool_name }}"
+    state: absent
+  register: setup_absent
+
+- name: Create MAC address pool
+  microsoft.scvmm.scvmm_mac_address_pool:
+    name: "{{ pool_name }}"
+    state: present
+    mac_address_range_start: "00-1D-D8-B7-1C-00"
+    mac_address_range_end: "00-1D-D8-B7-1C-FF"
+    host_groups: ["All Hosts"]
+    description: "Integration test pool"
+  register: create_pool
+
+- name: Assert create pool changed
+  ansible.builtin.assert:
+    that:
+      - create_pool.changed == true
+      - create_pool.mac_address_pool.name == pool_name
+      - create_pool.mac_address_pool.mac_address_range_start == "00-1D-D8-B7-1C-00"
+
+- name: Create MAC address pool (idempotency)
+  microsoft.scvmm.scvmm_mac_address_pool:
+    name: "{{ pool_name }}"
+    state: present
+    mac_address_range_start: "00-1D-D8-B7-1C-00"
+    mac_address_range_end: "00-1D-D8-B7-1C-FF"
+    host_groups: ["All Hosts"]
+    description: "Integration test pool"
+  register: create_pool_idempotency
+
+- name: Assert create pool idempotency
+  ansible.builtin.assert:
+    that:
+      - create_pool_idempotency.changed == false
+
+- name: Gather MAC address pool info
+  microsoft.scvmm.scvmm_mac_address_pool_info:
+    name: "{{ pool_name }}"
+  register: pool_info
+
+- name: Assert pool info
+  ansible.builtin.assert:
+    that:
+      - pool_info.mac_address_pools | length == 1
+      - pool_info.mac_address_pools[0].name == pool_name
+
+- name: Update MAC address pool description (check_mode)
+  microsoft.scvmm.scvmm_mac_address_pool:
+    name: "{{ pool_name }}"
+    state: present
+    description: "Updated description check mode"
+  check_mode: true
+  register: update_pool_check_mode
+
+- name: Assert update pool check_mode
+  ansible.builtin.assert:
+    that:
+      - update_pool_check_mode.changed == true
+
+- name: Verify description not changed after check_mode
+  microsoft.scvmm.scvmm_mac_address_pool_info:
+    name: "{{ pool_name }}"
+  register: pool_info_after_check
+
+- name: Assert description remains same
+  ansible.builtin.assert:
+    that:
+      - pool_info_after_check.mac_address_pools[0].description == "Integration test pool"
+
+- name: Update MAC address pool description
+  microsoft.scvmm.scvmm_mac_address_pool:
+    name: "{{ pool_name }}"
+    state: present
+    description: "Updated description"
+  register: update_pool
+
+- name: Assert update pool changed
+  ansible.builtin.assert:
+    that:
+      - update_pool.changed == true
+      - update_pool.mac_address_pool.description == "Updated description"
+
+- name: Remove MAC address pool
+  microsoft.scvmm.scvmm_mac_address_pool:
+    name: "{{ pool_name }}"
+    state: absent
+  register: remove_pool
+
+- name: Assert remove pool changed
+  ansible.builtin.assert:
+    that:
+      - remove_pool.changed == true
+
+- name: Remove MAC address pool (idempotency)
+  microsoft.scvmm.scvmm_mac_address_pool:
+    name: "{{ pool_name }}"
+    state: absent
+  register: remove_pool_idempotency
+
+- name: Assert remove pool idempotency
+  ansible.builtin.assert:
+    that:
+      - remove_pool_idempotency.changed == false

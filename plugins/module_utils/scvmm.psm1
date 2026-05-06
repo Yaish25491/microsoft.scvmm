@@ -379,5 +379,112 @@ function Get-SCVMMVirtualHardDiskInfo {
     return $info
 }
 
+function Get-SCVMMMACAddressPoolInfo {
+    <#
+    .SYNOPSIS
+    Converts a SCVMM MAC Address Pool object to a hashtable.
+    .DESCRIPTION
+    Extracts relevant properties from a MACAddressPool object and returns a standardized hashtable.
+    .PARAMETER MACAddressPool
+    The SCMACAddressPool object to convert.
+    #>
+    param(
+        [Parameter(Mandatory = $true)]
+        [Object]$MACAddressPool
+    )
+
+    $info = @{
+        name = $MACAddressPool.Name
+        id = $MACAddressPool.ID.Guid
+        description = $MACAddressPool.Description
+        mac_address_range_start = $MACAddressPool.MACAddressRangeStart
+        mac_address_range_end = $MACAddressPool.MACAddressRangeEnd
+        host_groups = $MACAddressPool.VMHostGroups | ForEach-Object { $_.Name }
+    }
+
+    return $info
+}
+
+function Get-SCVMMUplinkPortProfileInfo {
+    <#
+    .SYNOPSIS
+    Converts a SCVMM Uplink Port Profile object to a hashtable.
+    .DESCRIPTION
+    Extracts relevant properties from a NativeUplinkPortProfile object and returns a standardized hashtable.
+    .PARAMETER UplinkPortProfile
+    The NativeUplinkPortProfile object to convert.
+    #>
+    param(
+        [Parameter(Mandatory = $true)]
+        [Object]$UplinkPortProfile
+    )
+
+    $info = @{
+        name = $UplinkPortProfile.Name
+        id = $UplinkPortProfile.ID.Guid
+        description = $UplinkPortProfile.Description
+        lbfo_load_balancing_algorithm = if ($UplinkPortProfile.LBFOLoadBalancingAlgorithm) { $UplinkPortProfile.LBFOLoadBalancingAlgorithm.ToString() } else { $null }
+        lbfo_teaming_mode = if ($UplinkPortProfile.LBFOTeamingMode) { $UplinkPortProfile.LBFOTeamingMode.ToString() } else { $null }
+        enable_network_virtualization = $UplinkPortProfile.EnableNetworkVirtualization
+        logical_network_definitions = $UplinkPortProfile.LogicalNetworkDefinitions | ForEach-Object { $_.Name }
+    }
+
+    return $info
+}
+
+function Get-SCVMMPortClassificationInfo {
+    <#
+    .SYNOPSIS
+    Converts a SCVMM Port Classification object to a hashtable.
+    .DESCRIPTION
+    Extracts relevant properties from a PortClassification object and returns a standardized hashtable.
+    .PARAMETER PortClassification
+    The PortClassification object to convert.
+    #>
+    param(
+        [Parameter(Mandatory = $true)]
+        [Object]$PortClassification
+    )
+
+    $info = @{
+        name = $PortClassification.Name
+        id = $PortClassification.ID.Guid
+        description = $PortClassification.Description
+    }
+
+    return $info
+}
+
+function Get-SCVMMHostNetworkAdapterInfo {
+    <#
+    .SYNOPSIS
+    Converts a SCVMM Host Network Adapter object to a hashtable.
+    .DESCRIPTION
+    Extracts relevant properties from a HostNetworkAdapter object and returns a standardized hashtable.
+    .PARAMETER Adapter
+    The HostNetworkAdapter object to convert.
+    #>
+    param(
+        [Parameter(Mandatory = $true)]
+        [Object]$Adapter
+    )
+
+    $info = @{
+        name = $Adapter.Name
+        id = $Adapter.ID.Guid
+        connection_name = $Adapter.ConnectionName
+        vm_host = if ($Adapter.VMHost) { $Adapter.VMHost.Name } else { $null }
+        mac_address = $Adapter.MACAddress
+        vlan_enabled = $Adapter.VLanEnabled
+        vlan_mode = if ($Adapter.VLanMode) { $Adapter.VLanMode.ToString() } else { $null }
+        vlan_id = $Adapter.VLanID
+        vlan_trunk_ids = $Adapter.VLanTrunkID
+        logical_networks = $Adapter.LogicalNetwork | ForEach-Object { $_.Name }
+        available_for_placement = $Adapter.AvailableForPlacement
+    }
+
+    return $info
+}
+
 # Export functions
-Export-ModuleMember -Function Import-SCVMMModule, Get-SCVMMVMInfo, Get-SCVMMCloudInfo, Get-SCVMMTemplateInfo, Get-SCVMMHostClusterInfo, Get-SCVMMHostInfo, Get-SCVMMVMNetworkInfo, Get-SCVMMLogicalNetworkInfo, Get-SCVMMLogicalNetworkDefinitionInfo, Get-SCVMMLogicalSwitchInfo, Get-SCVMMLogicalSwitchExtensionInfo, Get-SCVMMVMSubnetInfo, Get-SCVMMVirtualHardDiskInfo
+Export-ModuleMember -Function Import-SCVMMModule, Get-SCVMMVMInfo, Get-SCVMMCloudInfo, Get-SCVMMTemplateInfo, Get-SCVMMHostClusterInfo, Get-SCVMMHostInfo, Get-SCVMMVMNetworkInfo, Get-SCVMMLogicalNetworkInfo, Get-SCVMMLogicalNetworkDefinitionInfo, Get-SCVMMLogicalSwitchInfo, Get-SCVMMLogicalSwitchExtensionInfo, Get-SCVMMVMSubnetInfo, Get-SCVMMVirtualHardDiskInfo, Get-SCVMMMACAddressPoolInfo, Get-SCVMMUplinkPortProfileInfo, Get-SCVMMPortClassificationInfo, Get-SCVMMHostNetworkAdapterInfo

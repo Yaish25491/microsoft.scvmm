@@ -1,0 +1,23 @@
+---
+- name: Gather info about all port classifications
+  microsoft.scvmm.scvmm_port_classification_info:
+  register: all_pcs
+
+- name: Assert all port classifications gathered
+  ansible.builtin.assert:
+    that:
+      - all_pcs.port_classifications is defined
+      - all_pcs.port_classifications is list
+
+- name: Gather info about specific port classification
+  microsoft.scvmm.scvmm_port_classification_info:
+    name: "{{ all_pcs.port_classifications[0].name }}"
+  register: spec_pc
+  when: all_pcs.port_classifications | length > 0
+
+- name: Assert specific port classification gathered
+  ansible.builtin.assert:
+    that:
+      - spec_pc.port_classifications is defined
+      - spec_pc.port_classifications | length == 1
+  when: all_pcs.port_classifications | length > 0

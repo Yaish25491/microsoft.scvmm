@@ -1,5 +1,6 @@
 #!powershell
 #Requires -Module Ansible.ModuleUtils.Legacy
+#Requires -Module microsoft.scvmm.plugins.module_utils.scvmm
 
 $spec = @{
     options = @{
@@ -22,13 +23,8 @@ $module.Result.vm_name = $name
 $module.Result.state = $null
 
 try {
-    # Check if the VirtualMachineManager module is available
-    if (-not (Get-Module -Name VirtualMachineManager -ListAvailable)) {
-        $module.FailJson("The VirtualMachineManager PowerShell module is not installed or available.")
-    }
-
-    # Import module
-    Import-Module -Name VirtualMachineManager -ErrorAction Stop
+    # Import SCVMM module using utility
+    Import-SCVMMModule -Module $module
 
     # Get the VM
     $vm = Get-SCVirtualMachine -Name $name -VMMServer $vmm_server -ErrorAction Stop

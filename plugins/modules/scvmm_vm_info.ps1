@@ -3,6 +3,7 @@
 # GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
 
 #Requires -Module VirtualMachineManager
+#Requires -Module microsoft.scvmm.plugins.module_utils.scvmm
 #AnsibleRequires -CSharpUtil Ansible.Basic
 
 $ErrorActionPreference = "Stop"
@@ -25,6 +26,9 @@ $cloud = $module.Params.cloud
 $module.Result.vms = @()
 
 try {
+    # Import SCVMM module using utility
+    Import-SCVMMModule -Module $module
+
     $cmdletArgs = @{
         ErrorAction = "Stop"
     }
@@ -55,15 +59,7 @@ try {
         # Ensure we always process an array even if a single item is returned
         $vmsArray = @($vms)
         foreach ($vm in $vmsArray) {
-            $module.Result.vms += @{
-                name = $vm.Name
-                id = $vm.ID.Guid
-                status = $vm.StatusString
-                cpu_count = $vm.CPUCount
-                memory = $vm.Memory
-                host_name = if ($vm.VMHost) { $vm.VMHost.Name } else { $null }
-                cloud = if ($vm.Cloud) { $vm.Cloud.Name } else { $null }
-            }
+            $module.Result.vms += Get-SCVMMVMInfo -VM $vm
         }
     }
 }

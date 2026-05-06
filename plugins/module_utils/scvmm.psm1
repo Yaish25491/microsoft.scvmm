@@ -346,6 +346,72 @@ function Get-SCVMMVMSubnetInfo {
     return $info
 }
 
+function Get-SCVMMVirtualNetworkAdapterInfo {
+    <#
+    .SYNOPSIS
+    Converts a SCVMM Virtual Network Adapter object to a hashtable.
+    .DESCRIPTION
+    Extracts relevant properties from a VirtualNetworkAdapter object and returns a standardized hashtable.
+    .PARAMETER Adapter
+    The VirtualNetworkAdapter object to convert.
+    #>
+    param(
+        [Parameter(Mandatory = $true)]
+        [Object]$Adapter
+    )
+
+    $info = @{
+        name = $Adapter.Name
+        id = $Adapter.ID.Guid
+        vm_name = if ($Adapter.VM) { $Adapter.VM.Name } else { $null }
+        vm_template_name = if ($Adapter.VMTemplate) { $Adapter.VMTemplate.Name } else { $null }
+        hardware_profile_name = if ($Adapter.HardwareProfile) { $Adapter.HardwareProfile.Name } else { $null }
+        mac_address = $Adapter.MACAddress
+        mac_address_type = if ($Adapter.MACAddressType) { $Adapter.MACAddressType.ToString() } else { $null }
+        ipv4_addresses = $Adapter.IPv4Addresses
+        ipv6_addresses = $Adapter.IPv6Addresses
+        logical_network = if ($Adapter.LogicalNetwork) { $Adapter.LogicalNetwork.Name } else { $null }
+        vm_network = if ($Adapter.VMNetwork) { $Adapter.VMNetwork.Name } else { $null }
+        port_classification = if ($Adapter.PortClassification) { $Adapter.PortClassification.Name } else { $null }
+        vlan_enabled = $Adapter.VLanEnabled
+        vlan_id = $Adapter.VLanID
+        enable_mac_address_spoofing = $Adapter.EnableMACAddressSpoofing
+    }
+
+    return $info
+}
+
+function Get-SCVMMLoadBalancerInfo {
+    <#
+    .SYNOPSIS
+    Converts a SCVMM Load Balancer object to a hashtable.
+    .DESCRIPTION
+    Extracts relevant properties from a LoadBalancer object and returns a standardized hashtable.
+    .PARAMETER LoadBalancer
+    The LoadBalancer object to convert.
+    #>
+    param(
+        [Parameter(Mandatory = $true)]
+        [Object]$LoadBalancer
+    )
+
+    $info = @{
+        name = $LoadBalancer.Name
+        id = $LoadBalancer.ID.Guid
+        address = $LoadBalancer.Address
+        port = $LoadBalancer.Port
+        manufacturer = $LoadBalancer.Manufacturer
+        model = $LoadBalancer.Model
+        description = $LoadBalancer.Description
+        host_groups = $LoadBalancer.VMHostGroup | ForEach-Object { $_.Name }
+        logical_network_vips = $LoadBalancer.LogicalNetwork | ForEach-Object { $_.Name }
+        connection_state = if ($LoadBalancer.ConnectionState) { $LoadBalancer.ConnectionState.ToString() } else { $null }
+        enabled = $LoadBalancer.Enabled
+    }
+
+    return $info
+}
+
 function Get-SCVMMVirtualHardDiskInfo {
     <#
     .SYNOPSIS
@@ -601,5 +667,71 @@ function Get-SCVMMStoragePoolInfo {
     return $info
 }
 
+function Get-SCVMMCustomPropertyInfo {
+    <#
+    .SYNOPSIS
+    Converts a SCVMM Custom Property object to a hashtable.
+    .DESCRIPTION
+    Extracts relevant properties from a CustomProperty object and returns a standardized hashtable.
+    .PARAMETER CustomProperty
+    The CustomProperty object to convert.
+    #>
+    param(
+        [Parameter(Mandatory = $true)]
+        [Object]$CustomProperty
+    )
+
+    $info = @{
+        name = $CustomProperty.Name
+        id = $CustomProperty.ID.Guid
+        description = $CustomProperty.Description
+        members = $CustomProperty.Members
+    }
+
+    return $info
+}
+
+function Get-SCVMMIPPoolInfo {
+    <#
+    .SYNOPSIS
+    Converts a SCVMM IP Pool object to a hashtable.
+    .DESCRIPTION
+    Extracts relevant properties from a StaticIPAddressPool object and returns a standardized hashtable.
+    .PARAMETER IPPool
+    The StaticIPAddressPool object to convert.
+    #>
+    param(
+        [Parameter(Mandatory = $true)]
+        [Object]$IPPool
+    )
+
+    $info = @{
+        name = $IPPool.Name
+        id = $IPPool.ID.Guid
+        description = $IPPool.Description
+        subnet = $IPPool.Subnet
+        vlan = $IPPool.Vlan
+        ip_address_range_start = $IPPool.IPAddressRangeStart
+        ip_address_range_end = $IPPool.IPAddressRangeEnd
+        ip_address_reserved_set = $IPPool.IPAddressReservedSet
+        vip_address_set = $IPPool.VIPAddressSet
+        dnssuffix = $IPPool.DNSSuffix
+        dns_search_suffixes = $IPPool.DNSSearchSuffixes
+        enable_netbios = $IPPool.EnableNetBIOS
+        logical_network_definition = if ($IPPool.LogicalNetworkDefinition) { $IPPool.LogicalNetworkDefinition.Name } else { $null }
+        vm_subnet = if ($IPPool.VMSubnet) { $IPPool.VMSubnet.Name } else { $null }
+        default_gateways = $IPPool.DefaultGateways | ForEach-Object {
+            @{
+                address = $_.Address
+                metric = $_.Metric
+            }
+        }
+        dns_servers = $IPPool.DNSServers
+        wins_servers = $IPPool.WINSServers
+    }
+
+    return $info
+}
+
 # Export functions
-Export-ModuleMember -Function Import-SCVMMModule, Get-SCVMMVMInfo, Get-SCVMMCloudInfo, Get-SCVMMTemplateInfo, Get-SCVMMHostClusterInfo, Get-SCVMMHostInfo, Get-SCVMMVMNetworkInfo, Get-SCVMMLogicalNetworkInfo, Get-SCVMMLogicalNetworkDefinitionInfo, Get-SCVMMLogicalSwitchInfo, Get-SCVMMLogicalSwitchExtensionInfo, Get-SCVMMVMSubnetInfo, Get-SCVMMVirtualHardDiskInfo, Get-SCVMMMACAddressPoolInfo, Get-SCVMMUplinkPortProfileInfo, Get-SCVMMPortClassificationInfo, Get-SCVMMHostNetworkAdapterInfo, Get-SCVMMStorageProviderInfo, Get-SCVMMStorageFileShareInfo, Get-SCVMMStoragePoolInfo, Get-SCVMMStorageClassificationInfo
+Export-ModuleMember -Function Import-SCVMMModule, Get-SCVMMVMInfo, Get-SCVMMCloudInfo, Get-SCVMMTemplateInfo, Get-SCVMMHostClusterInfo, Get-SCVMMHostInfo, Get-SCVMMVMNetworkInfo, Get-SCVMMLogicalNetworkInfo, Get-SCVMMLogicalNetworkDefinitionInfo, Get-SCVMMLogicalSwitchInfo, Get-SCVMMLogicalSwitchExtensionInfo, Get-SCVMMIPPoolInfo, Get-SCVMMVMSubnetInfo, Get-SCVMMVirtualHardDiskInfo, Get-SCVMMMACAddressPoolInfo, Get-SCVMMUplinkPortProfileInfo, Get-SCVMMPortClassificationInfo, Get-SCVMMHostNetworkAdapterInfo, Get-SCVMMStorageProviderInfo, Get-SCVMMStorageFileShareInfo, Get-SCVMMStoragePoolInfo, Get-SCVMMStorageClassificationInfo, Get-SCVMMCustomPropertyInfo, Get-SCVMMVirtualNetworkAdapterInfo, Get-SCVMMLoadBalancerInfo

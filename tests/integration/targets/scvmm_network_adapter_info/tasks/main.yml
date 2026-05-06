@@ -1,0 +1,22 @@
+---
+- name: Gather all Virtual Network Adapters
+  microsoft.scvmm.scvmm_network_adapter_info:
+  register: all_adapters
+
+- name: Assert all_adapters is returned
+  ansible.builtin.assert:
+    that:
+      - all_adapters.virtual_network_adapters is defined
+      - all_adapters.virtual_network_adapters | type_debug == 'list'
+
+- name: Gather adapters for a non-existent VM (should fail)
+  microsoft.scvmm.scvmm_network_adapter_info:
+    vm_name: "non_existent_vm_ansible_test"
+  ignore_errors: true
+  register: fail_vm
+
+- name: Assert failure for non-existent VM
+  ansible.builtin.assert:
+    that:
+      - fail_vm.failed
+      - "'not found' in fail_vm.msg or 'Failed to retrieve' in fail_vm.msg"

@@ -43,9 +43,9 @@ This backlog tracks the implementation of all 97 modules for the `microsoft.scvm
 - [x] `scvmm_port_classification_info` - Gather port classification info (ACA-5718)
 - [x] `scvmm_mac_address_pool` - Manage MAC address pools (ACA-5722)
 - [x] `scvmm_mac_address_pool_info` - Gather MAC address pool info (ACA-5725)
-- [ ] `scvmm_ip_pool_info` - Gather IP pool info (ACA-5728)
-- [ ] `scvmm_network_adapter_info` - Gather network adapter info (ACA-5731)
-- [ ] `scvmm_load_balancer` - Manage load balancers (ACA-5734)
+- [x] `scvmm_ip_pool_info` - Gather IP pool info (ACA-5728)
+- [x] `scvmm_network_adapter_info` - Gather network adapter info (ACA-5731)
+- [x] `scvmm_load_balancer` - Manage load balancers (ACA-5734)
 
 ## Storage Management (ACA-5516)
 - [x] `scvmm_virtual_hard_disk` - Manage virtual hard disks (ACA-5531)
@@ -57,8 +57,8 @@ This backlog tracks the implementation of all 97 modules for the `microsoft.scvm
 - [x] `scvmm_storage_file_share_info` - Gather storage file share info (ACA-5743)
 
 ## Infrastructure & Configuration (ACA-5679)
-- [ ] `scvmm_custom_property` - Manage custom properties (ACA-5738)
-- [ ] `scvmm_custom_property_info` - Gather custom property info (ACA-5740)
+- [x] `scvmm_custom_property` - Manage custom properties (ACA-5738)
+- [x] `scvmm_custom_property_info` - Gather custom property info (ACA-5740)
 - [ ] `scvmm_servicing_window` - Manage servicing windows (ACA-5742)
 - [ ] `scvmm_servicing_window_info` - Gather servicing window info (ACA-5744)
 - [ ] `scvmm_job_info` - Monitor SCVMM jobs (ACA-5745)
@@ -104,7 +104,7 @@ This backlog tracks the implementation of all 97 modules for the `microsoft.scvm
 - [ ] `scvmm_user_role_quota_info` - Gather user role quota info (ACA-5697)
 
 ## Infrastructure Management - IP Pools, Library, Classifications (ACA-5536)
-- [ ] `scvmm_ip_pool` - Manage IP pools (ACA-5544)
+- [x] `scvmm_ip_pool` - Manage IP pools (ACA-5544)
 - [ ] `scvmm_library_server_info` - Gather library server info (ACA-5545)
 - [ ] `scvmm_storage_classification` - Manage storage classifications (ACA-5546)
 - [ ] `scvmm_port_classification` - Manage port classifications (ACA-5547)

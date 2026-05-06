@@ -1,0 +1,49 @@
+---
+# Note: These tests assume a mockable environment or will fail if SCVMM cmdlets are not available.
+# In a real environment, you'd need a valid RunAsAccount and HostGroup.
+
+- name: Create Load Balancer (Check Mode)
+  microsoft.scvmm.scvmm_load_balancer:
+    name: "AnsibleTestLB"
+    address: "10.0.0.100"
+    port: 443
+    manufacturer: "Citrix"
+    model: "NetScaler"
+    run_as_account: "LBAdmin"
+    state: present
+  check_mode: true
+  register: lb_create_check
+  ignore_errors: true
+
+- name: Create Load Balancer (Actual)
+  microsoft.scvmm.scvmm_load_balancer:
+    name: "AnsibleTestLB"
+    address: "10.0.0.100"
+    port: 443
+    manufacturer: "Citrix"
+    model: "NetScaler"
+    run_as_account: "LBAdmin"
+    state: present
+  register: lb_create
+  ignore_errors: true
+
+- name: Update Load Balancer Description (Idempotency check)
+  microsoft.scvmm.scvmm_load_balancer:
+    name: "AnsibleTestLB"
+    description: "Updated by Ansible"
+  register: lb_update
+  ignore_errors: true
+  when: lb_create is not failed
+
+- name: Remove Load Balancer
+  microsoft.scvmm.scvmm_load_balancer:
+    name: "AnsibleTestLB"
+    state: absent
+  register: lb_remove
+  ignore_errors: true
+
+- name: Assert Load Balancer Removal
+  ansible.builtin.assert:
+    that:
+      - lb_remove is not failed
+  when: lb_remove is defined

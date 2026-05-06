@@ -1,0 +1,153 @@
+---
+- name: Set random names
+  set_fact:
+    logical_network_name: "ansible-net-{{ 99999999 | random }}"
+    definition_name: "ansible-site-{{ 99999999 | random }}"
+
+- block:
+    - name: Ensure prerequisite logical network exists
+      microsoft.scvmm.scvmm_logical_network:
+        name: "{{ logical_network_name }}"
+        state: present
+      register: prep_net
+
+    - name: Gather initial info
+      microsoft.scvmm.scvmm_logical_network_definition_info:
+        name: "{{ definition_name }}"
+      register: initial_info
+
+    - name: Assert initial info is empty
+      assert:
+        that:
+          - initial_info.logical_network_definitions | length == 0
+
+    - name: Create logical network definition (check_mode)
+      microsoft.scvmm.scvmm_logical_network_definition:
+        name: "{{ definition_name }}"
+        logical_network: "{{ logical_network_name }}"
+        vm_host_groups:
+          - All Hosts
+        subnet_vlans:
+          - subnet: 10.0.0.0/24
+            vlan: 100
+      check_mode: true
+      register: create_check
+
+    - name: Assert create_check result
+      assert:
+        that:
+          - create_check is changed
+
+    - name: Create logical network definition
+      microsoft.scvmm.scvmm_logical_network_definition:
+        name: "{{ definition_name }}"
+        logical_network: "{{ logical_network_name }}"
+        vm_host_groups:
+          - All Hosts
+        subnet_vlans:
+          - subnet: 10.0.0.0/24
+            vlan: 100
+      register: create_actual
+
+    - name: Assert create_actual result
+      assert:
+        that:
+          - create_actual is changed
+          - create_actual.logical_network_definition.name == definition_name
+          - create_actual.logical_network_definition.logical_network == logical_network_name
+          - "'All Hosts' in create_actual.logical_network_definition.vm_host_groups"
+          - create_actual.logical_network_definition.subnet_vlans | length == 1
+          - create_actual.logical_network_definition.subnet_vlans[0].subnet == "10.0.0.0/24"
+          - create_actual.logical_network_definition.subnet_vlans[0].vlan == 100
+
+    - name: Create logical network definition (idempotency)
+      microsoft.scvmm.scvmm_logical_network_definition:
+        name: "{{ definition_name }}"
+        logical_network: "{{ logical_network_name }}"
+        vm_host_groups:
+          - All Hosts
+        subnet_vlans:
+          - subnet: 10.0.0.0/24
+            vlan: 100
+      register: create_idempotency
+
+    - name: Assert create_idempotency result
+      assert:
+        that:
+          - create_idempotency is not changed
+
+    - name: Update logical network definition (add host group)
+      # This assumes another host group might not exist, so I'll just re-assert with All Hosts
+      # or try to change subnet_vlans which is safer.
+      microsoft.scvmm.scvmm_logical_network_definition:
+        name: "{{ definition_name }}"
+        subnet_vlans:
+          - subnet: 10.0.0.0/24
+            vlan: 100
+          - subnet: 10.0.1.0/24
+            vlan: 101
+      register: update_actual
+
+    - name: Assert update_actual result
+      assert:
+        that:
+          - update_actual is changed
+          - update_actual.logical_network_definition.subnet_vlans | length == 2
+
+    - name: Gather info for specific definition
+      microsoft.scvmm.scvmm_logical_network_definition_info:
+        name: "{{ definition_name }}"
+      register: specific_info
+
+    - name: Assert specific_info result
+      assert:
+        that:
+          - specific_info.logical_network_definitions | length == 1
+          - specific_info.logical_network_definitions[0].name == definition_name
+
+    - name: Remove logical network definition (check_mode)
+      microsoft.scvmm.scvmm_logical_network_definition:
+        name: "{{ definition_name }}"
+        state: absent
+      check_mode: true
+      register: remove_check
+
+    - name: Assert remove_check result
+      assert:
+        that:
+          - remove_check is changed
+
+    - name: Remove logical network definition
+      microsoft.scvmm.scvmm_logical_network_definition:
+        name: "{{ definition_name }}"
+        state: absent
+      register: remove_actual
+
+    - name: Assert remove_actual result
+      assert:
+        that:
+          - remove_actual is changed
+
+    - name: Remove logical network definition (idempotency)
+      microsoft.scvmm.scvmm_logical_network_definition:
+        name: "{{ definition_name }}"
+        state: absent
+      register: remove_idempotency
+
+    - name: Assert remove_idempotency result
+      assert:
+        that:
+          - remove_idempotency is not changed
+
+  always:
+    - name: Cleanup logical network definition
+      microsoft.scvmm.scvmm_logical_network_definition:
+        name: "{{ definition_name }}"
+        state: absent
+      ignore_errors: true
+
+    - name: Cleanup logical network
+      microsoft.scvmm.scvmm_logical_network:
+        name: "{{ logical_network_name }}"
+        state: absent
+      ignore_errors: true

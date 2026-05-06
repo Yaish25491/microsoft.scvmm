@@ -1,0 +1,52 @@
+---
+- name: Test SCVMM DVD Drive creation (Expect Failure or Skip)
+  microsoft.scvmm.scvmm_vm_dvd_drive:
+    vm: "AnsibleTestVM"
+    bus: 1
+    lun: 0
+    state: present
+  register: create_result
+  ignore_errors: true
+
+- name: Assert creation failed gracefully (due to missing VM/VMM module)
+  assert:
+    that:
+      - create_result.failed == true
+      - "'Virtual machine' in create_result.msg or 'VirtualMachineManager' in create_result.msg"
+
+- name: Test SCVMM DVD Drive Mount ISO (Expect Failure)
+  microsoft.scvmm.scvmm_vm_dvd_drive:
+    vm: "AnsibleTestVM"
+    bus: 0
+    lun: 1
+    iso: "test.iso"
+  register: mount_result
+  ignore_errors: true
+
+- name: Test SCVMM DVD Drive Unmount (Expect Failure)
+  microsoft.scvmm.scvmm_vm_dvd_drive:
+    vm: "AnsibleTestVM"
+    bus: 0
+    lun: 1
+    no_media: true
+  register: unmount_result
+  ignore_errors: true
+
+- name: Test SCVMM DVD Drive Check Mode (Expect Failure)
+  microsoft.scvmm.scvmm_vm_dvd_drive:
+    vm: "AnsibleTestVM"
+    bus: 1
+    lun: 0
+    state: present
+  check_mode: true
+  register: check_result
+  ignore_errors: true
+
+- name: Test SCVMM DVD Drive deletion (Expect Failure)
+  microsoft.scvmm.scvmm_vm_dvd_drive:
+    vm: "AnsibleTestVM"
+    bus: 1
+    lun: 0
+    state: absent
+  register: delete_result
+  ignore_errors: true

@@ -1,0 +1,12 @@
+---
+- name: Test Cloud Capacity Gathering (Expect Failure)
+  microsoft.scvmm.scvmm_cloud_capacity:
+    name: "NonExistentCloud"
+  register: capacity_result
+  ignore_errors: true
+
+- name: Assert graceful failure
+  assert:
+    that:
+      - capacity_result.failed == true
+      - "'Cloud ' in capacity_result.msg"

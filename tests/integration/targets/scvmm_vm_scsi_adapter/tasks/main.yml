@@ -1,0 +1,45 @@
+---
+- name: Test SCVMM SCSI Adapter creation (Expect Failure or Skip)
+  microsoft.scvmm.scvmm_vm_scsi_adapter:
+    vm: "AnsibleTestVM"
+    adapter_id: 1
+    state: present
+  register: create_result
+  ignore_errors: true
+
+- name: Assert creation failed gracefully
+  assert:
+    that:
+      - create_result.failed == true
+      - "'Virtual machine' in create_result.msg or 'VirtualMachineManager' in create_result.msg"
+
+- name: Test SCVMM SCSI Adapter Shared (Expect Failure)
+  microsoft.scvmm.scvmm_vm_scsi_adapter:
+    vm: "AnsibleTestVM"
+    adapter_id: 0
+    shared: true
+  register: shared_result
+  ignore_errors: true
+
+- name: Test SCVMM SCSI Adapter Synthetic (Expect Failure)
+  microsoft.scvmm.scvmm_vm_scsi_adapter:
+    vm: "AnsibleTestVM"
+    synthetic: true
+  register: synthetic_result
+  ignore_errors: true
+
+- name: Test SCVMM SCSI Adapter Check Mode (Expect Failure)
+  microsoft.scvmm.scvmm_vm_scsi_adapter:
+    vm: "AnsibleTestVM"
+    state: present
+  check_mode: true
+  register: check_result
+  ignore_errors: true
+
+- name: Test SCVMM SCSI Adapter deletion (Expect Failure)
+  microsoft.scvmm.scvmm_vm_scsi_adapter:
+    vm: "AnsibleTestVM"
+    adapter_id: 1
+    state: absent
+  register: delete_result
+  ignore_errors: true

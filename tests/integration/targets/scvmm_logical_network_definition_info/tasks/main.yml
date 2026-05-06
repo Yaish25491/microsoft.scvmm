@@ -1,0 +1,9 @@
+---
+- name: Gather all logical network definitions
+  microsoft.scvmm.scvmm_logical_network_definition_info:
+  register: all_definitions
+
+- name: Assert all_definitions result
+  assert:
+    that:
+      - all_definitions.logical_network_definitions is defined

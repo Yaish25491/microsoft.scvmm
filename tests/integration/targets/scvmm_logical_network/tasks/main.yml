@@ -1,0 +1,128 @@
+---
+- name: Set random network name
+  set_fact:
+    logical_network_name: "ansible-net-{{ 99999999 | random }}"
+
+- block:
+    - name: Gather initial info
+      microsoft.scvmm.scvmm_logical_network_info:
+        name: "{{ logical_network_name }}"
+      register: initial_info
+
+    - name: Assert initial info is empty
+      assert:
+        that:
+          - initial_info.logical_networks | length == 0
+
+    - name: Create logical network (check_mode)
+      microsoft.scvmm.scvmm_logical_network:
+        name: "{{ logical_network_name }}"
+        description: "Ansible Test Logical Network"
+        is_public: true
+      check_mode: true
+      register: create_check
+
+    - name: Assert create_check result
+      assert:
+        that:
+          - create_check is changed
+
+    - name: Create logical network
+      microsoft.scvmm.scvmm_logical_network:
+        name: "{{ logical_network_name }}"
+        description: "Ansible Test Logical Network"
+        is_public: true
+      register: create_actual
+
+    - name: Assert create_actual result
+      assert:
+        that:
+          - create_actual is changed
+          - create_actual.logical_network.name == logical_network_name
+          - create_actual.logical_network.description == "Ansible Test Logical Network"
+          - create_actual.logical_network.is_public == true
+
+    - name: Create logical network (idempotency)
+      microsoft.scvmm.scvmm_logical_network:
+        name: "{{ logical_network_name }}"
+        description: "Ansible Test Logical Network"
+        is_public: true
+      register: create_idempotency
+
+    - name: Assert create_idempotency result
+      assert:
+        that:
+          - create_idempotency is not changed
+
+    - name: Update logical network
+      microsoft.scvmm.scvmm_logical_network:
+        name: "{{ logical_network_name }}"
+        description: "Updated Description"
+      register: update_actual
+
+    - name: Assert update_actual result
+      assert:
+        that:
+          - update_actual is changed
+          - update_actual.logical_network.description == "Updated Description"
+
+    - name: Gather info for specific network
+      microsoft.scvmm.scvmm_logical_network_info:
+        name: "{{ logical_network_name }}"
+      register: specific_info
+
+    - name: Assert specific_info result
+      assert:
+        that:
+          - specific_info.logical_networks | length == 1
+          - specific_info.logical_networks[0].name == logical_network_name
+
+    - name: Gather all logical networks
+      microsoft.scvmm.scvmm_logical_network_info:
+      register: all_info
+
+    - name: Assert all_info result
+      assert:
+        that:
+          - all_info.logical_networks | length > 0
+
+    - name: Remove logical network (check_mode)
+      microsoft.scvmm.scvmm_logical_network:
+        name: "{{ logical_network_name }}"
+        state: absent
+      check_mode: true
+      register: remove_check
+
+    - name: Assert remove_check result
+      assert:
+        that:
+          - remove_check is changed
+
+    - name: Remove logical network
+      microsoft.scvmm.scvmm_logical_network:
+        name: "{{ logical_network_name }}"
+        state: absent
+      register: remove_actual
+
+    - name: Assert remove_actual result
+      assert:
+        that:
+          - remove_actual is changed
+
+    - name: Remove logical network (idempotency)
+      microsoft.scvmm.scvmm_logical_network:
+        name: "{{ logical_network_name }}"
+        state: absent
+      register: remove_idempotency
+
+    - name: Assert remove_idempotency result
+      assert:
+        that:
+          - remove_idempotency is not changed
+
+  always:
+    - name: Cleanup logical network
+      microsoft.scvmm.scvmm_logical_network:
+        name: "{{ logical_network_name }}"
+        state: absent
+      ignore_errors: true

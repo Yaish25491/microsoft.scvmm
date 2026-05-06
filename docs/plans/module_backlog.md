@@ -9,8 +9,8 @@ This backlog tracks the implementation of all 97 modules for the `microsoft.scvm
 - [x] `scvmm_vm_checkpoint` - Manage VM checkpoints (ACA-5521)
 - [x] `scvmm_vm_migrate` - Migrate VMs (ACA-5680)
 - [x] `scvmm_vm_clone` - Clone VMs (ACA-5686)
-- [ ] `scvmm_vm_dvd_drive` - Manage VM DVD drives (ACA-5689)
-- [ ] `scvmm_vm_scsi_adapter` - Manage VM SCSI adapters (ACA-5694)
+- [x] `scvmm_vm_dvd_drive` - Manage VM DVD drives (ACA-5689)
+- [x] `scvmm_vm_scsi_adapter` - Manage VM SCSI adapters (ACA-5694)
 - [x] `scvmm_template` - Manage VM templates (ACA-5522)
 - [x] `scvmm_template_info` - Gather information about VM templates (ACA-5523)
 
@@ -24,9 +24,9 @@ This backlog tracks the implementation of all 97 modules for the `microsoft.scvm
 - [x] `scvmm_host_cluster_info` - Gather cluster information (ACA-5709)
 - [ ] `scvmm_host_network_adapter` - Manage host network adapters (ACA-5713)
 - [ ] `scvmm_host_network_adapter_info` - Gather host network adapter info (ACA-5717)
-- [ ] `scvmm_host_rating_info` - Get host ratings for placement (ACA-5720)
-- [ ] `scvmm_cloud_capacity` - Manage cloud capacity (ACA-5724)
-- [ ] `scvmm_cloud_capacity_info` - Gather cloud capacity info (ACA-5727)
+- [x] `scvmm_host_rating_info` - Get host ratings for placement (ACA-5720)
+- [x] `scvmm_cloud_capacity` - Manage cloud capacity (ACA-5724)
+- [x] `scvmm_cloud_capacity_info` - Gather cloud capacity info (ACA-5727)
 
 ## Network Management (ACA-5515)
 - [ ] `scvmm_logical_network` - Manage logical networks (ACA-5528)

@@ -175,5 +175,90 @@ function Get-SCVMMHostClusterInfo {
     return $info
 }
 
+function Get-SCVMMVMNetworkInfo {
+    <#
+    .SYNOPSIS
+    Converts a SCVMM VM Network object to a hashtable.
+    .DESCRIPTION
+    Extracts relevant properties from a VMNetwork object and returns a standardized hashtable.
+    .PARAMETER VMNetwork
+    The VMNetwork object to convert.
+    #>
+    param(
+        [Parameter(Mandatory = $true)]
+        [Object]$VMNetwork
+    )
+
+    $info = @{
+        name = $VMNetwork.Name
+        id = $VMNetwork.ID.Guid
+        description = $VMNetwork.Description
+        logical_network = if ($VMNetwork.LogicalNetwork) { $VMNetwork.LogicalNetwork.Name } else { $null }
+        isolation_type = if ($VMNetwork.IsolationType) { $VMNetwork.IsolationType.ToString() } else { $null }
+        vm_network_type = if ($VMNetwork.VMNetworkType) { $VMNetwork.VMNetworkType.ToString() } else { $null }
+        ipv4_pa_address_pool_type = if ($VMNetwork.IPv4PAAddressPoolType) { $VMNetwork.IPv4PAAddressPoolType.ToString() } else { $null }
+        ipv6_pa_address_pool_type = if ($VMNetwork.IPv6PAAddressPoolType) { $VMNetwork.IPv6PAAddressPoolType.ToString() } else { $null }
+    }
+
+    return $info
+}
+
+function Get-SCVMMLogicalNetworkInfo {
+    <#
+    .SYNOPSIS
+    Converts a SCVMM Logical Network object to a hashtable.
+    .DESCRIPTION
+    Extracts relevant properties from a LogicalNetwork object and returns a standardized hashtable.
+    .PARAMETER LogicalNetwork
+    The LogicalNetwork object to convert.
+    #>
+    param(
+        [Parameter(Mandatory = $true)]
+        [Object]$LogicalNetwork
+    )
+
+    $info = @{
+        name = $LogicalNetwork.Name
+        id = $LogicalNetwork.ID.Guid
+        description = $LogicalNetwork.Description
+        enable_network_virtualization = $LogicalNetwork.EnableNetworkVirtualization
+        logical_network_definition_isolation = $LogicalNetwork.LogicalNetworkDefinitionIsolation
+        is_public = $LogicalNetwork.IsPublic
+        network_manager = if ($LogicalNetwork.NetworkManager) { $LogicalNetwork.NetworkManager.Name } else { $null }
+    }
+
+    return $info
+}
+
+function Get-SCVMMLogicalNetworkDefinitionInfo {
+    <#
+    .SYNOPSIS
+    Converts a SCVMM Logical Network Definition object to a hashtable.
+    .DESCRIPTION
+    Extracts relevant properties from a LogicalNetworkDefinition object and returns a standardized hashtable.
+    .PARAMETER LogicalNetworkDefinition
+    The LogicalNetworkDefinition object to convert.
+    #>
+    param(
+        [Parameter(Mandatory = $true)]
+        [Object]$LogicalNetworkDefinition
+    )
+
+    $info = @{
+        name = $LogicalNetworkDefinition.Name
+        id = $LogicalNetworkDefinition.ID.Guid
+        logical_network = if ($LogicalNetworkDefinition.LogicalNetwork) { $LogicalNetworkDefinition.LogicalNetwork.Name } else { $null }
+        vm_host_groups = $LogicalNetworkDefinition.VMHostGroup | ForEach-Object { $_.Name }
+        subnet_vlans = $LogicalNetworkDefinition.SubnetVLAN | ForEach-Object {
+            @{
+                subnet = $_.Subnet
+                vlan = $_.VLAN
+            }
+        }
+    }
+
+    return $info
+}
+
 # Export functions
-Export-ModuleMember -Function Import-SCVMMModule, Get-SCVMMVMInfo, Get-SCVMMCloudInfo, Get-SCVMMTemplateInfo, Get-SCVMMHostClusterInfo, Get-SCVMMHostInfo
+Export-ModuleMember -Function Import-SCVMMModule, Get-SCVMMVMInfo, Get-SCVMMCloudInfo, Get-SCVMMTemplateInfo, Get-SCVMMHostClusterInfo, Get-SCVMMHostInfo, Get-SCVMMVMNetworkInfo, Get-SCVMMLogicalNetworkInfo, Get-SCVMMLogicalNetworkDefinitionInfo

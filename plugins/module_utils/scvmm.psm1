@@ -796,31 +796,78 @@ function Get-SCPXEServerInfo {
     return $info
 }
 
-function Get-SCVMMVMCheckpointInfo {
+function Get-SCVMMBaselineInfo {
     <#
     .SYNOPSIS
-    Converts a SCVMM VM Checkpoint object to a hashtable.
+    Converts a SCVMM Baseline object to a hashtable.
     .DESCRIPTION
-    Extracts relevant properties from a VMCheckpoint object and returns a standardized hashtable.
-    .PARAMETER Checkpoint
-    The VMCheckpoint object to convert.
+    Extracts relevant properties from a Baseline object and returns a standardized hashtable.
+    .PARAMETER Baseline
+    The SCBaseline object to convert.
     #>
     param(
         [Parameter(Mandatory = $true)]
-        [Object]$Checkpoint
+        [Object]$Baseline
     )
 
     $info = @{
-        name = $Checkpoint.Name
-        description = $Checkpoint.Description
-        added_time = $Checkpoint.AddedTime.ToString("yyyy-MM-ddTHH:mm:ssZ")
-        id = $Checkpoint.CheckpointID.ToString()
-        vm_name = if ($Checkpoint.VM) { $Checkpoint.VM.Name } else { $null }
-        is_latest = $Checkpoint.IsLatest
+        name = $Baseline.Name
+        id = $Baseline.ID.Guid
+        description = $Baseline.Description
+        updates = $Baseline.Updates | ForEach-Object {
+            @{
+                name = $_.Name
+                id = $_.ID.Guid
+                bulletin_id = $_.BulletinID
+            }
+        }
+        assignment_scope = $Baseline.AssignmentScope | ForEach-Object {
+            @{
+                name = $_.Name
+                id = $_.ID.Guid
+                type = $_.GetType().Name
+            }
+        }
+    }
+
+    return $info
+}
+
+function Get-SCPhysicalComputerProfileInfo {
+    <#
+    .SYNOPSIS
+    Converts a SCVMM Physical Computer Profile object to a hashtable.
+    .DESCRIPTION
+    Extracts relevant properties from a PhysicalComputerProfile object and returns a standardized hashtable.
+    .PARAMETER Profile
+    The PhysicalComputerProfile object to convert.
+    #>
+    param(
+        [Parameter(Mandatory = $true)]
+        [Object]$Profile
+    )
+
+    $info = @{
+        name = $Profile.Name
+        id = $Profile.ID.Guid
+        description = $Profile.Description
+        owner = $Profile.Owner
+        virtual_hard_disk = if ($Profile.VirtualHardDisk) { $Profile.VirtualHardDisk.Name } else { $null }
+        domain = $Profile.Domain
+        join_workgroup = $Profile.JoinWorkgroup
+        use_as_vm_host = $Profile.UseAsVMHost
+        use_as_file_server = $Profile.UseAsFileServer
+        time_zone = $Profile.TimeZone
+        product_key = $Profile.ProductKey
+        answer_file = if ($Profile.AnswerFile) { $Profile.AnswerFile.Name } else { $null }
+        gui_run_once_commands = $Profile.GuiRunOnceCommands
+        driver_matching_tags = $Profile.DriverMatchingTags
+        disk_configuration = $Profile.DiskConfiguration
+        is_guarded = $Profile.IsGuarded
     }
 
     return $info
 }
 
 # Export functions
-Export-ModuleMember -Function Import-SCVMMModule, Get-SCVMMVMInfo, Get-SCVMMCloudInfo, Get-SCVMMTemplateInfo, Get-SCVMMHostClusterInfo, Get-SCVMMHostInfo, Get-SCVMMVMNetworkInfo, Get-SCVMMLogicalNetworkInfo, Get-SCVMMLogicalNetworkDefinitionInfo, Get-SCVMMLogicalSwitchInfo, Get-SCVMMLogicalSwitchExtensionInfo, Get-SCVMMIPPoolInfo, Get-SCVMMVMSubnetInfo, Get-SCVMMVirtualHardDiskInfo, Get-SCVMMMACAddressPoolInfo, Get-SCVMMUplinkPortProfileInfo, Get-SCVMMPortClassificationInfo, Get-SCVMMHostNetworkAdapterInfo, Get-SCVMMStorageProviderInfo, Get-SCVMMStorageFileShareInfo, Get-SCVMMStoragePoolInfo, Get-SCVMMStorageClassificationInfo, Get-SCVMMCustomPropertyInfo, Get-SCVMMVirtualNetworkAdapterInfo, Get-SCVMMLoadBalancerInfo, Get-SCVMMJobInfo, Get-SCPXEServerInfo, Get-SCVMMVMCheckpointInfo
+Export-ModuleMember -Function Import-SCVMMModule, Get-SCVMMVMInfo, Get-SCVMMCloudInfo, Get-SCVMMTemplateInfo, Get-SCVMMHostClusterInfo, Get-SCVMMHostInfo, Get-SCVMMVMNetworkInfo, Get-SCVMMLogicalNetworkInfo, Get-SCVMMLogicalNetworkDefinitionInfo, Get-SCVMMLogicalSwitchInfo, Get-SCVMMLogicalSwitchExtensionInfo, Get-SCVMMIPPoolInfo, Get-SCVMMVMSubnetInfo, Get-SCVMMVirtualHardDiskInfo, Get-SCVMMMACAddressPoolInfo, Get-SCVMMUplinkPortProfileInfo, Get-SCVMMPortClassificationInfo, Get-SCVMMHostNetworkAdapterInfo, Get-SCVMMStorageProviderInfo, Get-SCVMMStorageFileShareInfo, Get-SCVMMStoragePoolInfo, Get-SCVMMStorageClassificationInfo, Get-SCVMMCustomPropertyInfo, Get-SCVMMVirtualNetworkAdapterInfo, Get-SCVMMLoadBalancerInfo, Get-SCVMMJobInfo, Get-SCPXEServerInfo, Get-SCVMMVMCheckpointInfo, Get-SCUpdateServerInfo, Get-SCVMMBaselineInfo, Get-SCPhysicalComputerProfileInfo

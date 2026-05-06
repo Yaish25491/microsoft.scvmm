@@ -1,0 +1,115 @@
+---
+- name: Set test variables
+  set_fact:
+    test_baseline_name: "ansible_test_baseline_{{ 9999 | random }}"
+    test_scope_name: "All Hosts"
+
+- name: Test baseline information gathering (empty)
+  microsoft.scvmm.scvmm_baseline_info:
+  register: baseline_info_initial
+
+- name: Test baseline creation
+  microsoft.scvmm.scvmm_baseline:
+    name: "{{ test_baseline_name }}"
+    state: present
+    description: "Initial description"
+  register: baseline_create
+
+- name: Assert baseline creation succeeded
+  assert:
+    that:
+      - baseline_create.changed
+      - baseline_create.baseline.name == test_baseline_name
+
+- name: Test baseline idempotency
+  microsoft.scvmm.scvmm_baseline:
+    name: "{{ test_baseline_name }}"
+    state: present
+    description: "Initial description"
+  register: baseline_idempotent
+
+- name: Assert idempotency
+  assert:
+    that:
+      - not baseline_idempotent.changed
+
+- name: Test update (check mode)
+  microsoft.scvmm.scvmm_baseline:
+    name: "{{ test_baseline_name }}"
+    state: present
+    description: "Updated description"
+  check_mode: true
+  register: baseline_update_check
+
+- name: Assert update check mode
+  assert:
+    that:
+      - baseline_update_check.changed
+
+- name: Test update
+  microsoft.scvmm.scvmm_baseline:
+    name: "{{ test_baseline_name }}"
+    state: present
+    description: "Updated description"
+  register: baseline_update
+
+- name: Assert update
+  assert:
+    that:
+      - baseline_update.changed
+
+- name: Test baseline information gathering (with data)
+  microsoft.scvmm.scvmm_baseline_info:
+    name: "{{ test_baseline_name }}"
+  register: baseline_info_data
+
+- name: Assert information gathering
+  assert:
+    that:
+      - baseline_info_data.baselines | length == 1
+      - baseline_info_data.baselines[0].name == test_baseline_name
+      - baseline_info_data.baselines[0].description == "Updated description"
+
+- name: Test assignment scope (check mode - might fail if scope doesn't exist)
+  microsoft.scvmm.scvmm_baseline:
+    name: "{{ test_baseline_name }}"
+    state: present
+    assignment_scope:
+      - "{{ test_scope_name }}"
+  check_mode: true
+  register: baseline_scope_check
+  ignore_errors: true
+
+- name: Test delete (check mode)
+  microsoft.scvmm.scvmm_baseline:
+    name: "{{ test_baseline_name }}"
+    state: absent
+  check_mode: true
+  register: baseline_delete_check
+
+- name: Assert delete check mode
+  assert:
+    that:
+      - baseline_delete_check.changed
+
+- name: Test delete
+  microsoft.scvmm.scvmm_baseline:
+    name: "{{ test_baseline_name }}"
+    state: absent
+  register: baseline_delete
+
+- name: Assert delete
+  assert:
+    that:
+      - baseline_delete.changed
+
+- name: Test delete idempotency
+  microsoft.scvmm.scvmm_baseline:
+    name: "{{ test_baseline_name }}"
+    state: absent
+  register: baseline_delete_idempotent
+
+- name: Assert delete idempotency
+  assert:
+    that:
+      - not baseline_delete_idempotent.changed

@@ -486,5 +486,120 @@ function Get-SCVMMHostNetworkAdapterInfo {
     return $info
 }
 
+function Get-SCVMMStorageProviderInfo {
+    <#
+    .SYNOPSIS
+    Converts a SCVMM Storage Provider object to a hashtable.
+    .DESCRIPTION
+    Extracts relevant properties from a StorageProvider object and returns a standardized hashtable.
+    .PARAMETER StorageProvider
+    The StorageProvider object to convert.
+    #>
+    param(
+        [Parameter(Mandatory = $true)]
+        [Object]$StorageProvider
+    )
+
+    $info = @{
+        name = $StorageProvider.Name
+        id = $StorageProvider.ID.Guid
+        description = $StorageProvider.Description
+        type = if ($StorageProvider.Type) { $StorageProvider.Type.ToString() } else { $null }
+        network_device_name = $StorageProvider.NetworkDeviceName
+        manufacturer = $StorageProvider.Manufacturer
+        model = $StorageProvider.Model
+        is_active = $StorageProvider.IsActive
+        state = if ($StorageProvider.State) { $StorageProvider.State.ToString() } else { $null }
+        tcp_port = $StorageProvider.TCPPort
+    }
+
+    return $info
+}
+
+function Get-SCVMMStorageFileShareInfo {
+    <#
+    .SYNOPSIS
+    Converts a SCVMM Storage File Share object to a hashtable.
+    .DESCRIPTION
+    Extracts relevant properties from a StorageFileShare object and returns a standardized hashtable.
+    .PARAMETER StorageFileShare
+    The StorageFileShare object to convert.
+    #>
+    param(
+        [Parameter(Mandatory = $true)]
+        [Object]$StorageFileShare
+    )
+
+    $info = @{
+        name = $StorageFileShare.Name
+        id = $StorageFileShare.ID.Guid
+        path = $StorageFileShare.Path
+        description = $StorageFileShare.Description
+        storage_classification = if ($StorageFileShare.StorageClassification) { $StorageFileShare.StorageClassification.Name } else { $null }
+        capacity = $StorageFileShare.Capacity
+        free_space = $StorageFileShare.FreeSpace
+        is_available_for_placement = $StorageFileShare.IsAvailableForPlacement
+        storage_file_server = if ($StorageFileShare.StorageFileServer) { $StorageFileShare.StorageFileServer.Name } else { $null }
+        vm_host = if ($StorageFileShare.VMHost) { $StorageFileShare.VMHost.Name } else { $null }
+        library_server = if ($StorageFileShare.LibraryServer) { $StorageFileShare.LibraryServer.Name } else { $null }
+    }
+
+    return $info
+}
+
+function Get-SCVMMStorageClassificationInfo {
+    <#
+    .SYNOPSIS
+    Converts a SCVMM Storage Classification object to a hashtable.
+    .DESCRIPTION
+    Extracts relevant properties from a StorageClassification object and returns a standardized hashtable.
+    .PARAMETER StorageClassification
+    The StorageClassification object to convert.
+    #>
+    param(
+        [Parameter(Mandatory = $true)]
+        [Object]$StorageClassification
+    )
+
+    $info = @{
+        name = $StorageClassification.Name
+        id = $StorageClassification.ID.Guid
+        description = $StorageClassification.Description
+        is_read_only = $StorageClassification.IsReadOnly
+        is_system = $StorageClassification.IsSystem
+    }
+
+    return $info
+}
+
+function Get-SCVMMStoragePoolInfo {
+    <#
+    .SYNOPSIS
+    Converts a SCVMM Storage Pool object to a hashtable.
+    .DESCRIPTION
+    Extracts relevant properties from a StoragePool object and returns a standardized hashtable.
+    .PARAMETER StoragePool
+    The StoragePool object to convert.
+    #>
+    param(
+        [Parameter(Mandatory = $true)]
+        [Object]$StoragePool
+    )
+
+    $info = @{
+        name = $StoragePool.Name
+        id = $StoragePool.ID.Guid
+        description = $StoragePool.Description
+        is_managed = $StoragePool.IsManaged
+        storage_classification = if ($StoragePool.StorageClassification) { $StoragePool.StorageClassification.Name } else { $null }
+        storage_array = if ($StoragePool.StorageArray) { $StoragePool.StorageArray.Name } else { $null }
+        total_capacity = $StoragePool.TotalCapacity
+        free_space = $StoragePool.FreeSpace
+        used_space = $StoragePool.UsedSpace
+    }
+
+    return $info
+}
+
 # Export functions
-Export-ModuleMember -Function Import-SCVMMModule, Get-SCVMMVMInfo, Get-SCVMMCloudInfo, Get-SCVMMTemplateInfo, Get-SCVMMHostClusterInfo, Get-SCVMMHostInfo, Get-SCVMMVMNetworkInfo, Get-SCVMMLogicalNetworkInfo, Get-SCVMMLogicalNetworkDefinitionInfo, Get-SCVMMLogicalSwitchInfo, Get-SCVMMLogicalSwitchExtensionInfo, Get-SCVMMVMSubnetInfo, Get-SCVMMVirtualHardDiskInfo, Get-SCVMMMACAddressPoolInfo, Get-SCVMMUplinkPortProfileInfo, Get-SCVMMPortClassificationInfo, Get-SCVMMHostNetworkAdapterInfo
+Export-ModuleMember -Function Import-SCVMMModule, Get-SCVMMVMInfo, Get-SCVMMCloudInfo, Get-SCVMMTemplateInfo, Get-SCVMMHostClusterInfo, Get-SCVMMHostInfo, Get-SCVMMVMNetworkInfo, Get-SCVMMLogicalNetworkInfo, Get-SCVMMLogicalNetworkDefinitionInfo, Get-SCVMMLogicalSwitchInfo, Get-SCVMMLogicalSwitchExtensionInfo, Get-SCVMMVMSubnetInfo, Get-SCVMMVirtualHardDiskInfo, Get-SCVMMMACAddressPoolInfo, Get-SCVMMUplinkPortProfileInfo, Get-SCVMMPortClassificationInfo, Get-SCVMMHostNetworkAdapterInfo, Get-SCVMMStorageProviderInfo, Get-SCVMMStorageFileShareInfo, Get-SCVMMStoragePoolInfo, Get-SCVMMStorageClassificationInfo

@@ -1,0 +1,61 @@
+---
+- name: Gather info on all SCVMM Storage Providers
+  microsoft.scvmm.scvmm_storage_provider_info:
+  register: all_providers
+
+- name: Assert info was gathered
+  assert:
+    that:
+      - all_providers.storage_providers is defined
+      - all_providers.storage_providers | type_debug == "list"
+
+- name: Gather info on all SCVMM Storage Providers in check mode
+  microsoft.scvmm.scvmm_storage_provider_info:
+  check_mode: true
+  register: all_providers_check_mode
+
+- name: Assert info was gathered in check mode
+  assert:
+    that:
+      - all_providers_check_mode.storage_providers is defined
+      - all_providers_check_mode.storage_providers | length == all_providers.storage_providers | length
+
+- name: Gather info by name if providers exist
+  when: all_providers.storage_providers | length > 0
+  block:
+    - name: Gather info on a specific provider by name
+      microsoft.scvmm.scvmm_storage_provider_info:
+        name: "{{ all_providers.storage_providers[0].name }}"
+      register: specific_provider
+
+    - name: Assert specific provider info was gathered
+      assert:
+        that:
+          - specific_provider.storage_providers is defined
+          - specific_provider.storage_providers | length == 1
+          - specific_provider.storage_providers[0].name == all_providers.storage_providers[0].name
+          - specific_provider.storage_providers[0].id == all_providers.storage_providers[0].id
+
+    - name: Gather info on a specific provider by name in check mode
+      microsoft.scvmm.scvmm_storage_provider_info:
+        name: "{{ all_providers.storage_providers[0].name }}"
+      check_mode: true
+      register: specific_provider_check
+
+    - name: Assert specific provider info was gathered in check mode
+      assert:
+        that:
+          - specific_provider_check.storage_providers is defined
+          - specific_provider_check.storage_providers | length == 1
+          - specific_provider_check.storage_providers[0].name == all_providers.storage_providers[0].name
+
+- name: Gather info on a non-existent provider
+  microsoft.scvmm.scvmm_storage_provider_info:
+    name: "NonExistentProvider_1234567890"
+  register: non_existent_provider
+
+- name: Assert empty list is returned for non-existent provider
+  assert:
+    that:
+      - non_existent_provider.storage_providers is defined
+      - non_existent_provider.storage_providers | length == 0

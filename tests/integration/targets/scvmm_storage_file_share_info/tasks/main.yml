@@ -1,0 +1,61 @@
+---
+- name: Gather info on all SCVMM Storage File Shares
+  microsoft.scvmm.scvmm_storage_file_share_info:
+  register: all_shares
+
+- name: Assert info was gathered
+  assert:
+    that:
+      - all_shares.storage_file_shares is defined
+      - all_shares.storage_file_shares | type_debug == "list"
+
+- name: Gather info on all SCVMM Storage File Shares in check mode
+  microsoft.scvmm.scvmm_storage_file_share_info:
+  check_mode: true
+  register: all_shares_check_mode
+
+- name: Assert info was gathered in check mode
+  assert:
+    that:
+      - all_shares_check_mode.storage_file_shares is defined
+      - all_shares_check_mode.storage_file_shares | length == all_shares.storage_file_shares | length
+
+- name: Gather info by name if shares exist
+  when: all_shares.storage_file_shares | length > 0
+  block:
+    - name: Gather info on a specific share by name
+      microsoft.scvmm.scvmm_storage_file_share_info:
+        name: "{{ all_shares.storage_file_shares[0].name }}"
+      register: specific_share
+
+    - name: Assert specific share info was gathered
+      assert:
+        that:
+          - specific_share.storage_file_shares is defined
+          - specific_share.storage_file_shares | length == 1
+          - specific_share.storage_file_shares[0].name == all_shares.storage_file_shares[0].name
+          - specific_share.storage_file_shares[0].id == all_shares.storage_file_shares[0].id
+
+    - name: Gather info on a specific share by name in check mode
+      microsoft.scvmm.scvmm_storage_file_share_info:
+        name: "{{ all_shares.storage_file_shares[0].name }}"
+      check_mode: true
+      register: specific_share_check
+
+    - name: Assert specific share info was gathered in check mode
+      assert:
+        that:
+          - specific_share_check.storage_file_shares is defined
+          - specific_share_check.storage_file_shares | length == 1
+          - specific_share_check.storage_file_shares[0].name == all_shares.storage_file_shares[0].name
+
+- name: Gather info on a non-existent share
+  microsoft.scvmm.scvmm_storage_file_share_info:
+    name: "NonExistentShare_1234567890"
+  register: non_existent_share
+
+- name: Assert empty list is returned for non-existent share
+  assert:
+    that:
+      - non_existent_share.storage_file_shares is defined
+      - non_existent_share.storage_file_shares | length == 0

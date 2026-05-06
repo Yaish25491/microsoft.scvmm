@@ -49,12 +49,12 @@ This backlog tracks the implementation of all 97 modules for the `microsoft.scvm
 
 ## Storage Management (ACA-5516)
 - [x] `scvmm_virtual_hard_disk` - Manage virtual hard disks (ACA-5531)
-- [ ] `scvmm_storage_classification_info` - Gather storage classification info (ACA-5730)
-- [ ] `scvmm_storage_pool` - Manage storage pools (ACA-5733)
-- [ ] `scvmm_storage_pool_info` - Gather storage pool info (ACA-5737)
-- [ ] `scvmm_storage_provider` - Manage storage providers (ACA-5739)
-- [ ] `scvmm_storage_provider_info` - Gather storage provider info (ACA-5741)
-- [ ] `scvmm_storage_file_share_info` - Gather storage file share info (ACA-5743)
+- [x] `scvmm_storage_classification_info` - Gather storage classification info (ACA-5730)
+- [x] `scvmm_storage_pool` - Manage storage pools (ACA-5733)
+- [x] `scvmm_storage_pool_info` - Gather storage pool info (ACA-5737)
+- [x] `scvmm_storage_provider` - Manage storage providers (ACA-5739)
+- [x] `scvmm_storage_provider_info` - Gather storage provider info (ACA-5741)
+- [x] `scvmm_storage_file_share_info` - Gather storage file share info (ACA-5743)
 
 ## Infrastructure & Configuration (ACA-5679)
 - [ ] `scvmm_custom_property` - Manage custom properties (ACA-5738)

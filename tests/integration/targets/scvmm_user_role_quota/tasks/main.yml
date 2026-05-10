@@ -1,0 +1,65 @@
+---
+- name: Test scvmm_user_role_quota
+  block:
+    - name: Gather user role quota info (baseline)
+      microsoft.scvmm.scvmm_user_role_quota_info:
+        cloud: "TestCloud"
+        user_role: "TestRole"
+      register: quota_info_baseline
+
+    - name: Set quota limits
+      microsoft.scvmm.scvmm_user_role_quota:
+        cloud: "TestCloud"
+        user_role: "TestRole"
+        cpu_count: 10
+        memory_mb: 20480
+        storage_gb: 500
+        vm_count: 5
+        custom_quota_count: 100
+      register: quota_set
+
+    - name: Assert change
+      assert:
+        that:
+          - quota_set.changed == true
+
+    - name: Set quota limits (idempotency)
+      microsoft.scvmm.scvmm_user_role_quota:
+        cloud: "TestCloud"
+        user_role: "TestRole"
+        cpu_count: 10
+        memory_mb: 20480
+        storage_gb: 500
+        vm_count: 5
+        custom_quota_count: 100
+      register: quota_idempotent
+
+    - name: Assert idempotency
+      assert:
+        that:
+          - quota_idempotent.changed == false
+
+    - name: Set quota to unlimited (maximum)
+      microsoft.scvmm.scvmm_user_role_quota:
+        cloud: "TestCloud"
+        user_role: "TestRole"
+        use_maximum_quota: true
+      register: quota_unlimited
+
+    - name: Assert unlimited change
+      assert:
+        that:
+          - quota_unlimited.changed == true
+
+    - name: Set quota limits in check mode
+      microsoft.scvmm.scvmm_user_role_quota:
+        cloud: "TestCloud"
+        user_role: "TestRole"
+        cpu_count: 20
+      check_mode: true
+      register: quota_check
+
+    - name: Assert check mode change
+      assert:
+        that:
+          - quota_check.changed == true

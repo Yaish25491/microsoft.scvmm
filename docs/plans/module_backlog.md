@@ -96,12 +96,12 @@ This backlog tracks the implementation of all 97 modules for the `microsoft.scvm
 - [ ] `scvmm_capability_profile_info` - Gather capability profile info (ACA-5750)
 
 ## RBAC - User Role Management (ACA-5537)
-- [ ] `scvmm_user_role` - Manage user roles (ACA-5548)
-- [ ] `scvmm_user_role_info` - Gather user role info (ACA-5549)
-- [ ] `scvmm_run_as_account` - Manage run as accounts (ACA-5690)
-- [ ] `scvmm_run_as_account_info` - Gather run as account info (ACA-5691)
-- [ ] `scvmm_user_role_quota` - Manage user role quotas (ACA-5695)
-- [ ] `scvmm_user_role_quota_info` - Gather user role quota info (ACA-5697)
+- [x] `scvmm_user_role` - Manage user roles (ACA-5548)
+- [x] `scvmm_user_role_info` - Gather user role info (ACA-5549)
+- [x] `scvmm_run_as_account` - Manage run as accounts (ACA-5690)
+- [x] `scvmm_run_as_account_info` - Gather run as account info (ACA-5691)
+- [x] `scvmm_user_role_quota` - Manage user role quotas (ACA-5695)
+- [x] `scvmm_user_role_quota_info` - Gather user role quota info (ACA-5697)
 
 ## Infrastructure Management - IP Pools, Library, Classifications (ACA-5536)
 - [x] `scvmm_ip_pool` - Manage IP pools (ACA-5544)

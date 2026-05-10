@@ -1,0 +1,121 @@
+---
+- name: Set test variables
+  ansible.builtin.set_fact:
+    test_role_name: "AnsibleTestRole_{{ 10000 | random }}"
+    test_role_desc: "Ansible Test Role Description"
+    test_role_desc_updated: "Ansible Test Role Description Updated"
+
+- name: Ensure test user role is absent initially
+  microsoft.scvmm.scvmm_user_role:
+    name: "{{ test_role_name }}"
+    state: absent
+  register: result
+
+- name: Create user role
+  microsoft.scvmm.scvmm_user_role:
+    name: "{{ test_role_name }}"
+    profile: "SelfServiceUser"
+    description: "{{ test_role_desc }}"
+    state: present
+  register: result
+
+- name: Assert create was successful
+  ansible.builtin.assert:
+    that:
+      - result.changed == true
+      - result.user_role.name == test_role_name
+      - result.user_role.profile == "SelfServiceUser"
+      - result.user_role.description == test_role_desc
+
+- name: Idempotency - Create user role again
+  microsoft.scvmm.scvmm_user_role:
+    name: "{{ test_role_name }}"
+    profile: "SelfServiceUser"
+    description: "{{ test_role_desc }}"
+    state: present
+  register: result
+
+- name: Assert idempotency
+  ansible.builtin.assert:
+    that:
+      - result.changed == false
+
+- name: Update user role in check mode
+  microsoft.scvmm.scvmm_user_role:
+    name: "{{ test_role_name }}"
+    description: "{{ test_role_desc_updated }}"
+    state: present
+  check_mode: true
+  register: result
+
+- name: Assert check mode update
+  ansible.builtin.assert:
+    that:
+      - result.changed == true
+
+- name: Verify check mode didn't actually change
+  microsoft.scvmm.scvmm_user_role_info:
+    name: "{{ test_role_name }}"
+  register: info_result
+
+- name: Assert check mode didn't change
+  ansible.builtin.assert:
+    that:
+      - info_result.user_roles[0].description == test_role_desc
+
+- name: Update user role
+  microsoft.scvmm.scvmm_user_role:
+    name: "{{ test_role_name }}"
+    description: "{{ test_role_desc_updated }}"
+    state: present
+  register: result
+
+- name: Assert update was successful
+  ansible.builtin.assert:
+    that:
+      - result.changed == true
+      - result.user_role.description == test_role_desc_updated
+
+- name: Delete user role
+  microsoft.scvmm.scvmm_user_role:
+    name: "{{ test_role_name }}"
+    state: absent
+  register: result
+
+- name: Assert deletion
+  ansible.builtin.assert:
+    that:
+      - result.changed == true
+
+- name: Idempotency - Delete user role again
+  microsoft.scvmm.scvmm_user_role:
+    name: "{{ test_role_name }}"
+    state: absent
+  register: result
+
+- name: Assert deletion idempotency
+  ansible.builtin.assert:
+    that:
+      - result.changed == false
+
+- name: Test error handling - create without profile
+  microsoft.scvmm.scvmm_user_role:
+    name: "{{ test_role_name }}"
+    state: present
+  register: result
+  ignore_errors: true
+
+- name: Assert error without profile
+  ansible.builtin.assert:
+    that:
+      - result.failed == true
+      - "'profile' parameter is required" in result.msg
+
+- name: Get info for all roles
+  microsoft.scvmm.scvmm_user_role_info:
+  register: result
+
+- name: Assert get all roles info
+  ansible.builtin.assert:
+    that:
+      - result.user_roles | type_debug == 'list'

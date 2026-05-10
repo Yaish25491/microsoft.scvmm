@@ -491,12 +491,10 @@ function Get-SCVMMUplinkPortProfileInfo {
         description = $UplinkPortProfile.Description
         lbfo_load_balancing_algorithm = if ($UplinkPortProfile.LBFOLoadBalancingAlgorithm) {
             $UplinkPortProfile.LBFOLoadBalancingAlgorithm.ToString()
-        }
-        else { $null }
+        } else { $null }
         lbfo_teaming_mode = if ($UplinkPortProfile.LBFOTeamingMode) {
             $UplinkPortProfile.LBFOTeamingMode.ToString()
-        }
-        else { $null }
+        } else { $null }
         enable_network_virtualization = $UplinkPortProfile.EnableNetworkVirtualization
         logical_network_definitions = $UplinkPortProfile.LogicalNetworkDefinitions | ForEach-Object { $_.Name }
     }
@@ -957,40 +955,12 @@ function Get-SCVMMUserRoleInfo {
     return $info
 }
 
-$exports = @(
-    'Import-SCVMMModule',
-    'Get-SCVMMVMInfo',
-    'Get-SCVMMCloudInfo',
-    'Get-SCVMMTemplateInfo',
-    'Get-SCVMMHostClusterInfo',
-    'Get-SCVMMHostInfo',
-    'Get-SCVMMVMNetworkInfo',
-    'Get-SCVMMLogicalNetworkInfo',
-    'Get-SCVMMLogicalNetworkDefinitionInfo',
-    'Get-SCVMMLogicalSwitchInfo',
-    'Get-SCVMMLogicalSwitchExtensionInfo',
-    'Get-SCVMMIPPoolInfo',
-    'Get-SCVMMVMSubnetInfo',
-    'Get-SCVMMVirtualHardDiskInfo',
-    'Get-SCVMMMACAddressPoolInfo',
-    'Get-SCVMMUplinkPortProfileInfo',
-    'Get-SCVMMPortClassificationInfo',
-    'Get-SCVMMHostNetworkAdapterInfo',
-    'Get-SCVMMStorageProviderInfo',
-    'Get-SCVMMStorageFileShareInfo',
-    'Get-SCVMMStoragePoolInfo',
-    'Get-SCVMMStorageClassificationInfo',
-    'Get-SCVMMCustomPropertyInfo',
-    'Get-SCVMMVirtualNetworkAdapterInfo',
-    'Get-SCVMMLoadBalancerInfo',
-    'Get-SCVMMJobInfo',
-    'Get-SCPXEServerInfo',
-    'Get-SCVMMVMCheckpointInfo',
-    'Get-SCUpdateServerInfo',
-    'Get-SCVMMBaselineInfo',
-    'Get-SCPhysicalComputerProfileInfo',
-    'Get-SCVMMUserRoleQuotaInfo',
-    'Get-SCVMMUserRoleInfo',
-    'Get-SCVMMRunAsAccountInfo'
-)
-Export-ModuleMember -Function $exports
+# Export functions
+Export-ModuleMember -Function Import-SCVMMModule, Get-SCVMMVMInfo, Get-SCVMMCloudInfo, Get-SCVMMTemplateInfo, Get-SCVMMHostClusterInfo,
+    Get-SCVMMHostInfo, Get-SCVMMVMNetworkInfo, Get-SCVMMLogicalNetworkInfo, Get-SCVMMLogicalNetworkDefinitionInfo, Get-SCVMMLogicalSwitchInfo,
+    Get-SCVMMLogicalSwitchExtensionInfo, Get-SCVMMIPPoolInfo, Get-SCVMMVMSubnetInfo, Get-SCVMMVirtualHardDiskInfo, Get-SCVMMMACAddressPoolInfo,
+    Get-SCVMMUplinkPortProfileInfo, Get-SCVMMPortClassificationInfo, Get-SCVMMHostNetworkAdapterInfo, Get-SCVMMStorageProviderInfo,
+    Get-SCVMMStorageFileShareInfo, Get-SCVMMStoragePoolInfo, Get-SCVMMStorageClassificationInfo, Get-SCVMMCustomPropertyInfo,
+    Get-SCVMMVirtualNetworkAdapterInfo, Get-SCVMMLoadBalancerInfo, Get-SCVMMJobInfo, Get-SCPXEServerInfo, Get-SCVMMVMCheckpointInfo,
+    Get-SCUpdateServerInfo, Get-SCVMMBaselineInfo, Get-SCPhysicalComputerProfileInfo, Get-SCVMMUserRoleQuotaInfo, Get-SCVMMUserRoleInfo,
+    Get-SCVMMRunAsAccountInfo

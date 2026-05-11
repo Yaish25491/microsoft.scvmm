@@ -1,0 +1,88 @@
+---
+- name: Set test variables
+  set_fact:
+    test_profile_name: "AnsibleTestProfile_{{ 1000 | random }}"
+
+- name: Ensure profile is absent before test
+  microsoft.scvmm.scvmm_guest_os_profile:
+    name: "{{ test_profile_name }}"
+    state: absent
+
+- name: Create new profile
+  microsoft.scvmm.scvmm_guest_os_profile:
+    name: "{{ test_profile_name }}"
+    description: "Initial description"
+    computer_name: "TESTVM-*"
+    state: present
+  register: create_profile
+
+- name: Assert profile created
+  assert:
+    that:
+      - create_profile.changed == true
+      - create_profile.guest_os_profile.name == test_profile_name
+      - create_profile.guest_os_profile.description == "Initial description"
+      - create_profile.guest_os_profile.computer_name == "TESTVM-*"
+
+- name: Create new profile (Idempotency)
+  microsoft.scvmm.scvmm_guest_os_profile:
+    name: "{{ test_profile_name }}"
+    description: "Initial description"
+    computer_name: "TESTVM-*"
+    state: present
+  register: create_profile_idempotent
+
+- name: Assert idempotency
+  assert:
+    that:
+      - create_profile_idempotent.changed == false
+
+- name: Update profile
+  microsoft.scvmm.scvmm_guest_os_profile:
+    name: "{{ test_profile_name }}"
+    description: "Updated description"
+    computer_name: "NEWNAME-*"
+    state: present
+  register: update_profile
+
+- name: Assert profile updated
+  assert:
+    that:
+      - update_profile.changed == true
+      - update_profile.guest_os_profile.description == "Updated description"
+      - update_profile.guest_os_profile.computer_name == "NEWNAME-*"
+
+- name: Update profile (Check Mode)
+  microsoft.scvmm.scvmm_guest_os_profile:
+    name: "{{ test_profile_name }}"
+    description: "Check mode description"
+    state: present
+  check_mode: yes
+  register: update_profile_check
+
+- name: Assert check mode
+  assert:
+    that:
+      - update_profile_check.changed == true
+
+- name: Delete profile
+  microsoft.scvmm.scvmm_guest_os_profile:
+    name: "{{ test_profile_name }}"
+    state: absent
+  register: delete_profile
+
+- name: Assert profile deleted
+  assert:
+    that:
+      - delete_profile.changed == true
+
+- name: Delete profile (Idempotency)
+  microsoft.scvmm.scvmm_guest_os_profile:
+    name: "{{ test_profile_name }}"
+    state: absent
+  register: delete_profile_idempotent
+
+- name: Assert delete idempotency
+  assert:
+    that:
+      - delete_profile_idempotent.changed == false

@@ -1,0 +1,34 @@
+---
+- name: Ensure test profile exists
+  microsoft.scvmm.scvmm_application_profile:
+    name: "InfoTestAppProfile"
+    description: "For info testing"
+    state: present
+
+- name: Gather info for all profiles
+  microsoft.scvmm.scvmm_application_profile_info:
+  register: all_info
+
+- name: Assert all profiles gathered
+  assert:
+    that:
+      - all_info.application_profiles is defined
+      - all_info.application_profiles | length > 0
+
+- name: Gather info for specific profile
+  microsoft.scvmm.scvmm_application_profile_info:
+    name: "InfoTestAppProfile"
+  register: specific_info
+
+- name: Assert specific profile gathered
+  assert:
+    that:
+      - specific_info.application_profiles is defined
+      - specific_info.application_profiles | length == 1
+      - specific_info.application_profiles[0].name == "InfoTestAppProfile"
+      - specific_info.application_profiles[0].description == "For info testing"
+
+- name: Clean up test profile
+  microsoft.scvmm.scvmm_application_profile:
+    name: "InfoTestAppProfile"
+    state: absent

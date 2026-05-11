@@ -1,0 +1,153 @@
+---
+- name: Set test variables
+  set_fact:
+    test_hw_profile_name: "Ansible-Test-HW-Profile"
+    test_hw_profile_name_updated: "Ansible-Test-HW-Profile-Updated"
+    test_hw_profile_desc: "Created by Ansible Test"
+    test_hw_profile_desc_updated: "Updated by Ansible Test"
+
+- name: Clean up before tests
+  microsoft.scvmm.scvmm_hardware_profile:
+    name: "{{ item }}"
+    state: absent
+  loop:
+    - "{{ test_hw_profile_name }}"
+    - "{{ test_hw_profile_name_updated }}"
+  ignore_errors: yes
+
+- name: Test create hardware profile (Check Mode)
+  microsoft.scvmm.scvmm_hardware_profile:
+    name: "{{ test_hw_profile_name }}"
+    description: "{{ test_hw_profile_desc }}"
+    memory_mb: 1024
+    cpu_count: 1
+    state: present
+  check_mode: yes
+  register: create_check
+
+- name: Assert create hardware profile (Check Mode)
+  assert:
+    that:
+      - create_check.changed == true
+      - create_check.hardware_profile.name == test_hw_profile_name
+
+- name: Test create hardware profile
+  microsoft.scvmm.scvmm_hardware_profile:
+    name: "{{ test_hw_profile_name }}"
+    description: "{{ test_hw_profile_desc }}"
+    memory_mb: 1024
+    cpu_count: 1
+    state: present
+  register: create_actual
+
+- name: Assert create hardware profile
+  assert:
+    that:
+      - create_actual.changed == true
+      - create_actual.hardware_profile.name == test_hw_profile_name
+      - create_actual.hardware_profile.description == test_hw_profile_desc
+      - create_actual.hardware_profile.memory_mb == 1024
+      - create_actual.hardware_profile.cpu_count == 1
+
+- name: Test create hardware profile (Idempotency)
+  microsoft.scvmm.scvmm_hardware_profile:
+    name: "{{ test_hw_profile_name }}"
+    description: "{{ test_hw_profile_desc }}"
+    memory_mb: 1024
+    cpu_count: 1
+    state: present
+  register: create_idempotency
+
+- name: Assert create hardware profile (Idempotency)
+  assert:
+    that:
+      - create_idempotency.changed == false
+
+- name: Test update hardware profile (Check Mode)
+  microsoft.scvmm.scvmm_hardware_profile:
+    name: "{{ test_hw_profile_name }}"
+    description: "{{ test_hw_profile_desc_updated }}"
+    memory_mb: 2048
+    cpu_count: 2
+    state: present
+  check_mode: yes
+  register: update_check
+
+- name: Assert update hardware profile (Check Mode)
+  assert:
+    that:
+      - update_check.changed == true
+
+- name: Test update hardware profile
+  microsoft.scvmm.scvmm_hardware_profile:
+    name: "{{ test_hw_profile_name }}"
+    description: "{{ test_hw_profile_desc_updated }}"
+    memory_mb: 2048
+    cpu_count: 2
+    state: present
+  register: update_actual
+
+- name: Assert update hardware profile
+  assert:
+    that:
+      - update_actual.changed == true
+      - update_actual.hardware_profile.description == test_hw_profile_desc_updated
+      - update_actual.hardware_profile.memory_mb == 2048
+      - update_actual.hardware_profile.cpu_count == 2
+
+- name: Test update hardware profile (Idempotency)
+  microsoft.scvmm.scvmm_hardware_profile:
+    name: "{{ test_hw_profile_name }}"
+    description: "{{ test_hw_profile_desc_updated }}"
+    memory_mb: 2048
+    cpu_count: 2
+    state: present
+  register: update_idempotency
+
+- name: Assert update hardware profile (Idempotency)
+  assert:
+    that:
+      - update_idempotency.changed == false
+
+- name: Test remove hardware profile (Check Mode)
+  microsoft.scvmm.scvmm_hardware_profile:
+    name: "{{ test_hw_profile_name }}"
+    state: absent
+  check_mode: yes
+  register: remove_check
+
+- name: Assert remove hardware profile (Check Mode)
+  assert:
+    that:
+      - remove_check.changed == true
+
+- name: Test remove hardware profile
+  microsoft.scvmm.scvmm_hardware_profile:
+    name: "{{ test_hw_profile_name }}"
+    state: absent
+  register: remove_actual
+
+- name: Assert remove hardware profile
+  assert:
+    that:
+      - remove_actual.changed == true
+
+- name: Test remove hardware profile (Idempotency)
+  microsoft.scvmm.scvmm_hardware_profile:
+    name: "{{ test_hw_profile_name }}"
+    state: absent
+  register: remove_idempotency
+
+- name: Assert remove hardware profile (Idempotency)
+  assert:
+    that:
+      - remove_idempotency.changed == false
+
+- name: Clean up after tests
+  microsoft.scvmm.scvmm_hardware_profile:
+    name: "{{ item }}"
+    state: absent
+  loop:
+    - "{{ test_hw_profile_name }}"
+    - "{{ test_hw_profile_name_updated }}"
+  ignore_errors: yes

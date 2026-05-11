@@ -1,0 +1,43 @@
+---
+- name: Set test variables
+  set_fact:
+    test_profile_name: "AnsibleTestProfileInfo_{{ 1000 | random }}"
+
+- name: Ensure profile is absent before test
+  microsoft.scvmm.scvmm_guest_os_profile:
+    name: "{{ test_profile_name }}"
+    state: absent
+
+- name: Create a profile for info testing
+  microsoft.scvmm.scvmm_guest_os_profile:
+    name: "{{ test_profile_name }}"
+    description: "Test profile for info gathering"
+    state: present
+
+- name: Gather info for all profiles
+  microsoft.scvmm.scvmm_guest_os_profile_info:
+  register: all_profiles
+
+- name: Assert all profiles info gathered
+  assert:
+    that:
+      - all_profiles.guest_os_profiles is defined
+      - all_profiles.guest_os_profiles | type_debug == 'list'
+
+- name: Gather info for specific profile
+  microsoft.scvmm.scvmm_guest_os_profile_info:
+    name: "{{ test_profile_name }}"
+  register: specific_profile
+
+- name: Assert specific profile info gathered
+  assert:
+    that:
+      - specific_profile.guest_os_profiles is defined
+      - specific_profile.guest_os_profiles | length == 1
+      - specific_profile.guest_os_profiles[0].name == test_profile_name
+      - specific_profile.guest_os_profiles[0].description == "Test profile for info gathering"
+
+- name: Clean up profile
+  microsoft.scvmm.scvmm_guest_os_profile:
+    name: "{{ test_profile_name }}"
+    state: absent

@@ -1,0 +1,39 @@
+---
+- name: Set test variables
+  set_fact:
+    test_hw_profile_name: "Ansible-Test-Info-Profile"
+
+- name: Create test hardware profile
+  microsoft.scvmm.scvmm_hardware_profile:
+    name: "{{ test_hw_profile_name }}"
+    description: "Info test profile"
+    state: present
+  register: create_profile
+
+- name: Gather info for all hardware profiles
+  microsoft.scvmm.scvmm_hardware_profile_info:
+  register: all_profiles
+
+- name: Assert gather info for all hardware profiles
+  assert:
+    that:
+      - all_profiles.hardware_profiles is defined
+      - all_profiles.hardware_profiles | type_debug == "list"
+
+- name: Gather info for specific hardware profile
+  microsoft.scvmm.scvmm_hardware_profile_info:
+    name: "{{ test_hw_profile_name }}"
+  register: specific_profile
+
+- name: Assert gather info for specific hardware profile
+  assert:
+    that:
+      - specific_profile.hardware_profiles is defined
+      - specific_profile.hardware_profiles | length == 1
+      - specific_profile.hardware_profiles[0].name == test_hw_profile_name
+      - specific_profile.hardware_profiles[0].description == "Info test profile"
+
+- name: Clean up test hardware profile
+  microsoft.scvmm.scvmm_hardware_profile:
+    name: "{{ test_hw_profile_name }}"
+    state: absent

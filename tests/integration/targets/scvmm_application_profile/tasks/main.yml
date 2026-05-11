@@ -1,0 +1,91 @@
+---
+- name: Ensure starting state is clean
+  microsoft.scvmm.scvmm_application_profile:
+    name: "TestAppProfile"
+    state: absent
+
+- name: Create an application profile
+  microsoft.scvmm.scvmm_application_profile:
+    name: "TestAppProfile"
+    description: "Initial description"
+    state: present
+  register: result
+
+- name: Assert creation was successful
+  assert:
+    that:
+      - result.changed == true
+      - result.application_profile.name == "TestAppProfile"
+      - result.application_profile.description == "Initial description"
+
+- name: Test idempotency of creation
+  microsoft.scvmm.scvmm_application_profile:
+    name: "TestAppProfile"
+    description: "Initial description"
+    state: present
+  register: result_idempotent
+
+- name: Assert idempotency
+  assert:
+    that:
+      - result_idempotent.changed == false
+
+- name: Update the application profile (Check Mode)
+  microsoft.scvmm.scvmm_application_profile:
+    name: "TestAppProfile"
+    description: "Updated description"
+    state: present
+  check_mode: true
+  register: result_check_mode
+
+- name: Assert update check mode
+  assert:
+    that:
+      - result_check_mode.changed == true
+
+- name: Update the application profile
+  microsoft.scvmm.scvmm_application_profile:
+    name: "TestAppProfile"
+    description: "Updated description"
+    state: present
+  register: result_update
+
+- name: Assert update was successful
+  assert:
+    that:
+      - result_update.changed == true
+      - result_update.application_profile.description == "Updated description"
+
+- name: Remove the application profile (Check Mode)
+  microsoft.scvmm.scvmm_application_profile:
+    name: "TestAppProfile"
+    state: absent
+  check_mode: true
+  register: result_remove_check
+
+- name: Assert remove check mode
+  assert:
+    that:
+      - result_remove_check.changed == true
+
+- name: Remove the application profile
+  microsoft.scvmm.scvmm_application_profile:
+    name: "TestAppProfile"
+    state: absent
+  register: result_remove
+
+- name: Assert remove was successful
+  assert:
+    that:
+      - result_remove.changed == true
+
+- name: Test idempotency of removal
+  microsoft.scvmm.scvmm_application_profile:
+    name: "TestAppProfile"
+    state: absent
+  register: result_remove_idempotent
+
+- name: Assert remove idempotency
+  assert:
+    that:
+      - result_remove_idempotent.changed == false

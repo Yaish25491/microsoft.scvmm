@@ -110,9 +110,9 @@ This backlog tracks the implementation of all 97 modules for the `microsoft.scvm
 - [ ] `scvmm_port_classification` - Manage port classifications (ACA-5547)
 - [x] `scvmm_library_share` - Manage library shares (ACA-5681)
 - [x] `scvmm_library_share_info` - Gather library share info (ACA-5682)
-- [ ] `scvmm_iso_info` - Gather ISO info (ACA-5683)
-- [ ] `scvmm_script_info` - Gather script info (ACA-5684)
-- [ ] `scvmm_custom_resource_info` - Gather custom resource info (ACA-5685)
+- [x] `scvmm_iso_info` - Gather ISO info (ACA-5683)
+- [x] `scvmm_script_info` - Gather script info (ACA-5684)
+- [x] `scvmm_custom_resource_info` - Gather custom resource info (ACA-5685)
 - [x] `scvmm_library_resource` - Manage library resources (ACA-5687)
 
 ## VM Peripherals - Disk & NIC Management (ACA-5535)

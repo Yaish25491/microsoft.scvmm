@@ -1,0 +1,20 @@
+---
+- name: Gather info for all custom resources
+  microsoft.scvmm.scvmm_custom_resource_info:
+  register: all_info
+
+- name: Assert output structure
+  assert:
+    that:
+      - all_info.scvmm_custom_resources is defined
+      - all_info.scvmm_custom_resources | type_debug == 'list'
+
+- name: Gather info with check mode
+  microsoft.scvmm.scvmm_custom_resource_info:
+  check_mode: true
+  register: check_info
+
+- name: Assert check mode
+  assert:
+    that:
+      - check_info.scvmm_custom_resources is defined

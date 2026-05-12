@@ -1164,6 +1164,67 @@ function Get-SCVMMComplianceStatusInfo {
     return $info
 }
 
+function Get-SCVMMISOInfo {
+    <#
+    .SYNOPSIS
+    Converts a SCVMM ISO object to a hashtable.
+    .DESCRIPTION
+    Extracts relevant properties from an ISO object and returns a standardized hashtable.
+    .PARAMETER ISO
+    The SCISO object to convert.
+    #>
+    param(
+        [Parameter(Mandatory = $true)]
+        [Object]$ISO
+    )
+
+    $info = @{
+        name = $ISO.Name
+        id = $ISO.ID.Guid
+        description = $ISO.Description
+        family_name = $ISO.FamilyName
+        release = $ISO.Release
+        library_server = if ($ISO.LibraryServer) { $ISO.LibraryServer.Name } else { $null }
+        share_path = $ISO.SharePath
+        size = $ISO.Size
+        is_equivalent = $ISO.IsEquivalent
+        added_time = if ($ISO.AddedTime) { $ISO.AddedTime.ToString('yyyy-MM-ddTHH:mm:ssZ') } else { $null }
+        modified_time = if ($ISO.ModifiedTime) { $ISO.ModifiedTime.ToString('yyyy-MM-ddTHH:mm:ssZ') } else { $null }
+    }
+
+    return $info
+}
+
+function Get-SCVMMScriptInfo {
+    <#
+    .SYNOPSIS
+    Converts a SCVMM Script object to a hashtable.
+    .DESCRIPTION
+    Extracts relevant properties from a Script object and returns a standardized hashtable.
+    .PARAMETER Script
+    The SCScript object to convert.
+    #>
+    param(
+        [Parameter(Mandatory = $true)]
+        [Object]$Script
+    )
+
+    $info = @{
+        name = $Script.Name
+        id = $Script.ID.Guid
+        description = $Script.Description
+        family_name = $Script.FamilyName
+        release = $Script.Release
+        library_server = if ($Script.LibraryServer) { $Script.LibraryServer.Name } else { $null }
+        share_path = $Script.SharePath
+        is_equivalent = $Script.IsEquivalent
+        added_time = if ($Script.AddedTime) { $Script.AddedTime.ToString('yyyy-MM-ddTHH:mm:ssZ') } else { $null }
+        modified_time = if ($Script.ModifiedTime) { $Script.ModifiedTime.ToString('yyyy-MM-ddTHH:mm:ssZ') } else { $null }
+    }
+
+    return $info
+}
+
 $exports = @(
     'Import-SCVMMModule',
     'Get-SCVMMCapabilityProfileInfo',
@@ -1205,9 +1266,42 @@ $exports = @(
     'Get-SCVMMHardwareProfileInfo',
     'Get-SCVMMGuestOSProfileInfo',
     'Get-SCVMMServiceInfo',
-    'Get-SCVMMServiceTemplateInfo'
+    'Get-SCVMMServiceTemplateInfo',
+    'Get-SCVMMCustomResourceInfo',
+    'Get-SCVMMISOInfo',
+    'Get-SCVMMScriptInfo'
 )
 Export-ModuleMember -Function $exports
+
+function Get-SCVMMCustomResourceInfo {
+    <#
+    .SYNOPSIS
+    Converts a SCVMM Custom Resource object to a hashtable.
+    .DESCRIPTION
+    Extracts relevant properties from a CustomResource object and returns a standardized hashtable.
+    .PARAMETER CustomResource
+    The CustomResource object to convert.
+    #>
+    param(
+        [Parameter(Mandatory = $true)]
+        [Object]$CustomResource
+    )
+
+    $info = @{
+        name = $CustomResource.Name
+        id = $CustomResource.ID.Guid
+        description = $CustomResource.Description
+        family_name = $CustomResource.FamilyName
+        release = $CustomResource.Release
+        library_server = if ($CustomResource.LibraryServer) { $CustomResource.LibraryServer.Name } else { $null }
+        share_path = $CustomResource.SharePath
+        is_equivalent = $CustomResource.IsEquivalent
+        added_time = $CustomResource.AddedTime
+        modified_time = $CustomResource.ModifiedTime
+    }
+
+    return $info
+}
 
 function Get-SCVMMServiceTemplateInfo {
     <#

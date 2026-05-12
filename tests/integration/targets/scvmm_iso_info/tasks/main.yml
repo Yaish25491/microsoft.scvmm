@@ -1,0 +1,33 @@
+---
+- name: Gather info for all ISOs
+  microsoft.scvmm.scvmm_iso_info:
+  register: all_isos
+
+- name: Assert info gathered
+  assert:
+    that:
+      - all_isos.isos is defined
+      - all_isos.changed == false
+
+- name: Gather info for a specific ISO
+  microsoft.scvmm.scvmm_iso_info:
+    name: "non_existent_iso_12345"
+  register: specific_iso
+
+- name: Assert empty list returned for non-existent ISO
+  assert:
+    that:
+      - specific_iso.isos is defined
+      - specific_iso.isos | length == 0
+      - specific_iso.changed == false
+
+- name: Run in check mode
+  microsoft.scvmm.scvmm_iso_info:
+  check_mode: true
+  register: check_mode_result
+
+- name: Assert check mode results
+  assert:
+    that:
+      - check_mode_result.isos is defined
+      - check_mode_result.changed == false

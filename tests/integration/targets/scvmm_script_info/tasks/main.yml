@@ -1,0 +1,33 @@
+---
+- name: Gather info for all scripts
+  microsoft.scvmm.scvmm_script_info:
+  register: all_scripts
+
+- name: Assert info gathered
+  assert:
+    that:
+      - all_scripts.scripts is defined
+      - all_scripts.changed == false
+
+- name: Gather info for a specific script
+  microsoft.scvmm.scvmm_script_info:
+    name: "non_existent_script_12345"
+  register: specific_script
+
+- name: Assert empty list returned for non-existent script
+  assert:
+    that:
+      - specific_script.scripts is defined
+      - specific_script.scripts | length == 0
+      - specific_script.changed == false
+
+- name: Run in check mode
+  microsoft.scvmm.scvmm_script_info:
+  check_mode: true
+  register: check_mode_result
+
+- name: Assert check mode results
+  assert:
+    that:
+      - check_mode_result.scripts is defined
+      - check_mode_result.changed == false

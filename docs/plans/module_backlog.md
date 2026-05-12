@@ -78,12 +78,12 @@ This backlog tracks the implementation of all 97 modules for the `microsoft.scvm
 - [ ] `scvmm_compliance_info` - Gather compliance info (ACA-5723)
 
 ## Service Templates & Multi-tier Apps (ACA-5676)
-- [ ] `scvmm_service_template` - Manage service templates (ACA-5699)
-- [ ] `scvmm_service_template_info` - Gather service template info (ACA-5701)
-- [ ] `scvmm_service` - Manage services (ACA-5703)
-- [ ] `scvmm_service_info` - Gather service info (ACA-5708)
-- [ ] `scvmm_sql_profile` - Manage SQL profiles (ACA-5712)
-- [ ] `scvmm_sql_profile_info` - Gather SQL profile info (ACA-5716)
+- [x] `scvmm_service_template` - Manage service templates (ACA-5699)
+- [x] `scvmm_service_template_info` - Gather service template info (ACA-5701)
+- [x] `scvmm_service` - Manage services (ACA-5703)
+- [x] `scvmm_service_info` - Gather service info (ACA-5708)
+- [x] `scvmm_sql_profile` - Manage SQL profiles (ACA-5712)
+- [x] `scvmm_sql_profile_info` - Gather SQL profile info (ACA-5716)
 
 ## Profiles Management (ACA-5675)
 - [x] `scvmm_hardware_profile` - Manage hardware profiles (ACA-5705)

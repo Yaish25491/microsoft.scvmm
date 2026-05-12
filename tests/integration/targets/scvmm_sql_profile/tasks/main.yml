@@ -1,0 +1,140 @@
+---
+- name: Set random profile name
+  set_fact:
+    sql_profile_name: "test_sql_profile_{{ 9999 | random }}"
+
+- name: Ensure SQL profile is absent initially
+  microsoft.scvmm.scvmm_sql_profile:
+    name: "{{ sql_profile_name }}"
+    state: absent
+  register: result
+
+- name: Create SQL Profile (Check Mode)
+  microsoft.scvmm.scvmm_sql_profile:
+    name: "{{ sql_profile_name }}"
+    description: "Initial description"
+    state: present
+  check_mode: true
+  register: result
+
+- name: Assert create check mode
+  assert:
+    that:
+      - result.changed == true
+
+- name: Create SQL Profile
+  microsoft.scvmm.scvmm_sql_profile:
+    name: "{{ sql_profile_name }}"
+    description: "Initial description"
+    state: present
+  register: result
+
+- name: Assert create
+  assert:
+    that:
+      - result.changed == true
+      - result.sql_profile.name == sql_profile_name
+      - result.sql_profile.description == "Initial description"
+
+- name: Create SQL Profile Again (Idempotency)
+  microsoft.scvmm.scvmm_sql_profile:
+    name: "{{ sql_profile_name }}"
+    description: "Initial description"
+    state: present
+  register: result
+
+- name: Assert create idempotency
+  assert:
+    that:
+      - result.changed == false
+
+- name: Get SQL Profile Info
+  microsoft.scvmm.scvmm_sql_profile_info:
+    name: "{{ sql_profile_name }}"
+  register: info_result
+
+- name: Assert get info
+  assert:
+    that:
+      - info_result.sql_profiles | length == 1
+      - info_result.sql_profiles[0].name == sql_profile_name
+      - info_result.sql_profiles[0].description == "Initial description"
+
+- name: Update SQL Profile (Check Mode)
+  microsoft.scvmm.scvmm_sql_profile:
+    name: "{{ sql_profile_name }}"
+    description: "Updated description"
+    state: present
+  check_mode: true
+  register: result
+
+- name: Assert update check mode
+  assert:
+    that:
+      - result.changed == true
+
+- name: Get SQL Profile Info after check mode update
+  microsoft.scvmm.scvmm_sql_profile_info:
+    name: "{{ sql_profile_name }}"
+  register: info_result
+
+- name: Assert check mode did not change system
+  assert:
+    that:
+      - info_result.sql_profiles[0].description == "Initial description"
+
+- name: Update SQL Profile
+  microsoft.scvmm.scvmm_sql_profile:
+    name: "{{ sql_profile_name }}"
+    description: "Updated description"
+    state: present
+  register: result
+
+- name: Assert update
+  assert:
+    that:
+      - result.changed == true
+      - result.sql_profile.description == "Updated description"
+
+- name: Remove SQL Profile (Check Mode)
+  microsoft.scvmm.scvmm_sql_profile:
+    name: "{{ sql_profile_name }}"
+    state: absent
+  check_mode: true
+  register: result
+
+- name: Assert remove check mode
+  assert:
+    that:
+      - result.changed == true
+
+- name: Remove SQL Profile
+  microsoft.scvmm.scvmm_sql_profile:
+    name: "{{ sql_profile_name }}"
+    state: absent
+  register: result
+
+- name: Assert remove
+  assert:
+    that:
+      - result.changed == true
+
+- name: Remove SQL Profile Again (Idempotency)
+  microsoft.scvmm.scvmm_sql_profile:
+    name: "{{ sql_profile_name }}"
+    state: absent
+  register: result
+
+- name: Assert remove idempotency
+  assert:
+    that:
+      - result.changed == false
+
+- name: Get all SQL Profile Info
+  microsoft.scvmm.scvmm_sql_profile_info:
+  register: info_result
+
+- name: Assert get all info runs successfully
+  assert:
+    that:
+      - info_result.sql_profiles is defined

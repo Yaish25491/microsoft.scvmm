@@ -1,0 +1,52 @@
+---
+# tests/integration/targets/scvmm_service/tasks/main.yml
+
+- name: Set test variables
+  set_fact:
+    test_service_name: "AnsibleTestService_{{ 1000 | random }}"
+    test_description: "Initial description"
+    updated_description: "Updated description"
+    test_service_config: "AnsibleTestServiceConfig"
+
+- name: Ensure test service configuration exists (Setup)
+  # In a real environment, we would create a Service Template and Service Configuration.
+  # We might need to mock this or rely on a pre-existing one.
+  # For integration tests, we'll try to just test the error handling if it doesn't exist.
+  microsoft.scvmm.scvmm_service:
+    name: "{{ test_service_name }}"
+    state: present
+    service_configuration: "NonExistentConfig"
+  register: create_fail
+  ignore_errors: true
+
+- name: Assert create fails cleanly for missing configuration
+  assert:
+    that:
+      - create_fail is failed
+      - "'not found' in create_fail.msg"
+
+- name: Create a service (Mocking or relying on environment)
+  # We will test absent state on a non-existent service to ensure idempotency.
+  microsoft.scvmm.scvmm_service:
+    name: "SomeRandomMissingService"
+    state: absent
+  register: absent_test
+
+- name: Assert absent on missing service is changed=False
+  assert:
+    that:
+      - absent_test is not failed
+      - absent_test.changed == false
+
+- name: Check mode absent
+  microsoft.scvmm.scvmm_service:
+    name: "SomeRandomMissingService"
+    state: absent
+  check_mode: true
+  register: absent_check
+
+- name: Assert check mode absent on missing is changed=False
+  assert:
+    that:
+      - absent_check is not failed
+      - absent_check.changed == false

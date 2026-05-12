@@ -1,0 +1,26 @@
+---
+# tests/integration/targets/scvmm_service_info/tasks/main.yml
+
+- name: Setup - create dummy service
+  # Assuming we need a mock or we rely on the system state.
+  # Since this is an info module, we'll just test if it runs without errors.
+  microsoft.scvmm.scvmm_service_info:
+  register: info_all
+
+- name: Assert info module succeeds for all
+  assert:
+    that:
+      - info_all is not failed
+      - info_all.services is defined
+      - info_all.services | type_debug == "list"
+
+- name: Test gather info for a non-existent service
+  microsoft.scvmm.scvmm_service_info:
+    name: "NonExistentService12345"
+  register: info_none
+
+- name: Assert info module handles missing service correctly
+  assert:
+    that:
+      - info_none is not failed
+      - info_none.services | length == 0

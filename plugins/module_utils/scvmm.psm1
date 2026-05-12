@@ -1020,6 +1020,36 @@ function Get-SCVMMHardwareProfileInfo {
     return $info
 }
 
+function Get-SCVMMServiceInfo {
+    <#
+    .SYNOPSIS
+    Converts a SCVMM Service object to a hashtable.
+    .DESCRIPTION
+    Extracts relevant properties from a Service object and returns a standardized hashtable.
+    .PARAMETER Service
+    The SCService object to convert.
+    #>
+    param(
+        [Parameter(Mandatory = $true)]
+        [Object]$Service
+    )
+
+    $info = @{
+        name = $Service.Name
+        id = $Service.ID.Guid
+        description = $Service.Description
+        status = if ($Service.Status) { $Service.Status.ToString() } else { $null }
+        service_template = if ($Service.ServiceTemplate) { $Service.ServiceTemplate.Name } else { $null }
+        user_role = if ($Service.UserRole) { $Service.UserRole.Name } else { $null }
+        owner = $Service.Owner
+        release = $Service.Release
+        cost_center = $Service.CostCenter
+        is_recoverable = $Service.IsRecoverable
+    }
+
+    return $info
+}
+
 function Get-SCVMMGuestOSProfileInfo {
     <#
     .SYNOPSIS
@@ -1082,6 +1112,31 @@ function Get-SCVMMCapabilityProfileInfo {
     return $info
 }
 
+function Get-SCVMMSQLProfileInfo {
+    <#
+    .SYNOPSIS
+    Converts a SCVMM SQL Profile object to a hashtable.
+    .DESCRIPTION
+    Extracts relevant properties from a SQLProfile object and returns a standardized hashtable.
+    .PARAMETER SQLProfile
+    The SCSQLProfile object to convert.
+    #>
+    param(
+        [Parameter(Mandatory = $true)]
+        [Object]$SQLProfile
+    )
+
+    $info = @{
+        name = $SQLProfile.Name
+        id = $SQLProfile.ID.Guid
+        description = $SQLProfile.Description
+        owner = $SQLProfile.Owner
+        user_role = if ($SQLProfile.UserRole) { $SQLProfile.UserRole.Name } else { $null }
+    }
+
+    return $info
+}
+
 $exports = @(
     'Import-SCVMMModule',
     'Get-SCVMMCapabilityProfileInfo',
@@ -1120,6 +1175,36 @@ $exports = @(
     'Get-SCVMMRunAsAccountInfo',
     'Get-SCVMMApplicationProfileInfo',
     'Get-SCVMMHardwareProfileInfo',
-    'Get-SCVMMGuestOSProfileInfo'
+    'Get-SCVMMGuestOSProfileInfo',
+    'Get-SCVMMServiceInfo',
+    'Get-SCVMMServiceTemplateInfo'
 )
 Export-ModuleMember -Function $exports
+
+function Get-SCVMMServiceTemplateInfo {
+    <#
+    .SYNOPSIS
+    Converts a SCVMM Service Template object to a hashtable.
+    .DESCRIPTION
+    Extracts relevant properties from a ServiceTemplate object and returns a standardized hashtable.
+    .PARAMETER ServiceTemplate
+    The ServiceTemplate object to convert.
+    #>
+    param(
+        [Parameter(Mandatory = $true)]
+        [Object]$ServiceTemplate
+    )
+
+    $info = @{
+        name = $ServiceTemplate.Name
+        id = $ServiceTemplate.ID.Guid
+        description = $ServiceTemplate.Description
+        release = $ServiceTemplate.Release
+        owner = $ServiceTemplate.Owner
+        service_priority = if ($ServiceTemplate.ServicePriority) { $ServiceTemplate.ServicePriority.ToString() } else { $null }
+        user_role = if ($ServiceTemplate.UserRole) { $ServiceTemplate.UserRole.Name } else { $null }
+        is_published = $ServiceTemplate.Published
+    }
+
+    return $info
+}

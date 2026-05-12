@@ -1,0 +1,21 @@
+---
+- name: Test gathering library share info
+  microsoft.scvmm.scvmm_library_share_info:
+  register: info_all
+
+- name: Assert info_all
+  assert:
+    that:
+      - info_all is not changed
+      - info_all.library_shares is defined
+
+- name: Test gathering library share info with check_mode
+  microsoft.scvmm.scvmm_library_share_info:
+  check_mode: yes
+  register: info_check
+
+- name: Assert info_check
+  assert:
+    that:
+      - info_check is not changed
+      - info_check.library_shares is defined

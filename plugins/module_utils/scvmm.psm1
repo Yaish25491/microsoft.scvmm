@@ -1137,9 +1137,37 @@ function Get-SCVMMSQLProfileInfo {
     return $info
 }
 
+function Get-SCVMMComplianceStatusInfo {
+    <#
+    .SYNOPSIS
+    Converts a SCVMM Compliance Status object to a hashtable.
+    .DESCRIPTION
+    Extracts relevant properties from a ComplianceStatus object and returns a standardized hashtable.
+    .PARAMETER ComplianceStatus
+    The ComplianceStatus object to convert.
+    #>
+    param(
+        [Parameter(Mandatory = $true)]
+        [Object]$ComplianceStatus
+    )
+
+    $info = @{
+        compliance_status = if ($ComplianceStatus.ComplianceStatus) { $ComplianceStatus.ComplianceStatus.ToString() } else { $null }
+        last_scan_time = $ComplianceStatus.LastScanTime
+        object_name = if ($ComplianceStatus.ItemName) { $ComplianceStatus.ItemName } elseif ($ComplianceStatus.Name) { $ComplianceStatus.Name } else { $null }
+        object_type = if ($ComplianceStatus.ItemType) { $ComplianceStatus.ItemType.ToString() } else { $null }
+        baseline_name = if ($ComplianceStatus.Baseline) { $ComplianceStatus.Baseline.Name } else { $null }
+        error_code = $ComplianceStatus.ErrorCode
+        error_description = $ComplianceStatus.ErrorDescription
+    }
+
+    return $info
+}
+
 $exports = @(
     'Import-SCVMMModule',
     'Get-SCVMMCapabilityProfileInfo',
+    'Get-SCVMMComplianceStatusInfo',
     'Get-SCVMMVMInfo',
     'Get-SCVMMCloudInfo',
     'Get-SCVMMTemplateInfo',
@@ -1204,6 +1232,57 @@ function Get-SCVMMServiceTemplateInfo {
         service_priority = if ($ServiceTemplate.ServicePriority) { $ServiceTemplate.ServicePriority.ToString() } else { $null }
         user_role = if ($ServiceTemplate.UserRole) { $ServiceTemplate.UserRole.Name } else { $null }
         is_published = $ServiceTemplate.Published
+    }
+
+    return $info
+}
+
+function Get-SCVMMLibraryShareInfo {
+    <#
+    .SYNOPSIS
+    Converts a SCVMM Library Share object to a hashtable.
+    .DESCRIPTION
+    Extracts relevant properties from a LibraryShare object and returns a standardized hashtable.
+    .PARAMETER LibraryShare
+    The SCLibraryShare object to convert.
+    #>
+    param(
+        [Parameter(Mandatory = $true)]
+        [Object]$LibraryShare
+    )
+
+    $info = @{
+        name = $LibraryShare.Name
+        id = $LibraryShare.ID.Guid
+        description = $LibraryShare.Description
+        path = $LibraryShare.Path
+        library_server = if ($LibraryShare.LibraryServer) { $LibraryShare.LibraryServer.Name } else { $null }
+        is_read_only = $LibraryShare.IsReadOnly
+    }
+
+    return $info
+}
+
+function Get-SCVMMLibraryResourceInfo {
+    <#
+    .SYNOPSIS
+    Converts a SCVMM Library Resource object to a hashtable.
+    .DESCRIPTION
+    Extracts relevant properties from a LibraryResource object and returns a standardized hashtable.
+    .PARAMETER LibraryResource
+    The SCLibraryResource object to convert.
+    #>
+    param(
+        [Parameter(Mandatory = $true)]
+        [Object]$LibraryResource
+    )
+
+    $info = @{
+        name = $LibraryResource.Name
+        id = $LibraryResource.ID.Guid
+        description = $LibraryResource.Description
+        library_server = if ($LibraryResource.LibraryServer) { $LibraryResource.LibraryServer.Name } else { $null }
+        share_path = $LibraryResource.SharePath
     }
 
     return $info

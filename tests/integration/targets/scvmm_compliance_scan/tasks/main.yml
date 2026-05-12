@@ -1,0 +1,47 @@
+---
+- name: Force compliance scan for VMM Server
+  microsoft.scvmm.scvmm_compliance_scan:
+    vmm_server_object: true
+    force_scan: true
+  register: force_scan_result
+
+- name: Assert force scan changed
+  ansible.builtin.assert:
+    that:
+      - force_scan_result.changed is true
+
+- name: Idempotent compliance scan for VMM Server (force_scan=false)
+  microsoft.scvmm.scvmm_compliance_scan:
+    vmm_server_object: true
+    force_scan: false
+  register: idempotent_scan_result
+
+- name: Assert idempotent scan result
+  ansible.builtin.assert:
+    that:
+      - idempotent_scan_result.changed is defined
+
+- name: Check Mode compliance scan
+  microsoft.scvmm.scvmm_compliance_scan:
+    vmm_server_object: true
+    force_scan: true
+  check_mode: yes
+  register: check_mode_result
+
+- name: Assert check mode scan changed
+  ansible.builtin.assert:
+    that:
+      - check_mode_result.changed is true
+
+- name: Check error handling when mutually exclusive
+  microsoft.scvmm.scvmm_compliance_scan:
+    vmm_server_object: true
+    vm_host: "localhost"
+  register: error_result
+  ignore_errors: yes
+
+- name: Assert mutually exclusive error
+  ansible.builtin.assert:
+    that:
+      - error_result.failed is true
+      - "'mutually exclusive' in error_result.msg"

@@ -1,0 +1,25 @@
+---
+- name: Attempt to update a non-existent resource
+  microsoft.scvmm.scvmm_library_resource:
+    name: "NonExistentResourceXYZ"
+    state: present
+    description: "Should fail"
+  ignore_errors: yes
+  register: fail_res
+
+- name: Assert failure for non-existent resource
+  assert:
+    that:
+      - fail_res.failed is true
+      - "'does not exist' in fail_res.msg"
+
+- name: Ensure non-existent resource is absent
+  microsoft.scvmm.scvmm_library_resource:
+    name: "NonExistentResourceXYZ"
+    state: absent
+  register: absent_res
+
+- name: Assert idempotency for absent resource
+  assert:
+    that:
+      - absent_res is not changed

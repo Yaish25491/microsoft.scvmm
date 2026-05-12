@@ -1,0 +1,29 @@
+---
+- name: Get compliance info for VMM Server
+  microsoft.scvmm.scvmm_compliance_info:
+    vmm_server_object: true
+  register: compliance_info
+
+- name: Assert compliance info returned
+  ansible.builtin.assert:
+    that:
+      - compliance_info.compliance_status is defined
+
+- name: Get compliance info for VM Host
+  microsoft.scvmm.scvmm_compliance_info:
+    vm_host: "localhost"
+  register: host_compliance_info
+  ignore_errors: yes
+
+- name: Check error handling when mutually exclusive
+  microsoft.scvmm.scvmm_compliance_info:
+    vmm_server_object: true
+    vm_host: "localhost"
+  register: error_result
+  ignore_errors: yes
+
+- name: Assert mutually exclusive error
+  ansible.builtin.assert:
+    that:
+      - error_result.failed is true
+      - "'mutually exclusive' in error_result.msg"

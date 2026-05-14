@@ -1,0 +1,13 @@
+---
+- name: Test SCVMM VM NIC (Expect Failure - No VM)
+  microsoft.scvmm.scvmm_vm_nic:
+    vm_name: "AnsibleNonExistentVM"
+    state: present
+  register: nic_result
+  ignore_errors: true
+
+- name: Assert failure due to missing VM
+  assert:
+    that:
+      - nic_result.failed == true
+      - "'not found' in nic_result.msg or 'Failed' in nic_result.msg"

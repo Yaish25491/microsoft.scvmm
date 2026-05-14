@@ -1225,10 +1225,38 @@ function Get-SCVMMScriptInfo {
     return $info
 }
 
+function Get-SCVMMVirtualDiskDriveInfo {
+    <#
+    .SYNOPSIS
+    Converts a SCVMM Virtual Disk Drive object to a hashtable.
+    .DESCRIPTION
+    Extracts relevant properties from a VirtualDiskDrive object and returns a standardized hashtable.
+    .PARAMETER VirtualDiskDrive
+    The VirtualDiskDrive object to convert.
+    #>
+    param(
+        [Parameter(Mandatory = $true)]
+        [Object]$VirtualDiskDrive
+    )
+
+    $info = @{
+        name = $VirtualDiskDrive.Name
+        id = $VirtualDiskDrive.ID.Guid
+        bus = $VirtualDiskDrive.Bus
+        lun = $VirtualDiskDrive.LUN
+        bus_type = if ($VirtualDiskDrive.BusType) { $VirtualDiskDrive.BusType.ToString() } else { $null }
+        volume_type = if ($VirtualDiskDrive.VolumeType) { $VirtualDiskDrive.VolumeType.ToString() } else { $null }
+        virtual_hard_disk = if ($VirtualDiskDrive.VirtualHardDisk) { $VirtualDiskDrive.VirtualHardDisk.Name } else { $null }
+    }
+
+    return $info
+}
+
 $exports = @(
     'Import-SCVMMModule',
     'Get-SCVMMCapabilityProfileInfo',
     'Get-SCVMMComplianceStatusInfo',
+    'Get-SCVMMVirtualDiskDriveInfo',
     'Get-SCVMMVMInfo',
     'Get-SCVMMCloudInfo',
     'Get-SCVMMTemplateInfo',

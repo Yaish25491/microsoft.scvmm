@@ -1,0 +1,112 @@
+---
+- name: Test scvmm_storage_classification
+  block:
+    - name: Ensure test storage classification is absent (setup)
+      microsoft.scvmm.scvmm_storage_classification:
+        name: "AnsibleTestStorageClass"
+        state: absent
+
+    - name: Create new storage classification
+      microsoft.scvmm.scvmm_storage_classification:
+        name: "AnsibleTestStorageClass"
+        description: "Test description"
+        state: present
+      register: create_result
+
+    - name: Assert create changed
+      ansible.builtin.assert:
+        that:
+          - create_result.changed == true
+          - create_result.storage_classification.name == "AnsibleTestStorageClass"
+          - create_result.storage_classification.description == "Test description"
+
+    - name: Create new storage classification (Idempotency)
+      microsoft.scvmm.scvmm_storage_classification:
+        name: "AnsibleTestStorageClass"
+        description: "Test description"
+        state: present
+      register: create_idem_result
+
+    - name: Assert create idempotency
+      ansible.builtin.assert:
+        that:
+          - create_idem_result.changed == false
+
+    - name: Update storage classification description in check mode
+      microsoft.scvmm.scvmm_storage_classification:
+        name: "AnsibleTestStorageClass"
+        description: "Updated description check mode"
+        state: present
+      check_mode: true
+      register: update_check_result
+
+    - name: Assert update check mode changed
+      ansible.builtin.assert:
+        that:
+          - update_check_result.changed == true
+          - update_check_result.storage_classification.description == "Updated description check mode"
+
+    - name: Update storage classification description
+      microsoft.scvmm.scvmm_storage_classification:
+        name: "AnsibleTestStorageClass"
+        description: "Updated description"
+        state: present
+      register: update_result
+
+    - name: Assert update changed
+      ansible.builtin.assert:
+        that:
+          - update_result.changed == true
+          - update_result.storage_classification.description == "Updated description"
+
+    - name: Update storage classification (Idempotency)
+      microsoft.scvmm.scvmm_storage_classification:
+        name: "AnsibleTestStorageClass"
+        description: "Updated description"
+        state: present
+      register: update_idem_result
+
+    - name: Assert update idempotency
+      ansible.builtin.assert:
+        that:
+          - update_idem_result.changed == false
+
+    - name: Remove storage classification in check mode
+      microsoft.scvmm.scvmm_storage_classification:
+        name: "AnsibleTestStorageClass"
+        state: absent
+      check_mode: true
+      register: remove_check_result
+
+    - name: Assert remove check mode changed
+      ansible.builtin.assert:
+        that:
+          - remove_check_result.changed == true
+
+    - name: Remove storage classification
+      microsoft.scvmm.scvmm_storage_classification:
+        name: "AnsibleTestStorageClass"
+        state: absent
+      register: remove_result
+
+    - name: Assert remove changed
+      ansible.builtin.assert:
+        that:
+          - remove_result.changed == true
+
+    - name: Remove storage classification (Idempotency)
+      microsoft.scvmm.scvmm_storage_classification:
+        name: "AnsibleTestStorageClass"
+        state: absent
+      register: remove_idem_result
+
+    - name: Assert remove idempotency
+      ansible.builtin.assert:
+        that:
+          - remove_idem_result.changed == false
+  always:
+    - name: Ensure test storage classification is absent (cleanup)
+      microsoft.scvmm.scvmm_storage_classification:
+        name: "AnsibleTestStorageClass"
+        state: absent
+      ignore_errors: true

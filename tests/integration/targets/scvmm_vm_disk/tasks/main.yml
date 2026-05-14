@@ -1,0 +1,14 @@
+---
+- name: Test SCVMM VM Disk (Expect Failure - No VM)
+  microsoft.scvmm.scvmm_vm_disk:
+    vm_name: "AnsibleNonExistentVM"
+    size: 1024
+    state: present
+  register: disk_result
+  ignore_errors: true
+
+- name: Assert failure due to missing VM
+  assert:
+    that:
+      - disk_result.failed == true
+      - "'not found' in disk_result.msg or 'Failed' in disk_result.msg"

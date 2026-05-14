@@ -106,8 +106,8 @@ This backlog tracks the implementation of all 97 modules for the `microsoft.scvm
 ## Infrastructure Management - IP Pools, Library, Classifications (ACA-5536)
 - [x] `scvmm_ip_pool` - Manage IP pools (ACA-5544)
 - [x] `scvmm_library_server_info` - Gather library server info (ACA-5545)
-- [ ] `scvmm_storage_classification` - Manage storage classifications (ACA-5546)
-- [ ] `scvmm_port_classification` - Manage port classifications (ACA-5547)
+- [x] `scvmm_storage_classification` - Manage storage classifications (ACA-5546)
+- [x] `scvmm_port_classification` - Manage port classifications (ACA-5547)
 - [x] `scvmm_library_share` - Manage library shares (ACA-5681)
 - [x] `scvmm_library_share_info` - Gather library share info (ACA-5682)
 - [x] `scvmm_iso_info` - Gather ISO info (ACA-5683)
@@ -116,8 +116,8 @@ This backlog tracks the implementation of all 97 modules for the `microsoft.scvm
 - [x] `scvmm_library_resource` - Manage library resources (ACA-5687)
 
 ## VM Peripherals - Disk & NIC Management (ACA-5535)
-- [ ] `scvmm_vm_disk` - Manage VM disks (ACA-5542)
-- [ ] `scvmm_vm_nic` - Manage VM NICs (ACA-5543)
+- [x] `scvmm_vm_disk` - Manage VM disks (ACA-5542)
+- [x] `scvmm_vm_nic` - Manage VM NICs (ACA-5543)
 
 ## Info Module Completion (ACA-5534)
 - [x] `scvmm_vm_network_info` - Gather VM network info (ACA-5538)

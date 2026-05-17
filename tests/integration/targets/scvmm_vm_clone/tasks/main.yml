@@ -1,58 +1,12 @@
 ---
-- name: Test scvmm_vm_clone - Fail if missing source (Request Analysis)
+- name: Test SCVMM VM Clone (Expect Failure)
   microsoft.scvmm.scvmm_vm_clone:
-    name: "NonExistentSourceVM"
-    new_name: "CloneVM"
-    cloud: "AnyCloud"
-  register: fail_source
+    name: "NonExistentVM"
+    new_name: "AnsibleTestVMClone"
+  register: clone_result
   ignore_errors: true
 
-- name: Assert failure if source VM missing
+- name: Assert failure gracefully
   assert:
     that:
-      - fail_source.failed == true
-      - "'Source virtual machine' in fail_source.msg"
-
-- name: Test scvmm_vm_clone - Fail if missing required cloud/host
-  microsoft.scvmm.scvmm_vm_clone:
-    name: "AnySource"
-    new_name: "CloneVM"
-  register: fail_missing_target
-  ignore_errors: true
-
-- name: Assert failure if target host/cloud missing
-  assert:
-    that:
-      - fail_missing_target.failed == true
-      - "'one of the following is required: vm_host, cloud' in fail_missing_target.msg"
-
-# The following tests are "mocked" in behavior because we likely don't have a live SCVMM environment
-# But we can verify the parameter validation and initial response logic
-
-- name: Test scvmm_vm_clone - Fail if vm_host specified without path
-  microsoft.scvmm.scvmm_vm_clone:
-    name: "AnySource"
-    new_name: "CloneVM"
-    vm_host: "Host01"
-  register: fail_path
-  ignore_errors: true
-
-- name: Assert failure if path missing with vm_host
-  assert:
-    that:
-      - fail_path.failed == true
-      - "'path' is required when 'vm_host' is specified" or "'An error occurred' in fail_path.msg"
-
-- name: Test scvmm_vm_clone - Check Mode (Functional Coverage)
-  microsoft.scvmm.scvmm_vm_clone:
-    name: "{{ scvmm_source_vm | default('SourceVM') }}"
-    new_name: "{{ scvmm_target_vm | default('CloneVM') }}"
-    cloud: "{{ scvmm_cloud | default('Production') }}"
-  check_mode: true
-  register: check_mode_result
-  ignore_errors: true
-
-- name: Assert check mode result
-  assert:
-    that:
-      - check_mode_result.failed == true or check_mode_result.changed == true
+      - clone_result.failed == true

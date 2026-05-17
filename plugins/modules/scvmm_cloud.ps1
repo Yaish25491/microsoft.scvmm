@@ -52,7 +52,8 @@ try {
 
             $new_cloud = New-SCCloud -Name $name -VMHostGroup $hg_objects -Description $description -ErrorAction Stop
             $module.Result.changed = $true
-        } else {
+        }
+else {
             # Update
             $changed = $false
             $update_params = @{}
@@ -65,7 +66,7 @@ try {
             # Handle host group updates if host_group is provided
             if ($null -ne $host_group) {
                 $current_hg_names = @($current_cloud.VMHostGroup | Select-Object -ExpandProperty Name)
-                
+
                 $hgs_to_add = @()
                 foreach ($hg in $host_group) {
                     if ($hg -notin $current_hg_names) {
@@ -74,7 +75,7 @@ try {
                         $changed = $true
                     }
                 }
-                
+
                 $hgs_to_remove = @()
                 foreach ($hg in $current_hg_names) {
                     if ($hg -notin $host_group) {
@@ -102,7 +103,8 @@ try {
                 $module.Result.changed = $true
             }
         }
-    } elseif ($state -eq 'absent') {
+    }
+elseif ($state -eq 'absent') {
         if ($current_cloud) {
             # Delete
             if ($module.CheckMode) {
@@ -114,7 +116,8 @@ try {
             $module.Result.changed = $true
         }
     }
-} catch {
+}
+catch {
     $module.FailJson("Error managing SCVMM cloud: $($_.Exception.Message)")
 }
 

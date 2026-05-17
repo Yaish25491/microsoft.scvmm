@@ -80,7 +80,8 @@ try {
 
             $new_cluster = Add-SCVMHostCluster @addParams
             $module.Result.changed = $true
-        } else {
+        }
+else {
             # UPDATE CLUSTER
             $updateParams = @{}
             $changed = $false

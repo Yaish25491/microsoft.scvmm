@@ -101,10 +101,12 @@ try {
                     owner = $owner
                     user_role = $user_role
                 }
-            } else {
+            }
+else {
                 $module.Result.sql_profile = Get-SCVMMSQLProfileInfo -SQLProfile $sqlProfile
             }
-        } else {
+        }
+else {
             $module.Result.sql_profile = Get-SCVMMSQLProfileInfo -SQLProfile $sqlProfile
         }
     }

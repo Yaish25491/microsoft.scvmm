@@ -55,7 +55,8 @@ try {
     }
 
     $module.Result.hosts = $results
-} catch {
+}
+catch {
     $module.FailJson("Failed to gather SCVMM host information: $($_.Exception.Message)", $_)
 }
 

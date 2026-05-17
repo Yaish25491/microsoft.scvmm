@@ -19,7 +19,8 @@ $services = @()
 try {
     if ($name) {
         $result = Get-SCService -Name $name -ErrorAction Stop
-    } else {
+    }
+else {
         $result = Get-SCService -ErrorAction Stop
     }
 
@@ -28,11 +29,13 @@ try {
             foreach ($service in $result) {
                 $services += Get-SCVMMServiceInfo -Service $service
             }
-        } else {
+        }
+else {
             $services += Get-SCVMMServiceInfo -Service $result
         }
     }
-} catch {
+}
+catch {
     $global:Error.Clear()
     $module.FailJson("Failed to get SCVMM services: $($_.Exception.Message)")
 }

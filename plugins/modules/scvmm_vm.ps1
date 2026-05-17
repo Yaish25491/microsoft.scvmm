@@ -74,7 +74,8 @@ try {
 
                 $vm = New-SCVirtualMachine @createParams
             }
-        } else {
+        }
+else {
             $updateParams = @{ VM = $vm; ErrorAction = "Stop" }
             $needsUpdate = $false
 
@@ -98,7 +99,8 @@ try {
                 }
             }
         }
-    } elseif ($state -eq 'absent') {
+    }
+elseif ($state -eq 'absent') {
         if ($vm) {
             $module.Result.changed = $true
             if (-not $module.CheckMode) {
@@ -114,12 +116,14 @@ try {
         $module.Result.vm = @{
             name = $vm.Name
             id = $vm.ID.Guid
-            status = if ($vm.Status) { $vm.Status.ToString() } else { $vm.StatusString }
+            status = if ($vm.Status) { $vm.Status.ToString() }
+else { $vm.StatusString }
             cpu_count = $vm.CPUCount
             memory = $vm.Memory
             description = $vm.Description
         }
-    } elseif ($module.CheckMode -and -not $vm -and $state -eq 'present') {
+    }
+elseif ($module.CheckMode -and -not $vm -and $state -eq 'present') {
         $module.Result.vm = @{
             name = $name
             status = "PowerOff"

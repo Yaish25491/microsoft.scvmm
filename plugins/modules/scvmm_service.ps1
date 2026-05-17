@@ -32,7 +32,8 @@ $module.Result.changed = $false
 
 try {
     $service = Get-SCService -Name $name -ErrorAction Ignore
-} catch {
+}
+catch {
     $global:Error.Clear()
     $module.FailJson("Failed to check if service exists: $($_.Exception.Message)")
 }
@@ -43,13 +44,15 @@ if ($state -eq "absent") {
         if (-not $module.CheckMode) {
             try {
                 Remove-SCService -Service $service -ErrorAction Stop
-            } catch {
+            }
+catch {
                 $global:Error.Clear()
                 $module.FailJson("Failed to remove service: $($_.Exception.Message)")
             }
         }
     }
-} else {
+}
+else {
     # state is present, started, or stopped
     if (-not $service) {
         if (-not $service_configuration_name) {
@@ -82,7 +85,8 @@ if ($state -eq "absent") {
                 # but New-SCService might not support them directly. We will apply them after creation if needed.
 
                 $service = New-SCService @params
-            } catch {
+            }
+catch {
                 $global:Error.Clear()
                 $module.FailJson("Failed to create service: $($_.Exception.Message)")
             }
@@ -113,7 +117,8 @@ if ($state -eq "absent") {
                 }
                 $update_params.UserRole = $user_role
                 $needs_update = $true
-            } catch {
+            }
+catch {
                 $global:Error.Clear()
                 $module.FailJson("Failed to get User Role: $($_.Exception.Message)")
             }
@@ -132,7 +137,8 @@ if ($state -eq "absent") {
             if (-not $module.CheckMode) {
                 try {
                     $service = Set-SCService @update_params
-                } catch {
+                }
+catch {
                     $global:Error.Clear()
                     $module.FailJson("Failed to update service: $($_.Exception.Message)")
                 }
@@ -146,18 +152,21 @@ if ($state -eq "absent") {
                 try {
                     Start-SCService -Service $service -ErrorAction Stop
                     $service = Get-SCService -Name $name -ErrorAction Ignore
-                } catch {
+                }
+catch {
                     $global:Error.Clear()
                     $module.FailJson("Failed to start service: $($_.Exception.Message)")
                 }
             }
-        } elseif ($state -eq "stopped" -and $service.Status -ne "Stopped") {
+        }
+elseif ($state -eq "stopped" -and $service.Status -ne "Stopped") {
             $module.Result.changed = $true
             if (-not $module.CheckMode) {
                 try {
                     Stop-SCService -Service $service -ErrorAction Stop
                     $service = Get-SCService -Name $name -ErrorAction Ignore
-                } catch {
+                }
+catch {
                     $global:Error.Clear()
                     $module.FailJson("Failed to stop service: $($_.Exception.Message)")
                 }

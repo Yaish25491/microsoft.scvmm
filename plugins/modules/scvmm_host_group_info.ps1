@@ -62,7 +62,8 @@ try {
     }
 
     $module.Result.host_groups = $results
-} catch {
+}
+catch {
     $module.FailJson("Failed to gather SCVMM host group information: $($_.Exception.Message)", $_)
 }
 

@@ -39,4 +39,3 @@ try {
 catch {
     $module.FailJson("Failed to gather logical network definition information: $($_.Exception.Message)", $_)
 }
-

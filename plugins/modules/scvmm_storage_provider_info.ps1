@@ -31,10 +31,10 @@ try {
         $providerInfo += Get-SCVMMStorageProviderInfo -StorageProvider $provider
     }
 
-    $module.ExitJson(@{
-        storage_providers = $providerInfo
-    })
+    $module.Result.storage_providers = $providerInfo
 }
 catch {
     $module.FailJson("Failed to gather storage provider information: $($_.Exception.Message)")
 }
+
+$module.ExitJson()

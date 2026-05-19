@@ -177,4 +177,3 @@ try {
 catch {
     $module.FailJson("Failed to manage logical network definition: $($_.Exception.Message)", $_)
 }
-

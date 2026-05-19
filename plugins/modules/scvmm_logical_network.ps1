@@ -104,4 +104,3 @@ try {
 catch {
     $module.FailJson("Failed to manage logical network: $($_.Exception.Message)", $_)
 }
-

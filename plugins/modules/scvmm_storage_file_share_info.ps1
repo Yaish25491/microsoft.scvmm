@@ -31,10 +31,10 @@ try {
         $shareInfo += Get-SCVMMStorageFileShareInfo -StorageFileShare $share
     }
 
-    $module.ExitJson(@{
-        storage_file_shares = $shareInfo
-    })
+    $module.Result.storage_file_shares = $shareInfo
 }
 catch {
     $module.FailJson("Failed to gather storage file share information: $($_.Exception.Message)")
 }
+
+$module.ExitJson()

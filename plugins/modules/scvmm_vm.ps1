@@ -23,6 +23,8 @@ $spec = @{
 
 $module = [Ansible.Basic.AnsibleModule]::Create($args, $spec)
 
+Import-SCVMMModule -Module $module
+
 $name = $module.Params.name
 $state = $module.Params.state
 $host_group = $module.Params.host_group
@@ -75,7 +77,7 @@ try {
                 $vm = New-SCVirtualMachine @createParams
             }
         }
-else {
+        else {
             $updateParams = @{ VM = $vm; ErrorAction = "Stop" }
             $needsUpdate = $false
 
@@ -100,7 +102,7 @@ else {
             }
         }
     }
-elseif ($state -eq 'absent') {
+    elseif ($state -eq 'absent') {
         if ($vm) {
             $module.Result.changed = $true
             if (-not $module.CheckMode) {
@@ -113,31 +115,10 @@ elseif ($state -eq 'absent') {
     }
 
     if ($vm -and $state -eq 'present') {
-        $module.Result.vm = @{
-            name = $vm.Name
-            id = $vm.ID.Guid
-            status = if ($vm.Status) { $vm.Status.ToString() }
-else { $vm.StatusString }
-            cpu_count = $vm.CPUCount
-            memory = $vm.Memory
-            description = $vm.Description
-        }
+        $module.Result.vm = Get-SCVMMVMInfo -VM $vm
     }
-elseif ($module.CheckMode -and -not $vm -and $state -eq 'present') {
+    elseif ($module.CheckMode -and -not $vm -and $state -eq 'present') {
         $module.Result.vm = @{
-            name = $name
-            status = "PowerOff"
-            cpu_count = $cpu_count
-            memory = $memory_mb
-            description = $description
-        }
-    }
-}
-catch {
-    $module.FailJson("An error occurred: $($_.Exception.Message)", $_)
-}
-
-$module.ExitJson()
             name = $name
             status = "PowerOff"
             cpu_count = $cpu_count

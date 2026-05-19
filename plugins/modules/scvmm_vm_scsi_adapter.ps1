@@ -1,7 +1,8 @@
+#!powershell
 # Copyright: (c) 2026, Steve Fulmer
 # GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
 
-#Requires -Module Ansible.Basic
+#Requires -Module Ansible.ModuleUtils.Legacy
 #Requires -Module microsoft.scvmm.plugins.module_utils.scvmm
 
 $spec = @{
@@ -84,7 +85,7 @@ else {
                 if ($null -ne $adapter_id) { $new_params.AdapterID = $adapter_id }
                 if ($null -ne $shared) { $new_params.SharedVirtualScsiAdapter = $shared }
                 if ($null -ne $synthetic) { $new_params.Synthetic = $synthetic }
-                
+
                 $target_adapter = New-SCVirtualSCSIAdapter @new_params -ErrorAction Stop
             }
             catch {
@@ -95,7 +96,7 @@ else {
     else {
         # Adapter exists, check for modifications
         $update_params = @{}
-        
+
         if ($null -ne $shared) {
             if ($target_adapter.SharedVirtualScsiAdapter -ne $shared) {
                 $update_params.ShareVirtualScsiAdapter = $shared

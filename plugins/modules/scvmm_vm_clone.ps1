@@ -103,7 +103,7 @@ try {
                 $targetVM = New-SCVirtualMachine @createParams
             }
         }
-else {
+        else {
             # Idempotency check: description
             if ($null -ne $description -and $targetVM.Description -ne $description) {
                 $module.Result.changed = $true
@@ -123,14 +123,13 @@ else {
         $module.Result.vm = @{
             name = $targetVM.Name
             id = $targetVM.ID.Guid
-            status = if ($targetVM.Status) { $targetVM.Status.ToString() }
-else { $targetVM.StatusString }
+            status = if ($targetVM.Status) { $targetVM.Status.ToString() } else { $targetVM.StatusString }
             cpu_count = $targetVM.CPUCount
             memory = $targetVM.Memory
             description = $targetVM.Description
         }
     }
-elseif ($module.CheckMode -and $module.Result.changed) {
+    elseif ($module.CheckMode -and $module.Result.changed) {
         # Estimate return values for check mode if VM doesn't exist yet
         $module.Result.vm = @{
             name = $new_name

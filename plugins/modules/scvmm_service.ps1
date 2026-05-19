@@ -1,5 +1,9 @@
+#!powershell
+# Copyright: (c) 2026, Steve Fulmer
+# GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
+
 #Requires -Module Ansible.ModuleUtils.Legacy
-#Requires -Module Ansible.ModuleUtils.scvmm
+#Requires -Module microsoft.scvmm.plugins.module_utils.scvmm
 
 $spec = @{
     options = @{
@@ -45,7 +49,7 @@ if ($state -eq "absent") {
             try {
                 Remove-SCService -Service $service -ErrorAction Stop
             }
-catch {
+            catch {
                 $global:Error.Clear()
                 $module.FailJson("Failed to remove service: $($_.Exception.Message)")
             }
@@ -86,7 +90,7 @@ else {
 
                 $service = New-SCService @params
             }
-catch {
+            catch {
                 $global:Error.Clear()
                 $module.FailJson("Failed to create service: $($_.Exception.Message)")
             }
@@ -118,7 +122,7 @@ catch {
                 $update_params.UserRole = $user_role
                 $needs_update = $true
             }
-catch {
+            catch {
                 $global:Error.Clear()
                 $module.FailJson("Failed to get User Role: $($_.Exception.Message)")
             }
@@ -138,7 +142,7 @@ catch {
                 try {
                     $service = Set-SCService @update_params
                 }
-catch {
+                catch {
                     $global:Error.Clear()
                     $module.FailJson("Failed to update service: $($_.Exception.Message)")
                 }
@@ -153,20 +157,20 @@ catch {
                     Start-SCService -Service $service -ErrorAction Stop
                     $service = Get-SCService -Name $name -ErrorAction Ignore
                 }
-catch {
+                catch {
                     $global:Error.Clear()
                     $module.FailJson("Failed to start service: $($_.Exception.Message)")
                 }
             }
         }
-elseif ($state -eq "stopped" -and $service.Status -ne "Stopped") {
+        elseif ($state -eq "stopped" -and $service.Status -ne "Stopped") {
             $module.Result.changed = $true
             if (-not $module.CheckMode) {
                 try {
                     Stop-SCService -Service $service -ErrorAction Stop
                     $service = Get-SCService -Name $name -ErrorAction Ignore
                 }
-catch {
+                catch {
                     $global:Error.Clear()
                     $module.FailJson("Failed to stop service: $($_.Exception.Message)")
                 }

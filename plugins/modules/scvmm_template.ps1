@@ -44,9 +44,10 @@ try {
 
     if ($state -eq 'present') {
         if (-not $template) {
-            $module.FailJson("VM template '$name' not found. Creation of a new template requires a source (VM, VHD, or another template) which is not currently supported by this module's parameters.")
+            $module.FailJson("VM template '$name' not found. Creation of a new template " +
+                "requires a source which is not currently supported.")
         }
-else {
+        else {
             $updateParams = @{ VMTemplate = $template; ErrorAction = "Stop" }
             $needsUpdate = $false
 
@@ -66,7 +67,8 @@ else {
                 }
             }
         }
-    } elseif ($state -eq 'absent') {
+    }
+    elseif ($state -eq 'absent') {
         if ($template) {
             $module.Result.changed = $true
             if (-not $module.CheckMode) {

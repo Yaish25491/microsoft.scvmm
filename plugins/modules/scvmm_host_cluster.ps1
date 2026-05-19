@@ -2,8 +2,9 @@
 # Copyright: (c) 2026, Steve Fulmer
 # GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
 
-#Requires -Module VirtualMachineManager
+#Requires -Module Ansible.ModuleUtils.Legacy
 #Requires -Module microsoft.scvmm.plugins.module_utils.scvmm
+
 #AnsibleRequires -CSharpUtil Ansible.Basic
 
 $ErrorActionPreference = "Stop"
@@ -78,10 +79,10 @@ try {
                 $module.ExitJson()
             }
 
-            $new_cluster = Add-SCVMHostCluster @addParams
+            Add-SCVMHostCluster @addParams
             $module.Result.changed = $true
         }
-else {
+        else {
             # UPDATE CLUSTER
             $updateParams = @{}
             $changed = $false
@@ -101,16 +102,16 @@ else {
                 if (-not $raa) {
                     $module.FailJson("Run As Account '$run_as_account_name' not found.")
                 }
-                
+
                 $current_raa_name = if ($current_cluster.VMHostManagementCredential) { $current_cluster.VMHostManagementCredential.Name } else { $null }
-                
+
                 if ($current_raa_name -ne $run_as_account_name) {
                     $updateParams.VMHostManagementCredential = $raa
                     $changed = $true
                 }
             }
 
-            # Note: Set-SCVMHostCluster might not support all parameters like VMPaths directly 
+            # Note: Set-SCVMHostCluster might not support all parameters like VMPaths directly
             # if they are part of Add-SCVMHostCluster. Research showed ClusterReserve and Description are supported.
             # VMPaths, RemoteConnectEnabled are often part of Set-SCVMHost but sometimes cluster-wide.
             # For this implementation, we focus on what's definitely supported in Set-SCVMHostCluster.
@@ -125,7 +126,8 @@ else {
                 $module.Result.changed = $true
             }
         }
-    } elseif ($state -eq "absent") {
+    }
+    elseif ($state -eq "absent") {
         if ($current_cluster) {
             # REMOVE CLUSTER
             if ($module.CheckMode) {

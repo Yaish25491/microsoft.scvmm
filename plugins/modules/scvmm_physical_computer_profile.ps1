@@ -36,7 +36,10 @@ try {
             $module.Result.changed = $true
             if (-not $module.CheckMode) {
                 # New-SCPhysicalComputerProfile requires additional parameters
-                $module.FailJson("Creation of a new Physical Computer Profile requires more complex parameters (VHD, etc.) not yet exposed in this basic module.")
+                $module.FailJson(
+                    "Creation of a new Physical Computer Profile requires " +
+                    "more complex parameters not yet exposed in this basic module."
+                )
             }
         }
         else {

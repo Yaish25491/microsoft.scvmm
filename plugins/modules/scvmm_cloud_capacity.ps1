@@ -28,7 +28,6 @@ $cpu_count = $module.Params.cpu_count
 $memory_mb = $module.Params.memory_mb
 $storage_gb = $module.Params.storage_gb
 $vm_count = $module.Params.vm_count
-$vmm_server = $module.Params.vmm_server
 
 try {
     $cloud = Get-SCCloud -Name $name -ErrorAction SilentlyContinue
@@ -37,7 +36,7 @@ try {
     }
 
     $current_capacity = Get-SCCloudCapacity -Cloud $cloud
-    
+
     $changed = $false
     $update_params = @{}
 

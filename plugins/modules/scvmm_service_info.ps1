@@ -1,5 +1,9 @@
+#!powershell
+# Copyright: (c) 2026, Steve Fulmer
+# GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
+
 #Requires -Module Ansible.ModuleUtils.Legacy
-#Requires -Module Ansible.ModuleUtils.scvmm
+#Requires -Module microsoft.scvmm.plugins.module_utils.scvmm
 
 $spec = @{
     options = @{
@@ -20,7 +24,7 @@ try {
     if ($name) {
         $result = Get-SCService -Name $name -ErrorAction Stop
     }
-else {
+    else {
         $result = Get-SCService -ErrorAction Stop
     }
 
@@ -30,7 +34,7 @@ else {
                 $services += Get-SCVMMServiceInfo -Service $service
             }
         }
-else {
+        else {
             $services += Get-SCVMMServiceInfo -Service $result
         }
     }

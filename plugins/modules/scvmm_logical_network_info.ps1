@@ -43,6 +43,5 @@ catch {
     $module.FailJson("Failed to gather logical network information: $($_.Exception.Message)", $_)
 }
 
-$module.ExitJson(@{
-    logical_networks = $networks
-})
+$module.Result.logical_networks = $networks
+$module.ExitJson()

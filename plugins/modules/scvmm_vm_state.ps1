@@ -1,4 +1,7 @@
 #!powershell
+# Copyright: (c) 2026, Steve Fulmer
+# GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
+
 #Requires -Module Ansible.ModuleUtils.Legacy
 #Requires -Module microsoft.scvmm.plugins.module_utils.scvmm
 
@@ -50,39 +53,39 @@ try {
                 if ($current_status -eq 'Paused') {
                     Resume-SCVirtualMachine -VM $vm -ErrorAction Stop | Out-Null
                 }
-elseif ($current_status -eq 'SavedState') {
+                elseif ($current_status -eq 'SavedState') {
                     Start-SCVirtualMachine -VM $vm -ErrorAction Stop | Out-Null
                 }
-else {
+                else {
                     Start-SCVirtualMachine -VM $vm -ErrorAction Stop | Out-Null
                 }
                 $vm = Get-SCVirtualMachine -Name $name -VMMServer $vmm_server -ErrorAction Stop
                 $module.Result.state = $vm.Status.ToString()
             }
-else {
+            else {
                 $module.Result.state = 'Running'
             }
         }
     }
-elseif ($state -eq 'stopped') {
+    elseif ($state -eq 'stopped') {
         if ($current_status -eq 'Running' -or $current_status -eq 'Paused' -or $current_status -eq 'SavedState') {
             $changed = $true
             if (-not $module.CheckMode) {
                 if ($force) {
                     Stop-SCVirtualMachine -VM $vm -Force -ErrorAction Stop | Out-Null
                 }
-else {
+                else {
                     Stop-SCVirtualMachine -VM $vm -Shutdown -ErrorAction Stop | Out-Null
                 }
                 $vm = Get-SCVirtualMachine -Name $name -VMMServer $vmm_server -ErrorAction Stop
                 $module.Result.state = $vm.Status.ToString()
             }
-else {
+            else {
                 $module.Result.state = 'PowerOff'
             }
         }
     }
-elseif ($state -eq 'suspended') {
+    elseif ($state -eq 'suspended') {
         if ($current_status -eq 'Running') {
             $changed = $true
             if (-not $module.CheckMode) {
@@ -90,11 +93,11 @@ elseif ($state -eq 'suspended') {
                 $vm = Get-SCVirtualMachine -Name $name -VMMServer $vmm_server -ErrorAction Stop
                 $module.Result.state = $vm.Status.ToString()
             }
-else {
+            else {
                 $module.Result.state = 'Paused'
             }
         }
-elseif ($current_status -ne 'Paused') {
+        elseif ($current_status -ne 'Paused') {
             $module.FailJson("Virtual machine must be in 'Running' state to be suspended. Current state is '$current_status'.")
         }
     }

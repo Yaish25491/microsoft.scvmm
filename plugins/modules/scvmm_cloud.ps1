@@ -1,4 +1,7 @@
 #!powershell
+# Copyright: (c) 2026, Steve Fulmer
+# GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
+
 #Requires -Module Ansible.ModuleUtils.Legacy
 #Requires -Module microsoft.scvmm.plugins.module_utils.scvmm
 
@@ -50,10 +53,10 @@ try {
                 $module.ExitJson()
             }
 
-            $new_cloud = New-SCCloud -Name $name -VMHostGroup $hg_objects -Description $description -ErrorAction Stop
+            New-SCCloud -Name $name -VMHostGroup $hg_objects -Description $description -ErrorAction Stop
             $module.Result.changed = $true
         }
-else {
+        else {
             # Update
             $changed = $false
             $update_params = @{}
@@ -104,7 +107,7 @@ else {
             }
         }
     }
-elseif ($state -eq 'absent') {
+    elseif ($state -eq 'absent') {
         if ($current_cloud) {
             # Delete
             if ($module.CheckMode) {

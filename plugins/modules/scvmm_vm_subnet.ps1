@@ -141,8 +141,7 @@ if ($state -eq 'present') {
                 $info = Get-SCVMMVMSubnetInfo -VMSubnet $vm_subnet
                 foreach ($key in $update_params.Keys) {
                     $lowKey = $key.ToLower()
-                    if ($lowKey -eq 'portacl') { $info['port_acl'] = $port_acl_name }
-                    elseif ($lowKey -eq 'subnetvlan') {
+                    if ($lowKey -eq 'portacl') { $info['port_acl'] = $port_acl_name } elseif ($lowKey -eq 'subnetvlan') {
                         $info['subnet_vlans'] = $subnet_vlans_raw
                     }
                     else {

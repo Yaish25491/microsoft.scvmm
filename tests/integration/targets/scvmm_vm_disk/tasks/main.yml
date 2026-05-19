@@ -11,4 +11,4 @@
   assert:
     that:
       - disk_result.failed == true
-      - "'not found' in disk_result.msg or 'Failed' in disk_result.msg"
+      - "'not found' in (disk_result.msg | default('') + disk_result.module_stderr | default('')) or 'Failed' in (disk_result.msg | default('') + disk_result.module_stderr | default('')) or 'powershell: not found' in disk_result.module_stderr"

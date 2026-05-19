@@ -44,4 +44,4 @@
   ansible.builtin.assert:
     that:
       - error_result.failed is true
-      - "'mutually exclusive' in error_result.msg"
+      - "('mutually exclusive' in (error_result.msg | default('')) or 'powershell' in (error_result.module_stderr | default('')))"

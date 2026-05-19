@@ -12,3 +12,4 @@
   assert:
     that:
       - create_result.failed == true
+      - create_result.module_stderr is defined

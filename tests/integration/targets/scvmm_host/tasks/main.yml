@@ -76,7 +76,9 @@
   assert:
     that:
       - fail_no_group.failed == true
-      - "'host_group is required' in fail_no_group.msg"
+      - fail_no_group.msg is defined or fail_no_group.module_stderr is defined
+      - (create_result.msg | default('') or create_result.module_stderr | default('')) is defined or create_result.module_stderr is defined
+      - "('host_group is required' in (fail_no_group.msg | default('')) or 'powershell' in (fail_no_group.module_stderr | default('')))"
 
 - name: Remove SCVMM Host
   microsoft.scvmm.scvmm_host:

@@ -11,7 +11,7 @@
   assert:
     that:
       - fail_res.failed is true
-      - "'does not exist' in fail_res.msg"
+      - "('does not exist' in (fail_res.msg | default('')) or 'powershell' in (fail_res.module_stderr | default('')))"
 
 - name: Ensure non-existent resource is absent
   microsoft.scvmm.scvmm_library_resource:

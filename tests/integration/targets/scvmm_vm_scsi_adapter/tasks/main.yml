@@ -11,7 +11,8 @@
   assert:
     that:
       - create_result.failed == true
-      - "'Virtual machine' in create_result.msg or 'VirtualMachineManager' in create_result.msg"
+      - create_result.module_stderr is defined
+      - "'Virtual machine' in (create_result.msg | default('') + create_result.module_stderr | default('')) or 'VirtualMachineManager' in (create_result.msg | default('') + create_result.module_stderr | default(''))"
 
 - name: Test SCVMM SCSI Adapter Shared (Expect Failure)
   microsoft.scvmm.scvmm_vm_scsi_adapter:

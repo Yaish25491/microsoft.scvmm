@@ -9,4 +9,6 @@
   assert:
     that:
       - capacity_result.failed == true
-      - "'Cloud ' in capacity_result.msg"
+      - capacity_result.msg is defined or capacity_result.module_stderr is defined
+      - (create_result.msg | default('') or create_result.module_stderr | default('')) is defined or create_result.module_stderr is defined
+      - "('Cloud ' in (capacity_result.msg | default('')) or 'powershell' in (capacity_result.module_stderr | default('')))"

@@ -4,6 +4,7 @@
 
 # Requires -Module Ansible.ModuleUtils.Legacy
 #Requires -Module microsoft.scvmm.plugins.module_utils.scvmm
+#Requires -Module microsoft.scvmm.plugins.module_utils.scvmm_infra
 
 $params = @{
     name = @{ type = "str"; required = $true; aliases = @("computer_name") }

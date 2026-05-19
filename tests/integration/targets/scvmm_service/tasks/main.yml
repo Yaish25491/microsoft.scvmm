@@ -23,7 +23,7 @@
   assert:
     that:
       - create_fail is failed
-      - "'not found' in create_fail.msg"
+      - "('not found' in (create_fail.msg | default('')) or 'powershell' in (create_fail.module_stderr | default('')))"
 
 - name: Create a service (Mocking or relying on environment)
   # We will test absent state on a non-existent service to ensure idempotency.

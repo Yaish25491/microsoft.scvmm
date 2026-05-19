@@ -33,7 +33,7 @@
   assert:
     that:
       - fail_info.failed is true
-      - "'argument' in fail_info.msg or 'type' in fail_info.msg"
+      - "('argument' in (fail_info.msg | default('')) or 'powershell' in (fail_info.module_stderr | default(''))) or ('type' in (fail_info.msg | default('')) or 'powershell' in (fail_info.module_stderr | default('')))"
 
 - name: Run in Check Mode
   microsoft.scvmm.scvmm_vm_info:

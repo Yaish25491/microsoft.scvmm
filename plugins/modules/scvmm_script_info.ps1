@@ -4,8 +4,39 @@
 
 #Requires -Module Ansible.ModuleUtils.Legacy
 #Requires -Module microsoft.scvmm.plugins.module_utils.scvmm
+#Requires -Module microsoft.scvmm.plugins.module_utils.scvmm_library
 
 $ErrorActionPreference = "Stop"
+
+function Get-SCVMMScriptInfo {
+    <#
+    .SYNOPSIS
+    Converts a SCVMM Script object to a hashtable.
+    .DESCRIPTION
+    Extracts relevant properties from a Script object and returns a standardized hashtable.
+    .PARAMETER Script
+    The SCScript object to convert.
+    #>
+    param(
+        [Parameter(Mandatory = $true)]
+        [Object]$Script
+    )
+
+    $info = @{
+        name = $Script.Name
+        id = $Script.ID.Guid
+        description = $Script.Description
+        family_name = $Script.FamilyName
+        release = $Script.Release
+        library_server = if ($Script.LibraryServer) { $Script.LibraryServer.Name } else { $null }
+        share_path = $Script.SharePath
+        is_equivalent = $Script.IsEquivalent
+        added_time = if ($Script.AddedTime) { $Script.AddedTime.ToString('yyyy-MM-ddTHH:mm:ssZ') } else { $null }
+        modified_time = if ($Script.ModifiedTime) { $Script.ModifiedTime.ToString('yyyy-MM-ddTHH:mm:ssZ') } else { $null }
+    }
+
+    return $info
+}
 
 $spec = @{
     options = @{

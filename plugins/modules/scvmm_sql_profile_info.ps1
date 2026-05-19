@@ -6,6 +6,7 @@
 #AnsibleRequires -CSharpUtil Ansible.Basic
 #Requires -Module Ansible.ModuleUtils.Legacy
 #Requires -Module microsoft.scvmm.plugins.module_utils.scvmm
+#Requires -Module microsoft.scvmm.plugins.module_utils.scvmm_library
 
 $spec = @{
     options = @{

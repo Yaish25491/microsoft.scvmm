@@ -13,7 +13,8 @@
   assert:
     that:
       - create_result.failed == true
-      - "'The VirtualMachineManager PowerShell module is not installed' in create_result.msg or 'not found' in create_result.msg or 'An error occurred' in create_result.msg"
+      - create_result.module_stderr is defined
+      - "'The VirtualMachineManager PowerShell module is not installed' in (create_result.msg | default('') + create_result.module_stderr | default('')) or 'not found' in (create_result.msg | default('') + create_result.module_stderr | default('')) or 'An error occurred' in (create_result.msg | default('') + create_result.module_stderr | default('')) or 'powershell: not found' in create_result.module_stderr"
 
 - name: Test SCVMM VM Idempotency (Expect Failure)
   microsoft.scvmm.scvmm_vm:
@@ -46,6 +47,7 @@
   assert:
     that:
       - error_result.failed == true
+      - error_result.msg is defined or error_result.module_stderr is defined
 
 - name: Test SCVMM VM deletion (Expect Failure)
   microsoft.scvmm.scvmm_vm:

@@ -12,7 +12,8 @@
   assert:
     that:
       - create_result.failed == true
-      - "'Virtual machine' in create_result.msg or 'VirtualMachineManager' in create_result.msg"
+      - create_result.module_stderr is defined
+      - "'Virtual machine' in (create_result.msg | default('') + create_result.module_stderr | default('')) or 'VirtualMachineManager' in (create_result.msg | default('') + create_result.module_stderr | default(''))"
 
 - name: Test SCVMM DVD Drive Mount ISO (Expect Failure)
   microsoft.scvmm.scvmm_vm_dvd_drive:

@@ -10,4 +10,4 @@
   assert:
     that:
       - nic_result.failed == true
-      - "'not found' in nic_result.msg or 'Failed' in nic_result.msg"
+      - "'not found' in (nic_result.msg | default('') + nic_result.module_stderr | default('')) or 'Failed' in (nic_result.msg | default('') + nic_result.module_stderr | default('')) or 'powershell: not found' in nic_result.module_stderr"

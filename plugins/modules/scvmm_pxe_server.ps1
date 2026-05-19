@@ -4,6 +4,7 @@
 
 #Requires -Module Ansible.ModuleUtils.Legacy
 #Requires -Module microsoft.scvmm.plugins.module_utils.scvmm
+#Requires -Module microsoft.scvmm.plugins.module_utils.scvmm_compliance
 
 $params = Parse-Args $args -operators $true
 $check_mode = Get-AnsibleParam -obj $params -name "_ansible_check_mode" -type "bool" -default $false

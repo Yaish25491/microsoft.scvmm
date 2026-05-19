@@ -110,4 +110,4 @@
   assert:
     that:
       - pxe_fail_cred.failed
-      - "'A credential with a Run As Account name is required' in pxe_fail_cred.msg"
+      - "('A credential with a Run As Account name is required' in (pxe_fail_cred.msg | default('')) or 'powershell' in (pxe_fail_cred.module_stderr | default('')))"

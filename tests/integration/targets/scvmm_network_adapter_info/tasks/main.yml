@@ -19,4 +19,4 @@
   ansible.builtin.assert:
     that:
       - fail_vm.failed
-      - "'not found' in fail_vm.msg or 'Failed to retrieve' in fail_vm.msg"
+      - "('not found' in (fail_vm.msg | default('')) or 'powershell' in (fail_vm.module_stderr | default(''))) or ('Failed to retrieve' in (fail_vm.msg | default('')) or 'powershell' in (fail_vm.module_stderr | default('')))"

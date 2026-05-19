@@ -4,6 +4,38 @@
 
 #Requires -Module Ansible.ModuleUtils.Legacy
 #Requires -Module microsoft.scvmm.plugins.module_utils.scvmm
+#Requires -Module microsoft.scvmm.plugins.module_utils.scvmm_storage
+
+function Get-SCVMMStorageFileShareInfo {
+    <#
+    .SYNOPSIS
+    Converts a SCVMM Storage File Share object to a hashtable.
+    .DESCRIPTION
+    Extracts relevant properties from a StorageFileShare object and returns a standardized hashtable.
+    .PARAMETER StorageFileShare
+    The StorageFileShare object to convert.
+    #>
+    param(
+        [Parameter(Mandatory = $true)]
+        [Object]$StorageFileShare
+    )
+
+    $info = @{
+        name = $StorageFileShare.Name
+        id = $StorageFileShare.ID.Guid
+        path = $StorageFileShare.Path
+        description = $StorageFileShare.Description
+        storage_classification = if ($StorageFileShare.StorageClassification) { $StorageFileShare.StorageClassification.Name } else { $null }
+        capacity = $StorageFileShare.Capacity
+        free_space = $StorageFileShare.FreeSpace
+        is_available_for_placement = $StorageFileShare.IsAvailableForPlacement
+        storage_file_server = if ($StorageFileShare.StorageFileServer) { $StorageFileShare.StorageFileServer.Name } else { $null }
+        vm_host = if ($StorageFileShare.VMHost) { $StorageFileShare.VMHost.Name } else { $null }
+        library_server = if ($StorageFileShare.LibraryServer) { $StorageFileShare.LibraryServer.Name } else { $null }
+    }
+
+    return $info
+}
 
 $spec = @{
     options = @{

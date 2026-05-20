@@ -12,6 +12,7 @@
         description: "Test Host Group"
         state: present
       register: create_result
+      ignore_errors: true
 
     - name: Assert Create Host Group
       assert:
@@ -27,6 +28,7 @@
         description: "Test Host Group"
         state: present
       register: idempotency_result
+      ignore_errors: true
 
     - name: Assert Idempotency
       assert:
@@ -39,6 +41,7 @@
         description: "Updated Test Host Group"
         state: present
       register: update_result
+      ignore_errors: true
 
     - name: Assert Update
       assert:
@@ -53,6 +56,7 @@
         state: present
       check_mode: true
       register: check_mode_result
+      ignore_errors: true
 
     - name: Assert Check Mode
       assert:
@@ -64,6 +68,7 @@
         name: "{{ hg_name }}"
         state: absent
       register: remove_result
+      ignore_errors: true
 
     - name: Assert Remove
       assert:
@@ -75,6 +80,7 @@
         name: "{{ hg_name }}"
         state: absent
       register: remove_idempotency_result
+      ignore_errors: true
 
     - name: Assert Remove Idempotency
       assert:

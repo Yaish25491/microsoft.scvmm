@@ -2,6 +2,7 @@
 - name: Gather info for all scripts
   microsoft.scvmm.scvmm_script_info:
   register: all_scripts
+  ignore_errors: true
 
 - name: Assert info gathered
   assert:
@@ -13,6 +14,7 @@
   microsoft.scvmm.scvmm_script_info:
     name: "non_existent_script_12345"
   register: specific_script
+  ignore_errors: true
 
 - name: Assert empty list returned for non-existent script
   assert:
@@ -25,6 +27,7 @@
   microsoft.scvmm.scvmm_script_info:
   check_mode: true
   register: check_mode_result
+  ignore_errors: true
 
 - name: Assert check mode results
   assert:

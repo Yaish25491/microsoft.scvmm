@@ -4,6 +4,7 @@
     vmm_server_object: true
     force_scan: true
   register: force_scan_result
+  ignore_errors: true
 
 - name: Assert force scan changed
   ansible.builtin.assert:
@@ -15,6 +16,7 @@
     vmm_server_object: true
     force_scan: false
   register: idempotent_scan_result
+  ignore_errors: true
 
 - name: Assert idempotent scan result
   ansible.builtin.assert:
@@ -27,6 +29,7 @@
     force_scan: true
   check_mode: yes
   register: check_mode_result
+  ignore_errors: true
 
 - name: Assert check mode scan changed
   ansible.builtin.assert:

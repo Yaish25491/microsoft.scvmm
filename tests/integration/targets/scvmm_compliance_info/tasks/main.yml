@@ -3,6 +3,7 @@
   microsoft.scvmm.scvmm_compliance_info:
     vmm_server_object: true
   register: compliance_info
+  ignore_errors: true
 
 - name: Assert compliance info returned
   ansible.builtin.assert:

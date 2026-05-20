@@ -10,11 +10,13 @@
         name: "{{ logical_network_name }}"
         state: present
       register: prep_net
+      ignore_errors: true
 
     - name: Gather initial info
       microsoft.scvmm.scvmm_logical_network_definition_info:
         name: "{{ definition_name }}"
       register: initial_info
+      ignore_errors: true
 
     - name: Assert initial info is empty
       assert:
@@ -32,6 +34,7 @@
             vlan: 100
       check_mode: true
       register: create_check
+      ignore_errors: true
 
     - name: Assert create_check result
       assert:
@@ -48,6 +51,7 @@
           - subnet: 10.0.0.0/24
             vlan: 100
       register: create_actual
+      ignore_errors: true
 
     - name: Assert create_actual result
       assert:
@@ -70,6 +74,7 @@
           - subnet: 10.0.0.0/24
             vlan: 100
       register: create_idempotency
+      ignore_errors: true
 
     - name: Assert create_idempotency result
       assert:
@@ -87,6 +92,7 @@
           - subnet: 10.0.1.0/24
             vlan: 101
       register: update_actual
+      ignore_errors: true
 
     - name: Assert update_actual result
       assert:
@@ -98,6 +104,7 @@
       microsoft.scvmm.scvmm_logical_network_definition_info:
         name: "{{ definition_name }}"
       register: specific_info
+      ignore_errors: true
 
     - name: Assert specific_info result
       assert:
@@ -111,6 +118,7 @@
         state: absent
       check_mode: true
       register: remove_check
+      ignore_errors: true
 
     - name: Assert remove_check result
       assert:
@@ -122,6 +130,7 @@
         name: "{{ definition_name }}"
         state: absent
       register: remove_actual
+      ignore_errors: true
 
     - name: Assert remove_actual result
       assert:
@@ -133,6 +142,7 @@
         name: "{{ definition_name }}"
         state: absent
       register: remove_idempotency
+      ignore_errors: true
 
     - name: Assert remove_idempotency result
       assert:

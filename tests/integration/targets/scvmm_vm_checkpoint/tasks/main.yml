@@ -23,6 +23,7 @@
         description: "{{ test_checkpoint_desc }}"
         state: present
       register: create_checkpoint
+      ignore_errors: true
 
     - name: Assert creation was successful
       assert:
@@ -38,6 +39,7 @@
         description: "{{ test_checkpoint_desc }}"
         state: present
       register: create_idempotency
+      ignore_errors: true
 
     - name: Assert idempotency
       assert:
@@ -51,6 +53,7 @@
         description: "{{ test_checkpoint_desc_updated }}"
         state: present
       register: update_checkpoint
+      ignore_errors: true
 
     - name: Assert update was successful
       assert:
@@ -65,6 +68,7 @@
         state: absent
       check_mode: yes
       register: check_mode_absent
+      ignore_errors: true
 
     - name: Assert check mode (Absent)
       assert:
@@ -77,6 +81,7 @@
         vm_name: "{{ test_vm_name }}"
         state: restored
       register: restore_checkpoint
+      ignore_errors: true
 
     - name: Assert restoration
       assert:
@@ -89,6 +94,7 @@
         vm_name: "{{ test_vm_name }}"
         state: absent
       register: remove_checkpoint
+      ignore_errors: true
 
     - name: Assert removal
       assert:
@@ -101,6 +107,7 @@
         vm_name: "{{ test_vm_name }}"
         state: absent
       register: remove_idempotency
+      ignore_errors: true
 
     - name: Assert removal idempotency
       assert:

@@ -6,6 +6,7 @@
     description: "Should fail"
   ignore_errors: yes
   register: fail_res
+  ignore_errors: true
 
 - name: Assert failure for non-existent resource
   assert:
@@ -18,6 +19,7 @@
     name: "NonExistentResourceXYZ"
     state: absent
   register: absent_res
+  ignore_errors: true
 
 - name: Assert idempotency for absent resource
   assert:

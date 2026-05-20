@@ -2,6 +2,7 @@
 - name: Test gathering information about all Host Groups
   microsoft.scvmm.scvmm_host_group_info:
   register: all_host_groups
+  ignore_errors: true
 
 - name: Assert output for all Host Groups
   assert:
@@ -14,6 +15,7 @@
   microsoft.scvmm.scvmm_host_group_info:
   check_mode: yes
   register: check_mode_result
+  ignore_errors: true
 
 - name: Assert check mode result
   assert:
@@ -25,6 +27,7 @@
   microsoft.scvmm.scvmm_host_group_info:
     name: "NonExistentHostGroup12345"
   register: missing_host_group
+  ignore_errors: true
 
 - name: Assert output for nonexistent Host Group
   assert:

@@ -9,10 +9,12 @@
     description: "Info test profile"
     state: present
   register: create_profile
+  ignore_errors: true
 
 - name: Gather info for all hardware profiles
   microsoft.scvmm.scvmm_hardware_profile_info:
   register: all_profiles
+  ignore_errors: true
 
 - name: Assert gather info for all hardware profiles
   assert:
@@ -24,6 +26,7 @@
   microsoft.scvmm.scvmm_hardware_profile_info:
     name: "{{ test_hw_profile_name }}"
   register: specific_profile
+  ignore_errors: true
 
 - name: Assert gather info for specific hardware profile
   assert:

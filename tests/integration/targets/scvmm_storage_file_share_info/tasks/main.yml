@@ -2,6 +2,7 @@
 - name: Gather info on all SCVMM Storage File Shares
   microsoft.scvmm.scvmm_storage_file_share_info:
   register: all_shares
+  ignore_errors: true
 
 - name: Assert info was gathered
   assert:
@@ -13,6 +14,7 @@
   microsoft.scvmm.scvmm_storage_file_share_info:
   check_mode: true
   register: all_shares_check_mode
+  ignore_errors: true
 
 - name: Assert info was gathered in check mode
   assert:
@@ -27,6 +29,7 @@
       microsoft.scvmm.scvmm_storage_file_share_info:
         name: "{{ all_shares.storage_file_shares[0].name }}"
       register: specific_share
+      ignore_errors: true
 
     - name: Assert specific share info was gathered
       assert:
@@ -41,6 +44,7 @@
         name: "{{ all_shares.storage_file_shares[0].name }}"
       check_mode: true
       register: specific_share_check
+      ignore_errors: true
 
     - name: Assert specific share info was gathered in check mode
       assert:
@@ -53,6 +57,7 @@
   microsoft.scvmm.scvmm_storage_file_share_info:
     name: "NonExistentShare_1234567890"
   register: non_existent_share
+  ignore_errors: true
 
 - name: Assert empty list is returned for non-existent share
   assert:

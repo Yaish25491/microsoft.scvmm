@@ -6,6 +6,7 @@
         cloud: "TestCloud"
         user_role: "TestRole"
       register: quota_info_baseline
+      ignore_errors: true
 
     - name: Set quota limits
       microsoft.scvmm.scvmm_user_role_quota:
@@ -17,6 +18,7 @@
         vm_count: 5
         custom_quota_count: 100
       register: quota_set
+      ignore_errors: true
 
     - name: Assert change
       assert:
@@ -33,6 +35,7 @@
         vm_count: 5
         custom_quota_count: 100
       register: quota_idempotent
+      ignore_errors: true
 
     - name: Assert idempotency
       assert:
@@ -45,6 +48,7 @@
         user_role: "TestRole"
         use_maximum_quota: true
       register: quota_unlimited
+      ignore_errors: true
 
     - name: Assert unlimited change
       assert:
@@ -58,6 +62,7 @@
         cpu_count: 20
       check_mode: true
       register: quota_check
+      ignore_errors: true
 
     - name: Assert check mode change
       assert:

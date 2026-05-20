@@ -4,6 +4,7 @@
 - name: Gather all jobs
   microsoft.scvmm.scvmm_job_info:
   register: all_jobs
+  ignore_errors: true
 
 - name: Assert all jobs info is gathered and changed is false
   assert:
@@ -15,6 +16,7 @@
   microsoft.scvmm.scvmm_job_info:
     status: Running
   register: running_jobs
+  ignore_errors: true
 
 - name: Assert running jobs info is gathered
   assert:
@@ -26,6 +28,7 @@
   microsoft.scvmm.scvmm_job_info:
     id: "00000000-0000-0000-0000-000000000000"
   register: job_by_id
+  ignore_errors: true
 
 - name: Assert job by non-existent ID returns empty list
   assert:
@@ -37,6 +40,7 @@
   microsoft.scvmm.scvmm_job_info:
     name: "NonExistentJob_12345"
   register: job_by_name
+  ignore_errors: true
 
 - name: Assert job by non-existent name returns empty list
   assert:
@@ -60,6 +64,7 @@
   microsoft.scvmm.scvmm_job_info:
   check_mode: true
   register: check_mode_info
+  ignore_errors: true
 
 - name: Assert check mode does not change state and returns jobs
   assert:

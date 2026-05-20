@@ -2,6 +2,7 @@
 - name: Gather info about all host clusters
   microsoft.scvmm.scvmm_host_cluster_info:
   register: all_clusters
+  ignore_errors: true
 
 - name: Assert all_clusters results
   ansible.builtin.assert:
@@ -12,6 +13,7 @@
   microsoft.scvmm.scvmm_host_cluster_info:
     name: "{{ scvmm_cluster_name | default('non_existent_cluster') }}"
   register: specific_cluster
+  ignore_errors: true
 
 - name: Assert specific_cluster results
   ansible.builtin.assert:

@@ -4,7 +4,6 @@
 - name: Gather VM info (All VMs)
   microsoft.scvmm.scvmm_vm_info:
   register: all_vms_info
-  ignore_errors: true
 
 - name: Assert all VMs info is gathered and changed is false
   assert:
@@ -16,7 +15,6 @@
   microsoft.scvmm.scvmm_vm_info:
     name: "NonExistentVM_12345"
   register: specific_vm_info
-  ignore_errors: true
 
 - name: Assert specific VM info returns empty list
   assert:
@@ -35,13 +33,12 @@
   assert:
     that:
       - fail_info.failed is true
-      - "('argument' in (fail_info.msg | default('')) or 'powershell' in (fail_info.module_stderr | default(''))) or ('type' in (fail_info.msg | default('')) or 'powershell' in (fail_info.module_stderr | default('')))"
+      - "'argument' in fail_info.msg or 'type' in fail_info.msg"
 
 - name: Run in Check Mode
   microsoft.scvmm.scvmm_vm_info:
   check_mode: true
   register: check_mode_info
-  ignore_errors: true
 
 - name: Assert check mode does not change state and returns vms
   assert:

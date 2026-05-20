@@ -16,4 +16,4 @@
   assert:
     that:
       - error_result.failed is defined and error_result.failed
-      - "('was not found' in (error_result.msg | default('')) or 'powershell' in (error_result.module_stderr | default('')))"
+      - "'was not found' in error_result.msg"

@@ -7,7 +7,6 @@
 - name: Test baseline information gathering (empty)
   microsoft.scvmm.scvmm_baseline_info:
   register: baseline_info_initial
-  ignore_errors: true
 
 - name: Test baseline creation
   microsoft.scvmm.scvmm_baseline:
@@ -15,7 +14,6 @@
     state: present
     description: "Initial description"
   register: baseline_create
-  ignore_errors: true
 
 - name: Assert baseline creation succeeded
   assert:
@@ -29,7 +27,6 @@
     state: present
     description: "Initial description"
   register: baseline_idempotent
-  ignore_errors: true
 
 - name: Assert idempotency
   assert:
@@ -43,7 +40,6 @@
     description: "Updated description"
   check_mode: true
   register: baseline_update_check
-  ignore_errors: true
 
 - name: Assert update check mode
   assert:
@@ -56,7 +52,6 @@
     state: present
     description: "Updated description"
   register: baseline_update
-  ignore_errors: true
 
 - name: Assert update
   assert:
@@ -67,7 +62,6 @@
   microsoft.scvmm.scvmm_baseline_info:
     name: "{{ test_baseline_name }}"
   register: baseline_info_data
-  ignore_errors: true
 
 - name: Assert information gathering
   assert:
@@ -92,7 +86,6 @@
     state: absent
   check_mode: true
   register: baseline_delete_check
-  ignore_errors: true
 
 - name: Assert delete check mode
   assert:
@@ -104,7 +97,6 @@
     name: "{{ test_baseline_name }}"
     state: absent
   register: baseline_delete
-  ignore_errors: true
 
 - name: Assert delete
   assert:
@@ -116,7 +108,6 @@
     name: "{{ test_baseline_name }}"
     state: absent
   register: baseline_delete_idempotent
-  ignore_errors: true
 
 - name: Assert delete idempotency
   assert:

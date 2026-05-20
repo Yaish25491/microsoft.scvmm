@@ -4,7 +4,6 @@
     name: "{{ pool_name }}"
     state: absent
   register: setup_absent
-  ignore_errors: true
 
 - name: Create MAC address pool
   microsoft.scvmm.scvmm_mac_address_pool:
@@ -15,7 +14,6 @@
     host_groups: ["All Hosts"]
     description: "Integration test pool"
   register: create_pool
-  ignore_errors: true
 
 - name: Assert create pool changed
   ansible.builtin.assert:
@@ -33,7 +31,6 @@
     host_groups: ["All Hosts"]
     description: "Integration test pool"
   register: create_pool_idempotency
-  ignore_errors: true
 
 - name: Assert create pool idempotency
   ansible.builtin.assert:
@@ -44,7 +41,6 @@
   microsoft.scvmm.scvmm_mac_address_pool_info:
     name: "{{ pool_name }}"
   register: pool_info
-  ignore_errors: true
 
 - name: Assert pool info
   ansible.builtin.assert:
@@ -59,7 +55,6 @@
     description: "Updated description check mode"
   check_mode: true
   register: update_pool_check_mode
-  ignore_errors: true
 
 - name: Assert update pool check_mode
   ansible.builtin.assert:
@@ -70,7 +65,6 @@
   microsoft.scvmm.scvmm_mac_address_pool_info:
     name: "{{ pool_name }}"
   register: pool_info_after_check
-  ignore_errors: true
 
 - name: Assert description remains same
   ansible.builtin.assert:
@@ -83,7 +77,6 @@
     state: present
     description: "Updated description"
   register: update_pool
-  ignore_errors: true
 
 - name: Assert update pool changed
   ansible.builtin.assert:
@@ -96,7 +89,6 @@
     name: "{{ pool_name }}"
     state: absent
   register: remove_pool
-  ignore_errors: true
 
 - name: Assert remove pool changed
   ansible.builtin.assert:
@@ -108,7 +100,6 @@
     name: "{{ pool_name }}"
     state: absent
   register: remove_pool_idempotency
-  ignore_errors: true
 
 - name: Assert remove pool idempotency
   ansible.builtin.assert:

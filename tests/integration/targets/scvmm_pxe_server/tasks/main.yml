@@ -7,7 +7,6 @@
 - name: Gather initial info (expect success even if empty)
   microsoft.scvmm.scvmm_pxe_server_info:
   register: pxe_info_initial
-  ignore_errors: true
 
 - name: Test PXE server creation (expect failure if Run As Account doesn't exist)
   microsoft.scvmm.scvmm_pxe_server:
@@ -34,7 +33,6 @@
           name: "{{ test_run_as_account }}"
         description: "Initial description"
       register: pxe_idempotent
-      ignore_errors: true
 
     - name: Assert idempotency
       assert:
@@ -48,7 +46,6 @@
         description: "Updated description"
       check_mode: true
       register: pxe_update_check
-      ignore_errors: true
 
     - name: Assert update check mode
       assert:
@@ -59,7 +56,6 @@
       microsoft.scvmm.scvmm_pxe_server_info:
         computer_name: "{{ test_pxe_server }}"
       register: pxe_info_specific
-      ignore_errors: true
 
     - name: Assert info gathering
       assert:
@@ -73,7 +69,6 @@
         force: true
       check_mode: true
       register: pxe_delete_check
-      ignore_errors: true
 
     - name: Assert delete check mode
       assert:
@@ -86,7 +81,6 @@
         state: absent
         force: true
       register: pxe_delete
-      ignore_errors: true
 
     - name: Assert delete
       assert:
@@ -99,7 +93,6 @@
         state: absent
         force: true
       register: pxe_delete_idempotent
-      ignore_errors: true
 
     - name: Assert delete idempotency
       assert:
@@ -117,4 +110,4 @@
   assert:
     that:
       - pxe_fail_cred.failed
-      - "('A credential with a Run As Account name is required' in (pxe_fail_cred.msg | default('')) or 'powershell' in (pxe_fail_cred.module_stderr | default('')))"
+      - "'A credential with a Run As Account name is required' in pxe_fail_cred.msg"

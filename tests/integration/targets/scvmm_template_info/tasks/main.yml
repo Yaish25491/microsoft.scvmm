@@ -4,7 +4,6 @@
 - name: Gather VM Template info (All Templates)
   microsoft.scvmm.scvmm_template_info:
   register: all_templates_info
-  ignore_errors: true
 
 - name: Assert all templates info is gathered and changed is false
   assert:
@@ -16,7 +15,6 @@
   microsoft.scvmm.scvmm_template_info:
     name: "NonExistentTemplate_12345"
   register: specific_template_info
-  ignore_errors: true
 
 - name: Assert specific template info returns empty list
   assert:
@@ -40,7 +38,6 @@
   microsoft.scvmm.scvmm_template_info:
   check_mode: true
   register: check_mode_info
-  ignore_errors: true
 
 - name: Assert check mode does not change state and returns templates
   assert:

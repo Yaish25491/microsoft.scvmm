@@ -2,7 +2,6 @@
 - name: Gather info about all port classifications
   microsoft.scvmm.scvmm_port_classification_info:
   register: all_pcs
-  ignore_errors: true
 
 - name: Assert all port classifications gathered
   ansible.builtin.assert:
@@ -14,7 +13,6 @@
   microsoft.scvmm.scvmm_port_classification_info:
     name: "{{ all_pcs.port_classifications[0].name }}"
   register: spec_pc
-  ignore_errors: true
   when: all_pcs.port_classifications | length > 0
 
 - name: Assert specific port classification gathered

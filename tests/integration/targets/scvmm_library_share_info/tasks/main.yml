@@ -2,7 +2,6 @@
 - name: Test gathering library share info
   microsoft.scvmm.scvmm_library_share_info:
   register: info_all
-  ignore_errors: true
 
 - name: Assert info_all
   assert:
@@ -14,7 +13,6 @@
   microsoft.scvmm.scvmm_library_share_info:
   check_mode: yes
   register: info_check
-  ignore_errors: true
 
 - name: Assert info_check
   assert:

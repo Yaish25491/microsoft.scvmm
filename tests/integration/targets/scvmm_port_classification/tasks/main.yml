@@ -12,7 +12,6 @@
         description: "Test description"
         state: present
       register: create_result
-      ignore_errors: true
 
     - name: Assert create changed
       ansible.builtin.assert:
@@ -27,7 +26,6 @@
         description: "Test description"
         state: present
       register: create_idem_result
-      ignore_errors: true
 
     - name: Assert create idempotency
       ansible.builtin.assert:
@@ -41,7 +39,6 @@
         state: present
       check_mode: true
       register: update_check_result
-      ignore_errors: true
 
     - name: Assert update check mode changed
       ansible.builtin.assert:
@@ -55,7 +52,6 @@
         description: "Updated description"
         state: present
       register: update_result
-      ignore_errors: true
 
     - name: Assert update changed
       ansible.builtin.assert:
@@ -69,7 +65,6 @@
         description: "Updated description"
         state: present
       register: update_idem_result
-      ignore_errors: true
 
     - name: Assert update idempotency
       ansible.builtin.assert:
@@ -82,7 +77,6 @@
         state: absent
       check_mode: true
       register: remove_check_result
-      ignore_errors: true
 
     - name: Assert remove check mode changed
       ansible.builtin.assert:
@@ -94,7 +88,6 @@
         name: "AnsibleTestPortClass"
         state: absent
       register: remove_result
-      ignore_errors: true
 
     - name: Assert remove changed
       ansible.builtin.assert:
@@ -106,7 +99,6 @@
         name: "AnsibleTestPortClass"
         state: absent
       register: remove_idem_result
-      ignore_errors: true
 
     - name: Assert remove idempotency
       ansible.builtin.assert:

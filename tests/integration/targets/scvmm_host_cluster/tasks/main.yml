@@ -8,7 +8,6 @@
     cluster_reserve: 1
   check_mode: true
   register: add_cluster_check
-  ignore_errors: true
 
 - name: Assert add_cluster_check
   ansible.builtin.assert:
@@ -24,7 +23,6 @@
     cluster_reserve: 2
   check_mode: true
   register: update_cluster_check
-  ignore_errors: true
 
 - name: Remove host cluster (Check Mode)
   microsoft.scvmm.scvmm_host_cluster:
@@ -32,4 +30,3 @@
     state: absent
   check_mode: true
   register: remove_cluster_check
-  ignore_errors: true

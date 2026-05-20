@@ -8,7 +8,6 @@
     name: "{{ sql_profile_name }}"
     state: absent
   register: result
-  ignore_errors: true
 
 - name: Create SQL Profile (Check Mode)
   microsoft.scvmm.scvmm_sql_profile:
@@ -17,7 +16,6 @@
     state: present
   check_mode: true
   register: result
-  ignore_errors: true
 
 - name: Assert create check mode
   assert:
@@ -30,7 +28,6 @@
     description: "Initial description"
     state: present
   register: result
-  ignore_errors: true
 
 - name: Assert create
   assert:
@@ -45,7 +42,6 @@
     description: "Initial description"
     state: present
   register: result
-  ignore_errors: true
 
 - name: Assert create idempotency
   assert:
@@ -56,7 +52,6 @@
   microsoft.scvmm.scvmm_sql_profile_info:
     name: "{{ sql_profile_name }}"
   register: info_result
-  ignore_errors: true
 
 - name: Assert get info
   assert:
@@ -72,7 +67,6 @@
     state: present
   check_mode: true
   register: result
-  ignore_errors: true
 
 - name: Assert update check mode
   assert:
@@ -83,7 +77,6 @@
   microsoft.scvmm.scvmm_sql_profile_info:
     name: "{{ sql_profile_name }}"
   register: info_result
-  ignore_errors: true
 
 - name: Assert check mode did not change system
   assert:
@@ -96,7 +89,6 @@
     description: "Updated description"
     state: present
   register: result
-  ignore_errors: true
 
 - name: Assert update
   assert:
@@ -110,7 +102,6 @@
     state: absent
   check_mode: true
   register: result
-  ignore_errors: true
 
 - name: Assert remove check mode
   assert:
@@ -122,7 +113,6 @@
     name: "{{ sql_profile_name }}"
     state: absent
   register: result
-  ignore_errors: true
 
 - name: Assert remove
   assert:
@@ -134,7 +124,6 @@
     name: "{{ sql_profile_name }}"
     state: absent
   register: result
-  ignore_errors: true
 
 - name: Assert remove idempotency
   assert:
@@ -144,7 +133,6 @@
 - name: Get all SQL Profile Info
   microsoft.scvmm.scvmm_sql_profile_info:
   register: info_result
-  ignore_errors: true
 
 - name: Assert get all info runs successfully
   assert:

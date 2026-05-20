@@ -10,7 +10,6 @@
     description: "Initial description"
     state: present
   register: result
-  ignore_errors: true
 
 - name: Assert creation was successful
   assert:
@@ -25,7 +24,6 @@
     description: "Initial description"
     state: present
   register: result_idempotent
-  ignore_errors: true
 
 - name: Assert idempotency
   assert:
@@ -39,7 +37,6 @@
     state: present
   check_mode: true
   register: result_check_mode
-  ignore_errors: true
 
 - name: Assert update check mode
   assert:
@@ -52,7 +49,6 @@
     description: "Updated description"
     state: present
   register: result_update
-  ignore_errors: true
 
 - name: Assert update was successful
   assert:
@@ -66,7 +62,6 @@
     state: absent
   check_mode: true
   register: result_remove_check
-  ignore_errors: true
 
 - name: Assert remove check mode
   assert:
@@ -78,7 +73,6 @@
     name: "TestAppProfile"
     state: absent
   register: result_remove
-  ignore_errors: true
 
 - name: Assert remove was successful
   assert:
@@ -90,7 +84,6 @@
     name: "TestAppProfile"
     state: absent
   register: result_remove_idempotent
-  ignore_errors: true
 
 - name: Assert remove idempotency
   assert:

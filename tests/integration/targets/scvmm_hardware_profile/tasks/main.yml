@@ -24,7 +24,6 @@
     state: present
   check_mode: yes
   register: create_check
-  ignore_errors: true
 
 - name: Assert create hardware profile (Check Mode)
   assert:
@@ -40,7 +39,6 @@
     cpu_count: 1
     state: present
   register: create_actual
-  ignore_errors: true
 
 - name: Assert create hardware profile
   assert:
@@ -59,7 +57,6 @@
     cpu_count: 1
     state: present
   register: create_idempotency
-  ignore_errors: true
 
 - name: Assert create hardware profile (Idempotency)
   assert:
@@ -75,7 +72,6 @@
     state: present
   check_mode: yes
   register: update_check
-  ignore_errors: true
 
 - name: Assert update hardware profile (Check Mode)
   assert:
@@ -90,7 +86,6 @@
     cpu_count: 2
     state: present
   register: update_actual
-  ignore_errors: true
 
 - name: Assert update hardware profile
   assert:
@@ -108,7 +103,6 @@
     cpu_count: 2
     state: present
   register: update_idempotency
-  ignore_errors: true
 
 - name: Assert update hardware profile (Idempotency)
   assert:
@@ -121,7 +115,6 @@
     state: absent
   check_mode: yes
   register: remove_check
-  ignore_errors: true
 
 - name: Assert remove hardware profile (Check Mode)
   assert:
@@ -133,7 +126,6 @@
     name: "{{ test_hw_profile_name }}"
     state: absent
   register: remove_actual
-  ignore_errors: true
 
 - name: Assert remove hardware profile
   assert:
@@ -145,7 +137,6 @@
     name: "{{ test_hw_profile_name }}"
     state: absent
   register: remove_idempotency
-  ignore_errors: true
 
 - name: Assert remove hardware profile (Idempotency)
   assert:

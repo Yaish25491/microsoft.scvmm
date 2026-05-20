@@ -4,7 +4,6 @@
     name: "{{ scvmm_vm_name }}"
     vm_host: "{{ scvmm_target_host }}"
   register: migrate_check
-  ignore_errors: true
   check_mode: yes
 
 - name: Assert Check Mode
@@ -18,7 +17,6 @@
     name: "{{ scvmm_vm_name }}"
     vm_host: "{{ scvmm_target_host }}"
   register: migrate_result
-  ignore_errors: true
 
 - name: Assert Migration
   assert:
@@ -31,7 +29,6 @@
     name: "{{ scvmm_vm_name }}"
     vm_host: "{{ scvmm_target_host }}"
   register: migrate_idempotency
-  ignore_errors: true
 
 - name: Assert Idempotency
   assert:
@@ -44,7 +41,6 @@
     name: "{{ scvmm_vm_name }}"
     vm_host: "{{ scvmm_original_host }}"
   register: migrate_back
-  ignore_errors: true
 
 - name: Assert Migration Back
   assert:

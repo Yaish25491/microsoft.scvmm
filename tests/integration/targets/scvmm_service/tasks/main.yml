@@ -23,7 +23,7 @@
   assert:
     that:
       - create_fail is failed
-      - "('not found' in (create_fail.msg | default('')) or 'powershell' in (create_fail.module_stderr | default('')))"
+      - "'not found' in create_fail.msg"
 
 - name: Create a service (Mocking or relying on environment)
   # We will test absent state on a non-existent service to ensure idempotency.
@@ -31,7 +31,6 @@
     name: "SomeRandomMissingService"
     state: absent
   register: absent_test
-  ignore_errors: true
 
 - name: Assert absent on missing service is changed=False
   assert:
@@ -45,7 +44,6 @@
     state: absent
   check_mode: true
   register: absent_check
-  ignore_errors: true
 
 - name: Assert check mode absent on missing is changed=False
   assert:

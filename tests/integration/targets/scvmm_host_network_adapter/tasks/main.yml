@@ -3,7 +3,6 @@
   microsoft.scvmm.scvmm_host_network_adapter_info:
     vm_host: "{{ scvmm_host }}"
   register: initial_info
-  ignore_errors: true
 
 - name: Set logical network on host network adapter (check mode)
   microsoft.scvmm.scvmm_host_network_adapter:
@@ -12,7 +11,6 @@
     logical_network: "{{ scvmm_logical_network }}"
   check_mode: yes
   register: check_mode_result
-  ignore_errors: true
 
 - name: Verify check mode result
   ansible.builtin.assert:
@@ -26,7 +24,6 @@
     name: "{{ scvmm_host_adapter_name }}"
     logical_network: "{{ scvmm_logical_network }}"
   register: actual_change_result
-  ignore_errors: true
 
 - name: Verify actual change result
   ansible.builtin.assert:
@@ -40,7 +37,6 @@
     name: "{{ scvmm_host_adapter_name }}"
     logical_network: "{{ scvmm_logical_network }}"
   register: idempotency_result
-  ignore_errors: true
 
 - name: Verify idempotency result
   ansible.builtin.assert:
@@ -52,7 +48,6 @@
     vm_host: "{{ scvmm_host }}"
     name: "{{ scvmm_host_adapter_name }}"
   register: specific_adapter_info
-  ignore_errors: true
 
 - name: Verify specific adapter info
   ansible.builtin.assert:

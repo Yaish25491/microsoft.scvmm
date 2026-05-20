@@ -4,7 +4,6 @@
     vmm_server_object: true
     force_scan: true
   register: force_scan_result
-  ignore_errors: true
 
 - name: Assert force scan changed
   ansible.builtin.assert:
@@ -16,7 +15,6 @@
     vmm_server_object: true
     force_scan: false
   register: idempotent_scan_result
-  ignore_errors: true
 
 - name: Assert idempotent scan result
   ansible.builtin.assert:
@@ -29,7 +27,6 @@
     force_scan: true
   check_mode: yes
   register: check_mode_result
-  ignore_errors: true
 
 - name: Assert check mode scan changed
   ansible.builtin.assert:
@@ -47,4 +44,4 @@
   ansible.builtin.assert:
     that:
       - error_result.failed is true
-      - "('mutually exclusive' in (error_result.msg | default('')) or 'powershell' in (error_result.module_stderr | default('')))"
+      - "'mutually exclusive' in error_result.msg"

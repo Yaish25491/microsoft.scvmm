@@ -30,7 +30,6 @@
           - "{{ test_host_group }}"
         description: "Initial description"
       register: cloud_idempotent
-      ignore_errors: true
 
     - name: Assert idempotency
       assert:
@@ -44,7 +43,6 @@
         description: "Updated description"
       check_mode: true
       register: cloud_update_check
-      ignore_errors: true
 
     - name: Assert update check mode
       assert:
@@ -57,7 +55,6 @@
         state: present
         description: "Updated description"
       register: cloud_update
-      ignore_errors: true
 
     - name: Assert update
       assert:
@@ -70,7 +67,6 @@
         state: absent
       check_mode: true
       register: cloud_delete_check
-      ignore_errors: true
 
     - name: Assert delete check mode
       assert:
@@ -82,7 +78,6 @@
         name: "{{ test_cloud_name }}"
         state: absent
       register: cloud_delete
-      ignore_errors: true
 
     - name: Assert delete
       assert:
@@ -94,7 +89,6 @@
         name: "{{ test_cloud_name }}"
         state: absent
       register: cloud_delete_idempotent
-      ignore_errors: true
 
     - name: Assert delete idempotency
       assert:

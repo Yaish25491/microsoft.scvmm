@@ -6,20 +6,18 @@
     description: "Should fail"
   ignore_errors: yes
   register: fail_res
-  ignore_errors: true
 
 - name: Assert failure for non-existent resource
   assert:
     that:
       - fail_res.failed is true
-      - "('does not exist' in (fail_res.msg | default('')) or 'powershell' in (fail_res.module_stderr | default('')))"
+      - "'does not exist' in fail_res.msg"
 
 - name: Ensure non-existent resource is absent
   microsoft.scvmm.scvmm_library_resource:
     name: "NonExistentResourceXYZ"
     state: absent
   register: absent_res
-  ignore_errors: true
 
 - name: Assert idempotency for absent resource
   assert:

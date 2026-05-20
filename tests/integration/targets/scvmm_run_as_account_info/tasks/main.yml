@@ -14,7 +14,6 @@
       microsoft.scvmm.scvmm_run_as_account_info:
         name: "AnsibleTestInfoAccount"
       register: get_specific_info
-      ignore_errors: true
 
     - name: Assert specific info gathering
       assert:
@@ -27,7 +26,6 @@
     - name: Gather info on all Run As Accounts
       microsoft.scvmm.scvmm_run_as_account_info:
       register: get_all_info
-      ignore_errors: true
 
     - name: Assert all info gathering
       assert:

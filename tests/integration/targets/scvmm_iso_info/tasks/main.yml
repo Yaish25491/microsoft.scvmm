@@ -2,7 +2,6 @@
 - name: Gather info for all ISOs
   microsoft.scvmm.scvmm_iso_info:
   register: all_isos
-  ignore_errors: true
 
 - name: Assert info gathered
   assert:
@@ -14,7 +13,6 @@
   microsoft.scvmm.scvmm_iso_info:
     name: "non_existent_iso_12345"
   register: specific_iso
-  ignore_errors: true
 
 - name: Assert empty list returned for non-existent ISO
   assert:
@@ -27,7 +25,6 @@
   microsoft.scvmm.scvmm_iso_info:
   check_mode: true
   register: check_mode_result
-  ignore_errors: true
 
 - name: Assert check mode results
   assert:

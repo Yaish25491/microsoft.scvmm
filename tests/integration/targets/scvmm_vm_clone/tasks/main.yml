@@ -10,5 +10,3 @@
   assert:
     that:
       - clone_result.failed == true
-      - clone_result.msg is defined or clone_result.module_stderr is defined
-      - (create_result.msg | default('') or create_result.module_stderr | default('')) is defined or create_result.module_stderr is defined

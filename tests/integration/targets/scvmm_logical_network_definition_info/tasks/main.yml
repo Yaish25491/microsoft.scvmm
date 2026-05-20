@@ -2,7 +2,6 @@
 - name: Gather all logical network definitions
   microsoft.scvmm.scvmm_logical_network_definition_info:
   register: all_definitions
-  ignore_errors: true
 
 - name: Assert all_definitions result
   assert:

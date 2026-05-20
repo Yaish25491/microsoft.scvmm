@@ -6,6 +6,31 @@
 
 $ErrorActionPreference = 'Stop'
 
+function Get-SCVMMLibraryResourceInfo {
+    <#
+    .SYNOPSIS
+    Converts a SCVMM Library Resource object to a hashtable.
+    .DESCRIPTION
+    Extracts relevant properties from a LibraryResource object and returns a standardized hashtable.
+    .PARAMETER LibraryResource
+    The SCLibraryResource object to convert.
+    #>
+    param(
+        [Parameter(Mandatory = $true)]
+        [Object]$LibraryResource
+    )
+
+    $info = @{
+        name = $LibraryResource.Name
+        id = $LibraryResource.ID.Guid
+        description = $LibraryResource.Description
+        library_server = if ($LibraryResource.LibraryServer) { $LibraryResource.LibraryServer.Name } else { $null }
+        share_path = $LibraryResource.SharePath
+    }
+
+    return $info
+}
+
 $spec = @{
     options = @{
         name = @{ type = 'str'; required = $true }

@@ -3,11 +3,42 @@
 # GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
 
 #Requires -Module Ansible.ModuleUtils.Legacy
-#Requires -Module microsoft.scvmm.plugins.module_utils.scvmm
+#AnsibleRequires -PowerShell ansible_collections.microsoft.scvmm.plugins.module_utils.scvmm
+#AnsibleRequires -PowerShell ansible_collections.microsoft.scvmm.plugins.module_utils.scvmm_infra
 
 #AnsibleRequires -CSharpUtil Ansible.Basic
 
 $ErrorActionPreference = "Stop"
+
+function Get-SCVMMHostClusterInfo {
+    <#
+    .SYNOPSIS
+    Converts a SCVMM Host Cluster object to a hashtable.
+    .DESCRIPTION
+    Extracts relevant properties from a VMHostCluster object and returns a standardized hashtable.
+    .PARAMETER Cluster
+    The VMHostCluster object to convert.
+    #>
+    param(
+        [Parameter(Mandatory = $true)]
+        [Object]$Cluster
+    )
+
+    $info = @{
+        name = $Cluster.Name
+        id = $Cluster.ID.Guid
+        cluster_reserve = $Cluster.ClusterReserve
+        is_over_committed = $Cluster.IsOverCommitted
+        nodes = $Cluster.Nodes | ForEach-Object { $_.Name }
+        vm_host_group = if ($Cluster.VMHostGroup) { $Cluster.VMHostGroup.Name } else { $null }
+        vm_paths = $Cluster.VMPaths
+        remote_connect_enabled = $Cluster.RemoteConnectEnabled
+        remote_connect_port = $Cluster.RemoteConnectPort
+        virtualization_platform = if ($Cluster.VirtualizationPlatform) { $Cluster.VirtualizationPlatform.ToString() } else { $null }
+    }
+
+    return $info
+}
 
 $spec = @{
     options = @{

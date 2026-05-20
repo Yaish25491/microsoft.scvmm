@@ -2,8 +2,44 @@
 # Copyright: (c) 2026, Steve Fulmer
 # GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
 
+function Get-SCVMMLoadBalancerInfo {
+    <#
+    .SYNOPSIS
+    Converts a SCVMM Load Balancer object to a hashtable.
+    .DESCRIPTION
+    Extracts relevant properties from a LoadBalancer object and returns a standardized hashtable.
+    .PARAMETER LoadBalancer
+    The LoadBalancer object to convert.
+    #>
+    param(
+        [Parameter(Mandatory = $true)]
+        [Object]$LoadBalancer
+    )
+
+    $info = @{
+        name = $LoadBalancer.Name
+        id = $LoadBalancer.ID.Guid
+        address = $LoadBalancer.Address
+        port = $LoadBalancer.Port
+        manufacturer = $LoadBalancer.Manufacturer
+        model = $LoadBalancer.Model
+        description = $LoadBalancer.Description
+        host_groups = $LoadBalancer.VMHostGroup | ForEach-Object { $_.Name }
+        logical_network_vips = $LoadBalancer.LogicalNetwork | ForEach-Object { $_.Name }
+        connection_state = if ($LoadBalancer.ConnectionState) { $LoadBalancer.ConnectionState.ToString() } else { $null }
+        enabled = $LoadBalancer.Enabled
+    }
+
+    return $info
+}
+
+#!powershell
+# Copyright: (c) 2026, Steve Fulmer
+# GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
+
 #Requires -Module Ansible.ModuleUtils.Legacy
-#Requires -Module microsoft.scvmm.plugins.module_utils.scvmm
+#AnsibleRequires -PowerShell ansible_collections.microsoft.scvmm.plugins.module_utils.scvmm
+#AnsibleRequires -PowerShell ansible_collections.microsoft.scvmm.plugins.module_utils.scvmm_network
 
 $params = @{
     name = @{ type = 'str'; required = $true }

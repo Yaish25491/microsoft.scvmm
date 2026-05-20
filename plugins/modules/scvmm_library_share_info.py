@@ -14,7 +14,7 @@ description:
   - Gather information about SCVMM Library Shares.
 version_added: "1.0.0"
 author:
-  - Ansible Project (@github_handle)
+  - Steve Fulmer (@stevefulme1)
 options:
   name:
     description:

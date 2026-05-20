@@ -7,6 +7,36 @@
 
 $ErrorActionPreference = 'Stop'
 
+function Get-SCVMMCustomResourceInfo {
+    <#
+    .SYNOPSIS
+    Converts a SCVMM Custom Resource object to a hashtable.
+    .DESCRIPTION
+    Extracts relevant properties from a CustomResource object and returns a standardized hashtable.
+    .PARAMETER CustomResource
+    The CustomResource object to convert.
+    #>
+    param(
+        [Parameter(Mandatory = $true)]
+        [Object]$CustomResource
+    )
+
+    $info = @{
+        name = $CustomResource.Name
+        id = $CustomResource.ID.Guid
+        description = $CustomResource.Description
+        family_name = $CustomResource.FamilyName
+        release = $CustomResource.Release
+        library_server = if ($CustomResource.LibraryServer) { $CustomResource.LibraryServer.Name } else { $null }
+        share_path = $CustomResource.SharePath
+        is_equivalent = $CustomResource.IsEquivalent
+        added_time = $CustomResource.AddedTime
+        modified_time = $CustomResource.ModifiedTime
+    }
+
+    return $info
+}
+
 $spec = @{
     options = @{
         name = @{ type = 'str' }

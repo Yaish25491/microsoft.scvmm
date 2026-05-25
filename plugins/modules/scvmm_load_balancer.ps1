@@ -1,5 +1,5 @@
 #!powershell
-# Copyright: (c) 2026, Steve Fulmer
+# Copyright: (c) 2026, Ansible Collections Team (@ansible-collections)
 # GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
 
 function Get-SCVMMLoadBalancerInfo {
@@ -34,7 +34,7 @@ function Get-SCVMMLoadBalancerInfo {
 }
 
 #!powershell
-# Copyright: (c) 2026, Steve Fulmer
+# Copyright: (c) 2026, Ansible Collections Team (@ansible-collections)
 # GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
 
 #Requires -Module Ansible.ModuleUtils.Legacy

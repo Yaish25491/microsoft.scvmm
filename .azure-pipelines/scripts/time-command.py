@@ -1,4 +1,7 @@
 #!/usr/bin/env python
+# -*- coding: utf-8 -*-
+# Copyright: (c) 2026, Ansible Collections Team (@ansible-collections)
+# GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
 """Prepends a relative timestamp to each input line from stdin and writes it to stdout."""
 
 from __future__ import annotations

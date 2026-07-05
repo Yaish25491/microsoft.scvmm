@@ -1,0 +1,46 @@
+---
+- name: Get all VMs info
+  microsoft.scvmm.scvmm_vm_info:
+    vmm_server: "{{ scvmm_server }}"
+  register: all_vms
+
+- name: Assert all VMs returned
+  assert:
+    that:
+      - all_vms.virtual_machines is defined
+      - all_vms.virtual_machines | length > 0
+
+- name: Get specific VM info by name
+  microsoft.scvmm.scvmm_vm_info:
+    name: "{{ test_vm }}"
+    vmm_server: "{{ scvmm_server }}"
+  register: specific_vm
+
+- name: Assert specific VM returned
+  assert:
+    that:
+      - specific_vm.virtual_machines | length == 1
+      - specific_vm.virtual_machines[0].name == test_vm
+
+- name: Get info for non-existent VM
+  microsoft.scvmm.scvmm_vm_info:
+    name: "NonExistentVM_{{ 99999 | random }}"
+    vmm_server: "{{ scvmm_server }}"
+  register: missing_vm
+
+- name: Assert no VM returned for non-existent
+  assert:
+    that:
+      - missing_vm.virtual_machines | length == 0
+
+- name: Get VM info again (idempotency check)
+  microsoft.scvmm.scvmm_vm_info:
+    name: "{{ test_vm }}"
+    vmm_server: "{{ scvmm_server }}"
+  register: second_query
+
+- name: Assert consistent results
+  assert:
+    that:
+      - second_query.virtual_machines | length == 1
+      - second_query.virtual_machines[0].name == specific_vm.virtual_machines[0].name

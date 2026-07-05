@@ -1,0 +1,3 @@
+---
+minor_changes:
+  - scvmm_vm_info - Gather information about Virtual Machines managed by SCVMM 2022.

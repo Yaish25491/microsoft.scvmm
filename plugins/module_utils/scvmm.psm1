@@ -34,4 +34,38 @@ function Connect-SCVMMServerSession {
     }
 }
 
-Export-ModuleMember -Function 'Connect-SCVMMServerSession'
+<#
+.SYNOPSIS
+Removes a virtual machine from SCVMM by name.
+#>
+function Remove-SCVMMVirtualMachine {
+    param(
+        [Parameter(Mandatory = $true)]
+        [Object]$Module,
+        [Parameter(Mandatory = $true)]
+        [Object]$VMMConnection,
+        [Parameter(Mandatory = $true)]
+        [string]$Name
+    )
+
+    $vm = Get-SCVirtualMachine -VMMServer $VMMConnection -Name $Name -ErrorAction Stop
+
+    if ($vm -and $vm.Count -gt 1) {
+        $Module.FailJson("Multiple VMs found with name '$Name'. Cannot determine which VM to remove.")
+    }
+
+    if (-not $vm) {
+        return @{ changed = $false; vm = $null }
+    }
+
+    if (-not $Module.CheckMode) {
+        if ($vm.Status -eq 'Running') {
+            Stop-SCVirtualMachine -VM $vm -Force -ErrorAction Stop | Out-Null
+        }
+        Remove-SCVirtualMachine -VM $vm -Force -ErrorAction Stop | Out-Null
+    }
+
+    return @{ changed = $true; vm = $vm }
+}
+
+Export-ModuleMember -Function 'Connect-SCVMMServerSession', 'Remove-SCVMMVirtualMachine'

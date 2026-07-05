@@ -1,0 +1,103 @@
+---
+- name: Start VM
+  microsoft.scvmm.scvmm_vm_state:
+    name: "{{ test_vm }}"
+    state: started
+    vmm_server: "{{ scvmm_server }}"
+  register: start_result
+
+- name: Assert VM started
+  assert:
+    that:
+      - start_result.changed == true
+
+- name: Start VM again (idempotency)
+  microsoft.scvmm.scvmm_vm_state:
+    name: "{{ test_vm }}"
+    state: started
+    vmm_server: "{{ scvmm_server }}"
+  register: start_idem
+
+- name: Assert idempotent
+  assert:
+    that:
+      - start_idem.changed == false
+
+- name: Check mode stop VM
+  microsoft.scvmm.scvmm_vm_state:
+    name: "{{ test_vm }}"
+    state: stopped
+    vmm_server: "{{ scvmm_server }}"
+  check_mode: true
+  register: check_stop
+
+- name: Assert check mode reports changed
+  assert:
+    that:
+      - check_stop.changed == true
+
+- name: Stop VM
+  microsoft.scvmm.scvmm_vm_state:
+    name: "{{ test_vm }}"
+    state: stopped
+    vmm_server: "{{ scvmm_server }}"
+  register: stop_result
+
+- name: Assert VM stopped
+  assert:
+    that:
+      - stop_result.changed == true
+
+- name: Stop VM again (idempotency)
+  microsoft.scvmm.scvmm_vm_state:
+    name: "{{ test_vm }}"
+    state: stopped
+    vmm_server: "{{ scvmm_server }}"
+  register: stop_idem
+
+- name: Assert idempotent
+  assert:
+    that:
+      - stop_idem.changed == false
+
+- name: Start VM for suspend test
+  microsoft.scvmm.scvmm_vm_state:
+    name: "{{ test_vm }}"
+    state: started
+    vmm_server: "{{ scvmm_server }}"
+
+- name: Suspend VM
+  microsoft.scvmm.scvmm_vm_state:
+    name: "{{ test_vm }}"
+    state: suspended
+    vmm_server: "{{ scvmm_server }}"
+  register: suspend_result
+
+- name: Assert VM suspended
+  assert:
+    that:
+      - suspend_result.changed == true
+
+- name: Suspend VM again (idempotency)
+  microsoft.scvmm.scvmm_vm_state:
+    name: "{{ test_vm }}"
+    state: suspended
+    vmm_server: "{{ scvmm_server }}"
+  register: suspend_idem
+
+- name: Assert idempotent
+  assert:
+    that:
+      - suspend_idem.changed == false
+
+- name: Resume VM from suspended state
+  microsoft.scvmm.scvmm_vm_state:
+    name: "{{ test_vm }}"
+    state: started
+    vmm_server: "{{ scvmm_server }}"
+  register: resume_result
+
+- name: Assert VM resumed
+  assert:
+    that:
+      - resume_result.changed == true

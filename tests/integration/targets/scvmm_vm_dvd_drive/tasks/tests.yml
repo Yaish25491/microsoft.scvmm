@@ -1,0 +1,87 @@
+---
+- name: Add DVD drive
+  microsoft.scvmm.scvmm_vm_dvd_drive:
+    vm_name: "{{ test_vm }}"
+    vmm_server: "{{ scvmm_server }}"
+    state: present
+  register: add_dvd
+
+- name: Assert DVD drive added
+  assert:
+    that:
+      - add_dvd.changed == true
+
+- name: Add DVD drive again (idempotency)
+  microsoft.scvmm.scvmm_vm_dvd_drive:
+    vm_name: "{{ test_vm }}"
+    vmm_server: "{{ scvmm_server }}"
+    state: present
+  register: add_dvd_idem
+
+- name: Assert idempotent
+  assert:
+    that:
+      - add_dvd_idem.changed == false
+
+- name: Add DVD drive in check mode (already exists)
+  microsoft.scvmm.scvmm_vm_dvd_drive:
+    vm_name: "{{ test_vm }}"
+    vmm_server: "{{ scvmm_server }}"
+    state: present
+  check_mode: true
+  register: add_dvd_check
+
+- name: Assert check mode reports no change
+  assert:
+    that:
+      - add_dvd_check.changed == false
+
+- name: Remove DVD drive
+  microsoft.scvmm.scvmm_vm_dvd_drive:
+    vm_name: "{{ test_vm }}"
+    vmm_server: "{{ scvmm_server }}"
+    state: absent
+  register: remove_dvd
+
+- name: Assert DVD drive removed
+  assert:
+    that:
+      - remove_dvd.changed == true
+
+- name: Remove DVD drive again (idempotency)
+  microsoft.scvmm.scvmm_vm_dvd_drive:
+    vm_name: "{{ test_vm }}"
+    vmm_server: "{{ scvmm_server }}"
+    state: absent
+  register: remove_dvd_idem
+
+- name: Assert remove is idempotent
+  assert:
+    that:
+      - remove_dvd_idem.changed == false
+
+- name: Remove DVD drive in check mode (already removed)
+  microsoft.scvmm.scvmm_vm_dvd_drive:
+    vm_name: "{{ test_vm }}"
+    vmm_server: "{{ scvmm_server }}"
+    state: absent
+  check_mode: true
+  register: remove_dvd_check
+
+- name: Assert check mode reports no change
+  assert:
+    that:
+      - remove_dvd_check.changed == false
+
+- name: Test error handling - add DVD to non-existent VM
+  microsoft.scvmm.scvmm_vm_dvd_drive:
+    vm_name: "NonExistentVM"
+    vmm_server: "{{ scvmm_server }}"
+    state: present
+  register: dvd_error
+  ignore_errors: true
+
+- name: Assert error was raised
+  assert:
+    that:
+      - dvd_error.failed == true

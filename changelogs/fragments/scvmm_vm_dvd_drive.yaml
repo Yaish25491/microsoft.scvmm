@@ -1,0 +1,3 @@
+---
+minor_changes:
+  - scvmm_vm_dvd_drive - Manage virtual DVD drives and ISO mounting for SCVMM 2022 Virtual Machines.

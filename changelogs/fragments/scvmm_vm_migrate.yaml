@@ -1,0 +1,3 @@
+---
+minor_changes:
+  - scvmm_vm_migrate - Migrate Virtual Machines between Hyper-V hosts on SCVMM 2022.

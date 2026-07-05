@@ -1,0 +1,196 @@
+---
+- name: Check mode add DVD drive
+  microsoft.scvmm.scvmm_vm_dvd_drive:
+    vm_name: "{{ test_vm }}"
+    vmm_server: "{{ scvmm_server }}"
+    state: present
+  check_mode: true
+  register: check_add
+
+- name: Assert check mode reports changed
+  assert:
+    that:
+      - check_add.changed == true
+
+- name: Verify check mode did not create drive
+  microsoft.scvmm.scvmm_vm_dvd_drive_info:
+    vm_name: "{{ test_vm }}"
+    vmm_server: "{{ scvmm_server }}"
+  register: post_check_add
+
+- name: Assert drive was not actually created
+  assert:
+    that:
+      - post_check_add.dvd_drives | selectattr('bus', 'equalto', 0) | selectattr('lun', 'equalto', 1) | list | length == 0
+
+- name: Add DVD drive
+  microsoft.scvmm.scvmm_vm_dvd_drive:
+    vm_name: "{{ test_vm }}"
+    vmm_server: "{{ scvmm_server }}"
+    state: present
+  register: add_dvd
+
+- name: Assert DVD drive added with return values
+  assert:
+    that:
+      - add_dvd.changed == true
+      - add_dvd.dvd_drive.id is defined
+      - add_dvd.dvd_drive.id | length > 0
+      - add_dvd.dvd_drive.bus == 0
+      - add_dvd.dvd_drive.lun == 1
+
+- name: Verify DVD drive exists via info module
+  microsoft.scvmm.scvmm_vm_dvd_drive_info:
+    vm_name: "{{ test_vm }}"
+    vmm_server: "{{ scvmm_server }}"
+  register: dvd_verify
+
+- name: Assert DVD drive visible in SCVMM
+  assert:
+    that:
+      - dvd_verify.dvd_drives | length > 0
+      - dvd_verify.dvd_drives | selectattr('bus', 'equalto', 0) | selectattr('lun', 'equalto', 1) | list | length == 1
+
+- name: Add DVD drive again (idempotency)
+  microsoft.scvmm.scvmm_vm_dvd_drive:
+    vm_name: "{{ test_vm }}"
+    vmm_server: "{{ scvmm_server }}"
+    state: present
+  register: add_dvd_idem
+
+- name: Assert idempotent
+  assert:
+    that:
+      - add_dvd_idem.changed == false
+      - add_dvd_idem.dvd_drive.bus == 0
+      - add_dvd_idem.dvd_drive.lun == 1
+
+- name: Check mode add when already present (no-op)
+  microsoft.scvmm.scvmm_vm_dvd_drive:
+    vm_name: "{{ test_vm }}"
+    vmm_server: "{{ scvmm_server }}"
+    state: present
+  check_mode: true
+  register: check_add_noop
+
+- name: Assert check mode no-op reports no change
+  assert:
+    that:
+      - check_add_noop.changed == false
+
+- name: Check mode remove DVD drive
+  microsoft.scvmm.scvmm_vm_dvd_drive:
+    vm_name: "{{ test_vm }}"
+    vmm_server: "{{ scvmm_server }}"
+    state: absent
+  check_mode: true
+  register: check_remove
+
+- name: Assert check mode remove reports changed
+  assert:
+    that:
+      - check_remove.changed == true
+
+- name: Verify check mode did not remove drive
+  microsoft.scvmm.scvmm_vm_dvd_drive_info:
+    vm_name: "{{ test_vm }}"
+    vmm_server: "{{ scvmm_server }}"
+  register: post_check_remove
+
+- name: Assert drive still exists after check mode
+  assert:
+    that:
+      - post_check_remove.dvd_drives | selectattr('bus', 'equalto', 0) | selectattr('lun', 'equalto', 1) | list | length == 1
+
+- name: Remove DVD drive
+  microsoft.scvmm.scvmm_vm_dvd_drive:
+    vm_name: "{{ test_vm }}"
+    vmm_server: "{{ scvmm_server }}"
+    state: absent
+  register: remove_dvd
+
+- name: Assert DVD drive removed
+  assert:
+    that:
+      - remove_dvd.changed == true
+
+- name: Verify DVD drive removed via info module
+  microsoft.scvmm.scvmm_vm_dvd_drive_info:
+    vm_name: "{{ test_vm }}"
+    vmm_server: "{{ scvmm_server }}"
+  register: post_remove_verify
+
+- name: Assert DVD drive at bus 0 lun 1 no longer exists
+  assert:
+    that:
+      - post_remove_verify.dvd_drives | selectattr('bus', 'equalto', 0) | selectattr('lun', 'equalto', 1) | list | length == 0
+
+- name: Remove DVD drive again (idempotency)
+  microsoft.scvmm.scvmm_vm_dvd_drive:
+    vm_name: "{{ test_vm }}"
+    vmm_server: "{{ scvmm_server }}"
+    state: absent
+  register: remove_dvd_idem
+
+- name: Assert remove is idempotent
+  assert:
+    that:
+      - remove_dvd_idem.changed == false
+
+- name: Check mode remove when already absent (no-op)
+  microsoft.scvmm.scvmm_vm_dvd_drive:
+    vm_name: "{{ test_vm }}"
+    vmm_server: "{{ scvmm_server }}"
+    state: absent
+  check_mode: true
+  register: check_remove_noop
+
+- name: Assert check mode no-op reports no change
+  assert:
+    that:
+      - check_remove_noop.changed == false
+
+- name: Add DVD drive on non-default bus/lun
+  microsoft.scvmm.scvmm_vm_dvd_drive:
+    vm_name: "{{ test_vm }}"
+    vmm_server: "{{ scvmm_server }}"
+    bus: 1
+    lun: 0
+    state: present
+  register: add_dvd_custom
+
+- name: Assert non-default DVD drive added with correct return values
+  assert:
+    that:
+      - add_dvd_custom.changed == true
+      - add_dvd_custom.dvd_drive.bus == 1
+      - add_dvd_custom.dvd_drive.lun == 0
+      - add_dvd_custom.dvd_drive.id is defined
+
+- name: Remove non-default DVD drive
+  microsoft.scvmm.scvmm_vm_dvd_drive:
+    vm_name: "{{ test_vm }}"
+    vmm_server: "{{ scvmm_server }}"
+    bus: 1
+    lun: 0
+    state: absent
+  register: remove_dvd_custom
+
+- name: Assert non-default DVD drive removed
+  assert:
+    that:
+      - remove_dvd_custom.changed == true
+
+- name: Add DVD to non-existent VM
+  microsoft.scvmm.scvmm_vm_dvd_drive:
+    vm_name: "NonExistentVM_{{ 99999 | random }}"
+    vmm_server: "{{ scvmm_server }}"
+    state: present
+  register: dvd_error
+  ignore_errors: true
+
+- name: Assert missing VM fails
+  assert:
+    that:
+      - dvd_error is failed
+      - "'not found' in dvd_error.msg"

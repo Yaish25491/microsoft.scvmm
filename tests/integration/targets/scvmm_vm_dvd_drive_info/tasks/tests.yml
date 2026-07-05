@@ -1,0 +1,40 @@
+---
+- name: Get all DVD drives on VM
+  microsoft.scvmm.scvmm_vm_dvd_drive_info:
+    vm_name: "{{ test_vm }}"
+    vmm_server: "{{ scvmm_server }}"
+  register: all_drives
+
+- name: Assert DVD drives returned
+  assert:
+    that:
+      - all_drives.dvd_drives is defined
+      - all_drives.dvd_drives | length > 0
+
+- name: Assert created drive is in the list
+  assert:
+    that:
+      - all_drives.dvd_drives | selectattr('bus', 'equalto', 0) | selectattr('lun', 'equalto', 1) | list | length == 1
+
+- name: Get DVD drives again (consistency check)
+  microsoft.scvmm.scvmm_vm_dvd_drive_info:
+    vm_name: "{{ test_vm }}"
+    vmm_server: "{{ scvmm_server }}"
+  register: second_query
+
+- name: Assert consistent results
+  assert:
+    that:
+      - second_query.dvd_drives | length == all_drives.dvd_drives | length
+
+- name: Get DVD drives on non-existent VM
+  microsoft.scvmm.scvmm_vm_dvd_drive_info:
+    vm_name: "NonExistentVM_{{ 99999 | random }}"
+    vmm_server: "{{ scvmm_server }}"
+  register: bad_vm
+  ignore_errors: true
+
+- name: Assert failure for non-existent VM
+  assert:
+    that:
+      - bad_vm.failed == true

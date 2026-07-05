@@ -1,0 +1,93 @@
+---
+- name: Create checkpoint
+  microsoft.scvmm.scvmm_vm_checkpoint:
+    vm_name: "{{ test_vm }}"
+    name: "{{ test_checkpoint }}"
+    vmm_server: "{{ scvmm_server }}"
+    state: present
+  register: checkpoint_create
+
+- name: Assert checkpoint created
+  assert:
+    that:
+      - checkpoint_create.changed == true
+
+- name: Create checkpoint again (idempotency)
+  microsoft.scvmm.scvmm_vm_checkpoint:
+    vm_name: "{{ test_vm }}"
+    name: "{{ test_checkpoint }}"
+    vmm_server: "{{ scvmm_server }}"
+    state: present
+  register: checkpoint_idem
+
+- name: Assert idempotent
+  assert:
+    that:
+      - checkpoint_idem.changed == false
+
+- name: Check mode restore checkpoint
+  microsoft.scvmm.scvmm_vm_checkpoint:
+    vm_name: "{{ test_vm }}"
+    name: "{{ test_checkpoint }}"
+    vmm_server: "{{ scvmm_server }}"
+    state: reverted
+  check_mode: true
+  register: check_restore
+
+- name: Assert check mode reports changed
+  assert:
+    that:
+      - check_restore.changed == true
+
+- name: Restore checkpoint
+  microsoft.scvmm.scvmm_vm_checkpoint:
+    vm_name: "{{ test_vm }}"
+    name: "{{ test_checkpoint }}"
+    vmm_server: "{{ scvmm_server }}"
+    state: reverted
+  register: restore_result
+
+- name: Assert checkpoint restored
+  assert:
+    that:
+      - restore_result.changed == true
+
+- name: Check mode delete checkpoint
+  microsoft.scvmm.scvmm_vm_checkpoint:
+    vm_name: "{{ test_vm }}"
+    name: "{{ test_checkpoint }}"
+    vmm_server: "{{ scvmm_server }}"
+    state: absent
+  check_mode: true
+  register: check_delete
+
+- name: Assert check mode reports changed
+  assert:
+    that:
+      - check_delete.changed == true
+
+- name: Delete checkpoint
+  microsoft.scvmm.scvmm_vm_checkpoint:
+    vm_name: "{{ test_vm }}"
+    name: "{{ test_checkpoint }}"
+    vmm_server: "{{ scvmm_server }}"
+    state: absent
+  register: delete_result
+
+- name: Assert checkpoint deleted
+  assert:
+    that:
+      - delete_result.changed == true
+
+- name: Delete checkpoint again (idempotency)
+  microsoft.scvmm.scvmm_vm_checkpoint:
+    vm_name: "{{ test_vm }}"
+    name: "{{ test_checkpoint }}"
+    vmm_server: "{{ scvmm_server }}"
+    state: absent
+  register: delete_idem
+
+- name: Assert idempotent
+  assert:
+    that:
+      - delete_idem.changed == false

@@ -1,0 +1,44 @@
+---
+- name: Add SCSI adapter (auto adapter_id)
+  microsoft.scvmm.scvmm_vm_scsi_adapter:
+    vm_name: "{{ test_vm }}"
+    vmm_server: "{{ scvmm_server }}"
+    state: present
+  register: add_scsi
+
+- name: Assert SCSI adapter added
+  assert:
+    that:
+      - add_scsi.changed == true
+      - add_scsi.scsi_adapter is defined
+      - add_scsi.scsi_adapter.id is defined
+
+- name: Save adapter_id for later tests
+  set_fact:
+    test_adapter_id: "{{ add_scsi.scsi_adapter.adapter_id }}"
+
+- name: Remove SCSI adapter by adapter_id
+  microsoft.scvmm.scvmm_vm_scsi_adapter:
+    vm_name: "{{ test_vm }}"
+    vmm_server: "{{ scvmm_server }}"
+    adapter_id: "{{ test_adapter_id | int }}"
+    state: absent
+  register: remove_scsi
+
+- name: Assert SCSI adapter removed
+  assert:
+    that:
+      - remove_scsi.changed == true
+
+- name: Test error handling - add SCSI to non-existent VM
+  microsoft.scvmm.scvmm_vm_scsi_adapter:
+    vm_name: "NonExistentVM"
+    vmm_server: "{{ scvmm_server }}"
+    state: present
+  register: scsi_error
+  ignore_errors: true
+
+- name: Assert error was raised
+  assert:
+    that:
+      - scsi_error.failed == true

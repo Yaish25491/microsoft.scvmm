@@ -65,45 +65,24 @@ function Get-VmResultDict {
 }
 
 if ($state -eq 'absent') {
-    if ($vm) {
+    $removeResult = Remove-SCVMMVirtualMachine -Module $module -VMMConnection $vmmConnection -Name $name
+
+    if ($removeResult.vm) {
         $hostName = $null
-        if ($vm.VMHost) {
-            $hostName = $vm.VMHost.Name
+        if ($removeResult.vm.VMHost) {
+            $hostName = $removeResult.vm.VMHost.Name
         }
         $module.Diff.before = @{
-            name = $vm.Name
-            status = $vm.Status.ToString()
+            name = $removeResult.vm.Name
+            status = $removeResult.vm.Status.ToString()
             host = $hostName
         }
         $module.Diff.after = @{}
-
-        if (-not $module.CheckMode) {
-            if ($vm.Status -eq 'Running') {
-                try {
-                    Stop-SCVirtualMachine -VM $vm -Force -ErrorAction Stop | Out-Null
-                }
-                catch {
-                    $module.FailJson("Failed to stop VM: $($_.Exception.Message)")
-                }
-            }
-
-            try {
-                Remove-SCVirtualMachine -VM $vm -Force -ErrorAction Stop | Out-Null
-            }
-            catch {
-                $module.FailJson("Failed to remove VM: $($_.Exception.Message)")
-            }
-        }
-
-        $module.Result.changed = $true
-        $module.Result.name = $name
-        $module.Result.state = 'absent'
     }
-    else {
-        $module.Result.changed = $false
-        $module.Result.name = $name
-        $module.Result.state = 'absent'
-    }
+
+    $module.Result.changed = $removeResult.changed
+    $module.Result.name = $name
+    $module.Result.state = 'absent'
 }
 else {
     if (-not $vm) {

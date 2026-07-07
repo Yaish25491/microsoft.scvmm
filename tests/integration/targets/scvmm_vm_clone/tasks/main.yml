@@ -1,0 +1,52 @@
+---
+- name: Define test variables
+  set_fact:
+    test_vm_source: "AnsibleTest_CloneSource_{{ 99999 | random }}"
+    test_vm_clone: "AnsibleTest_Clone_{{ 99999 | random }}"
+
+- block:
+    - name: Setup - Create source VM
+      microsoft.scvmm.scvmm_vm:
+        name: "{{ test_vm_source }}"
+        template: "{{ test_vm_template }}"
+        vm_host: "{{ test_vm_host }}"
+        vmm_server: "{{ scvmm_server }}"
+        state: present
+
+    - name: Run tests
+      ansible.builtin.include_tasks: tests.yml
+
+  always:
+    - name: Teardown - Remove clone VM
+      microsoft.scvmm.scvmm_vm:
+        name: "{{ test_vm_clone }}"
+        state: absent
+        vmm_server: "{{ scvmm_server }}"
+      ignore_errors: true
+
+    - name: Teardown - Remove source VM
+      microsoft.scvmm.scvmm_vm:
+        name: "{{ test_vm_source }}"
+        state: absent
+        vmm_server: "{{ scvmm_server }}"
+      ignore_errors: true
+
+    - name: Teardown - Validate clone VM removed
+      microsoft.scvmm.scvmm_vm:
+        name: "{{ test_vm_clone }}"
+        state: absent
+        vmm_server: "{{ scvmm_server }}"
+      register: teardown_clone_validate
+
+    - name: Teardown - Validate source VM removed
+      microsoft.scvmm.scvmm_vm:
+        name: "{{ test_vm_source }}"
+        state: absent
+        vmm_server: "{{ scvmm_server }}"
+      register: teardown_source_validate
+
+    - name: Teardown - Assert server is clean
+      assert:
+        that:
+          - teardown_clone_validate.changed == false
+          - teardown_source_validate.changed == false

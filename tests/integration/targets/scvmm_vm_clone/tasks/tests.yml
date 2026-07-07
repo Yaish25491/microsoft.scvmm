@@ -1,0 +1,186 @@
+---
+# ── Check-mode present (clone does not exist yet) ──
+- name: Check-mode - Clone VM
+  microsoft.scvmm.scvmm_vm_clone:
+    source_vm: "{{ test_vm_source }}"
+    name: "{{ test_vm_clone }}"
+    vmm_server: "{{ scvmm_server }}"
+    state: present
+  check_mode: true
+  register: clone_check
+
+- name: Assert check-mode reports changed
+  assert:
+    that:
+      - clone_check.changed == true
+
+- name: Verify check-mode did not create VM
+  microsoft.scvmm.scvmm_vm_info:
+    name: "{{ test_vm_clone }}"
+    vmm_server: "{{ scvmm_server }}"
+  register: clone_check_info
+
+- name: Assert VM does not exist after check-mode
+  assert:
+    that:
+      - clone_check_info.virtual_machines | length == 0
+
+# ── Create clone with description ──
+- name: Clone VM with description
+  microsoft.scvmm.scvmm_vm_clone:
+    source_vm: "{{ test_vm_source }}"
+    name: "{{ test_vm_clone }}"
+    description: "Integration test clone"
+    vmm_server: "{{ scvmm_server }}"
+    state: present
+  register: clone_result
+
+- name: Assert clone created with return values
+  assert:
+    that:
+      - clone_result.changed == true
+      - clone_result.vm.id is defined
+      - clone_result.vm.id | length > 0
+      - clone_result.vm.name == test_vm_clone
+      - clone_result.vm.status is defined
+      - clone_result.vm.host is defined
+      - clone_result.vm.host | length > 0
+
+# ── Verify via info module ──
+- name: Verify clone exists via info
+  microsoft.scvmm.scvmm_vm_info:
+    name: "{{ test_vm_clone }}"
+    vmm_server: "{{ scvmm_server }}"
+  register: clone_info
+
+- name: Assert clone info
+  assert:
+    that:
+      - clone_info.virtual_machines | length == 1
+      - clone_info.virtual_machines[0].name == test_vm_clone
+
+# ── Idempotency ──
+- name: Clone VM again (idempotency)
+  microsoft.scvmm.scvmm_vm_clone:
+    source_vm: "{{ test_vm_source }}"
+    name: "{{ test_vm_clone }}"
+    vmm_server: "{{ scvmm_server }}"
+    state: present
+  register: clone_idem
+
+- name: Assert idempotent with return values
+  assert:
+    that:
+      - clone_idem.changed == false
+      - clone_idem.vm.id == clone_result.vm.id
+      - clone_idem.vm.name == test_vm_clone
+
+# ── Check-mode present no-op (VM already exists) ──
+- name: Check-mode - Clone VM already exists
+  microsoft.scvmm.scvmm_vm_clone:
+    source_vm: "{{ test_vm_source }}"
+    name: "{{ test_vm_clone }}"
+    vmm_server: "{{ scvmm_server }}"
+    state: present
+  check_mode: true
+  register: clone_check_noop
+
+- name: Assert check-mode no-op
+  assert:
+    that:
+      - clone_check_noop.changed == false
+
+# ── Check-mode absent (VM exists, should report changed but not delete) ──
+- name: Check-mode - Delete clone
+  microsoft.scvmm.scvmm_vm_clone:
+    source_vm: "{{ test_vm_source }}"
+    name: "{{ test_vm_clone }}"
+    vmm_server: "{{ scvmm_server }}"
+    state: absent
+  check_mode: true
+  register: delete_check
+
+- name: Assert check-mode absent reports changed
+  assert:
+    that:
+      - delete_check.changed == true
+
+- name: Verify VM still exists after check-mode absent
+  microsoft.scvmm.scvmm_vm_info:
+    name: "{{ test_vm_clone }}"
+    vmm_server: "{{ scvmm_server }}"
+  register: after_check_delete_info
+
+- name: Assert VM unchanged after check-mode absent
+  assert:
+    that:
+      - after_check_delete_info.virtual_machines | length == 1
+
+# ── Delete clone ──
+- name: Delete clone
+  microsoft.scvmm.scvmm_vm_clone:
+    source_vm: "{{ test_vm_source }}"
+    name: "{{ test_vm_clone }}"
+    vmm_server: "{{ scvmm_server }}"
+    state: absent
+  register: delete_clone
+
+- name: Assert clone deleted
+  assert:
+    that:
+      - delete_clone.changed == true
+
+- name: Verify clone removed via info
+  microsoft.scvmm.scvmm_vm_info:
+    name: "{{ test_vm_clone }}"
+    vmm_server: "{{ scvmm_server }}"
+  register: after_delete_info
+
+- name: Assert clone no longer exists
+  assert:
+    that:
+      - after_delete_info.virtual_machines | length == 0
+
+# ── Delete idempotency ──
+- name: Delete clone again (idempotency)
+  microsoft.scvmm.scvmm_vm_clone:
+    source_vm: "{{ test_vm_source }}"
+    name: "{{ test_vm_clone }}"
+    vmm_server: "{{ scvmm_server }}"
+    state: absent
+  register: delete_idem
+
+- name: Assert delete is idempotent
+  assert:
+    that:
+      - delete_idem.changed == false
+
+# ── Check-mode absent no-op (VM already gone) ──
+- name: Check-mode - Delete already absent clone
+  microsoft.scvmm.scvmm_vm_clone:
+    source_vm: "{{ test_vm_source }}"
+    name: "{{ test_vm_clone }}"
+    vmm_server: "{{ scvmm_server }}"
+    state: absent
+  check_mode: true
+  register: delete_check_noop
+
+- name: Assert check-mode absent no-op
+  assert:
+    that:
+      - delete_check_noop.changed == false
+
+# ── Negative: clone from non-existent source VM ──
+- name: Clone from non-existent source VM
+  microsoft.scvmm.scvmm_vm_clone:
+    source_vm: "NonExistentVM_{{ 99999 | random }}"
+    name: "ShouldFail"
+    vmm_server: "{{ scvmm_server }}"
+    state: present
+  register: clone_error
+  ignore_errors: true
+
+- name: Assert error for non-existent source
+  assert:
+    that:
+      - clone_error.failed == true

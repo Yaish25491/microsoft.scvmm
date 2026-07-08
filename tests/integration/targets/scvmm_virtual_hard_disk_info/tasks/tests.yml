@@ -1,0 +1,106 @@
+---
+# ── Query all virtual hard disks ──
+- name: Get all virtual hard disks
+  microsoft.scvmm.scvmm_virtual_hard_disk_info:
+    vmm_server: "{{ scvmm_server }}"
+  register: all_vhds
+
+- name: Assert module returns list and reports no change
+  assert:
+    that:
+      - all_vhds is not changed
+      - all_vhds.virtual_hard_disks is defined
+      - all_vhds.virtual_hard_disks | length > 0
+
+# ── Verify library_server field on library VHDs ──
+- name: Assert library_server is returned for library VHDs
+  assert:
+    that:
+      - all_vhds.virtual_hard_disks[0].library_server is defined
+
+# ── Query by name ──
+- name: Get VHD by name
+  microsoft.scvmm.scvmm_virtual_hard_disk_info:
+    name: "{{ test_vhd_name }}"
+    vmm_server: "{{ scvmm_server }}"
+  register: named_vhd
+
+- name: Assert VHD found by name
+  assert:
+    that:
+      - named_vhd is not changed
+      - named_vhd.virtual_hard_disks | length >= 1
+      - named_vhd.virtual_hard_disks[0].name == test_vhd_name
+      - named_vhd.virtual_hard_disks[0].id is defined
+      - named_vhd.virtual_hard_disks[0].vhd_format is defined
+      - named_vhd.virtual_hard_disks[0].library_server is defined
+
+# ── Query non-existent VHD ──
+- name: Get info for non-existent VHD
+  microsoft.scvmm.scvmm_virtual_hard_disk_info:
+    name: "NonExistentDisk_{{ 99999 | random }}.vhdx"
+    vmm_server: "{{ scvmm_server }}"
+  register: missing_vhd
+
+- name: Assert no VHD returned for non-existent
+  assert:
+    that:
+      - missing_vhd is not changed
+      - missing_vhd.virtual_hard_disks | length == 0
+
+# ── Filter by VM name ──
+- name: Query VHDs attached to test VM
+  microsoft.scvmm.scvmm_virtual_hard_disk_info:
+    vm_name: "{{ test_vm_vhd }}"
+    vmm_server: "{{ scvmm_server }}"
+  register: vm_vhds
+
+- name: Assert VM VHD query returns results with bus/lun
+  assert:
+    that:
+      - vm_vhds is not changed
+      - vm_vhds.virtual_hard_disks | length >= 1
+      - vm_vhds.virtual_hard_disks[0].vm_name == test_vm_vhd
+      - vm_vhds.virtual_hard_disks[0].bus is defined
+      - vm_vhds.virtual_hard_disks[0].lun is defined
+      - vm_vhds.virtual_hard_disks[0].bus_type is defined
+
+# ── Filter by non-existent VM ──
+- name: Query VHDs for non-existent VM
+  microsoft.scvmm.scvmm_virtual_hard_disk_info:
+    vm_name: "NonExistentVM_{{ 99999 | random }}"
+    vmm_server: "{{ scvmm_server }}"
+  register: missing_vm_vhds
+  ignore_errors: true
+
+- name: Assert error for non-existent VM
+  assert:
+    that:
+      - missing_vm_vhds is failed
+      - "'not found' in missing_vm_vhds.msg"
+
+# ── Check mode ──
+- name: Get VHD info in check mode
+  microsoft.scvmm.scvmm_virtual_hard_disk_info:
+    vmm_server: "{{ scvmm_server }}"
+  check_mode: true
+  register: check_mode_result
+
+- name: Assert check mode returns data and no change
+  assert:
+    that:
+      - check_mode_result is not changed
+      - check_mode_result.virtual_hard_disks is defined
+      - check_mode_result.virtual_hard_disks | length > 0
+
+# ── Idempotency ──
+- name: Get virtual hard disks again (idempotency)
+  microsoft.scvmm.scvmm_virtual_hard_disk_info:
+    vmm_server: "{{ scvmm_server }}"
+  register: second_query
+
+- name: Assert results are consistent across queries
+  assert:
+    that:
+      - second_query is not changed
+      - second_query.virtual_hard_disks | length == all_vhds.virtual_hard_disks | length

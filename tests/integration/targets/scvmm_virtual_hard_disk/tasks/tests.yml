@@ -1,0 +1,84 @@
+---
+# ── Update description ──
+- name: Update VHD description
+  microsoft.scvmm.scvmm_virtual_hard_disk:
+    name: "{{ test_vhd_name }}"
+    description: "Ansible test description"
+    state: present
+    vmm_server: "{{ scvmm_server }}"
+  register: update_result
+
+- name: Assert VHD was updated
+  assert:
+    that:
+      - update_result is changed
+      - update_result.virtual_hard_disk.name == test_vhd_name
+      - update_result.virtual_hard_disk.description == "Ansible test description"
+
+# ── Idempotency: same description again ──
+- name: Update VHD with same description (idempotency)
+  microsoft.scvmm.scvmm_virtual_hard_disk:
+    name: "{{ test_vhd_name }}"
+    description: "Ansible test description"
+    state: present
+    vmm_server: "{{ scvmm_server }}"
+  register: idempotent_result
+
+- name: Assert no change on idempotent update
+  assert:
+    that:
+      - idempotent_result is not changed
+
+# ── Check mode ──
+- name: Update VHD in check mode
+  microsoft.scvmm.scvmm_virtual_hard_disk:
+    name: "{{ test_vhd_name }}"
+    description: "Check mode description"
+    state: present
+    vmm_server: "{{ scvmm_server }}"
+  check_mode: true
+  register: check_mode_result
+
+- name: Assert check mode reports change but does not apply
+  assert:
+    that:
+      - check_mode_result is changed
+
+- name: Verify description unchanged after check mode
+  microsoft.scvmm.scvmm_virtual_hard_disk_info:
+    name: "{{ test_vhd_name }}"
+    vmm_server: "{{ scvmm_server }}"
+  register: after_check
+
+- name: Assert description still has test value (not check mode value)
+  assert:
+    that:
+      - after_check.virtual_hard_disks[0].description == "Ansible test description"
+
+# ── Negative: non-existent VHD (present) ──
+- name: Attempt to manage non-existent VHD
+  microsoft.scvmm.scvmm_virtual_hard_disk:
+    name: "NonExistentDisk_{{ 99999 | random }}.vhdx"
+    state: present
+    vmm_server: "{{ scvmm_server }}"
+  register: vhd_error
+  ignore_errors: true
+
+- name: Assert error for non-existent VHD
+  assert:
+    that:
+      - vhd_error is failed
+      - "'not found' in vhd_error.msg"
+
+# ── Negative: remove non-existent VHD (no change) ──
+- name: Remove non-existent VHD
+  microsoft.scvmm.scvmm_virtual_hard_disk:
+    name: "NonExistentDisk_{{ 99999 | random }}.vhdx"
+    state: absent
+    vmm_server: "{{ scvmm_server }}"
+  register: remove_missing
+
+- name: Assert no change when removing non-existent VHD
+  assert:
+    that:
+      - remove_missing is not changed

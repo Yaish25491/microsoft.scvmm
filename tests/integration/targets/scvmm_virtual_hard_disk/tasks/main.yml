@@ -1,0 +1,34 @@
+---
+- name: Save original VHD state
+  microsoft.scvmm.scvmm_virtual_hard_disk_info:
+    name: "{{ test_vhd_name }}"
+    vmm_server: "{{ scvmm_server }}"
+  register: original_vhd
+
+- name: Define test variables
+  set_fact:
+    original_description: "{{ original_vhd.virtual_hard_disks[0].description | default('') }}"
+
+- block:
+    - name: Run tests
+      ansible.builtin.include_tasks: tests.yml
+
+  always:
+    - name: Teardown - Revert VHD description to original
+      microsoft.scvmm.scvmm_virtual_hard_disk:
+        name: "{{ test_vhd_name }}"
+        description: "{{ original_description }}"
+        state: present
+        vmm_server: "{{ scvmm_server }}"
+      ignore_errors: true
+
+    - name: Teardown - Validate VHD description reverted
+      microsoft.scvmm.scvmm_virtual_hard_disk_info:
+        name: "{{ test_vhd_name }}"
+        vmm_server: "{{ scvmm_server }}"
+      register: teardown_validate
+
+    - name: Teardown - Assert server is clean
+      assert:
+        that:
+          - teardown_validate.virtual_hard_disks[0].description == original_description

@@ -1,0 +1,39 @@
+---
+# ── Get host ratings ──
+- name: Get host ratings for VM
+  microsoft.scvmm.scvmm_host_rating_info:
+    vm_name: "{{ test_vm_name }}"
+    vmm_server: "{{ scvmm_server }}"
+  register: ratings
+
+- name: Assert ratings returned
+  assert:
+    that:
+      - ratings is not changed
+      - ratings.host_ratings is defined
+
+# ── Get ratings with host group filter ──
+- name: Get host ratings with host group
+  microsoft.scvmm.scvmm_host_rating_info:
+    vm_name: "{{ test_vm_name }}"
+    host_group: "All Hosts"
+    vmm_server: "{{ scvmm_server }}"
+  register: ratings_filtered
+
+- name: Assert filtered ratings returned
+  assert:
+    that:
+      - ratings_filtered is not changed
+      - ratings_filtered.host_ratings is defined
+
+# ── Stability ──
+- name: Get ratings again
+  microsoft.scvmm.scvmm_host_rating_info:
+    vm_name: "{{ test_vm_name }}"
+    vmm_server: "{{ scvmm_server }}"
+  register: second_query
+
+- name: Assert repeated query returns same count
+  assert:
+    that:
+      - second_query.host_ratings | length == ratings.host_ratings | length

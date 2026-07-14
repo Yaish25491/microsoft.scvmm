@@ -1,0 +1,47 @@
+---
+# ── Get all clouds ──
+- name: Get all clouds
+  microsoft.scvmm.scvmm_cloud_info:
+    vmm_server: "{{ scvmm_server }}"
+  register: all_clouds
+
+- name: Assert clouds were returned
+  assert:
+    that:
+      - all_clouds.clouds is defined
+      - all_clouds.clouds | length > 0
+      - all_clouds is not changed
+
+# ── Verify cloud properties ──
+- name: Assert cloud has expected properties
+  assert:
+    that:
+      - all_clouds.clouds[0].id is defined
+      - all_clouds.clouds[0].id | length > 0
+      - all_clouds.clouds[0].name is defined
+      - all_clouds.clouds[0].host_groups is defined
+
+# ── Get specific cloud by name ──
+- name: Get specific cloud by name
+  microsoft.scvmm.scvmm_cloud_info:
+    name: "{{ test_cloud_name }}"
+    vmm_server: "{{ scvmm_server }}"
+  register: specific_cloud
+
+- name: Assert specific cloud was returned
+  assert:
+    that:
+      - specific_cloud.clouds | length == 1
+      - specific_cloud.clouds[0].name == test_cloud_name
+
+# ── Query non-existent cloud ──
+- name: Query non-existent cloud
+  microsoft.scvmm.scvmm_cloud_info:
+    name: "NonExistent_Cloud_{{ 99999 | random }}"
+    vmm_server: "{{ scvmm_server }}"
+  register: missing_cloud
+
+- name: Assert empty list for non-existent cloud
+  assert:
+    that:
+      - missing_cloud.clouds | length == 0

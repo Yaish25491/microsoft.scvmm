@@ -1,0 +1,40 @@
+---
+- hosts: windows
+  gather_facts: false
+  vars_files:
+    - ../defaults/main.yml
+  tasks:
+    - name: Get adapter info to find adapter name
+      microsoft.scvmm.scvmm_host_network_adapter_info:
+        vm_host: "{{ test_host_name }}"
+        vmm_server: "{{ scvmm_server }}"
+      register: adapter_list
+
+    - name: Store test adapter name and original description
+      set_fact:
+        test_adapter_name: "{{ adapter_list.network_adapters[0].name }}"
+        original_adapter_description: ""
+
+    - name: Get original adapter state
+      microsoft.scvmm.scvmm_host_network_adapter:
+        vm_host: "{{ test_host_name }}"
+        adapter_name: "{{ test_adapter_name }}"
+        vmm_server: "{{ scvmm_server }}"
+      register: original_state
+
+    - name: Store original description from action module
+      set_fact:
+        original_adapter_description: "{{ original_state.adapter.description | default('') }}"
+
+    - block:
+        - name: Run tests
+          ansible.builtin.include_tasks: tests.yml
+
+      always:
+        - name: Teardown - Restore original description
+          microsoft.scvmm.scvmm_host_network_adapter:
+            vm_host: "{{ test_host_name }}"
+            adapter_name: "{{ test_adapter_name }}"
+            description: "{{ original_adapter_description }}"
+            vmm_server: "{{ scvmm_server }}"
+          ignore_errors: true

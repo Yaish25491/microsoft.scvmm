@@ -1,0 +1,8 @@
+---
+- hosts: windows
+  gather_facts: false
+  vars_files:
+    - ../defaults/main.yml
+  tasks:
+    - name: Run tests
+      ansible.builtin.include_tasks: tests.yml

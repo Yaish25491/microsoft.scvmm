@@ -1,0 +1,36 @@
+---
+# ── Query all clusters ──
+- name: Get all host clusters
+  microsoft.scvmm.scvmm_host_cluster_info:
+    vmm_server: "{{ scvmm_server }}"
+  register: all_clusters
+
+- name: Assert query all returns a list
+  assert:
+    that:
+      - all_clusters is not changed
+      - all_clusters.host_clusters is defined
+
+# ── Query non-existent cluster ──
+- name: Query non-existent cluster
+  microsoft.scvmm.scvmm_host_cluster_info:
+    name: "NonExistentCluster_{{ 99999 | random }}"
+    vmm_server: "{{ scvmm_server }}"
+  register: missing_cluster
+
+- name: Assert empty list for non-existent cluster
+  assert:
+    that:
+      - missing_cluster.host_clusters | length == 0
+      - missing_cluster is not changed
+
+# ── Stability ──
+- name: Query all clusters again
+  microsoft.scvmm.scvmm_host_cluster_info:
+    vmm_server: "{{ scvmm_server }}"
+  register: second_query
+
+- name: Assert repeated query returns same count
+  assert:
+    that:
+      - second_query.host_clusters | length == all_clusters.host_clusters | length

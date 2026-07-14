@@ -7,6 +7,7 @@ __metaclass__ = type
 DOCUMENTATION = r'''
 ---
 module: scvmm_cloud_info
+version_added: "1.0.0"
 short_description: Query private cloud information in System Center Virtual Machine Manager
 description:
   - Retrieve information about private clouds in SCVMM.

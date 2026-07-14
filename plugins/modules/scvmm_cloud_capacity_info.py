@@ -7,6 +7,7 @@ __metaclass__ = type
 DOCUMENTATION = r'''
 ---
 module: scvmm_cloud_capacity_info
+version_added: "1.0.0"
 short_description: Query cloud capacity information in System Center Virtual Machine Manager
 description:
   - Retrieve capacity limits and current usage for an SCVMM private cloud.
@@ -55,7 +56,7 @@ cloud_capacity:
       sample: 100
     memory_gb:
       description: Maximum memory in GB.
-      type: int
+      type: float
       returned: always
       sample: 512
     storage_gb:
@@ -75,7 +76,7 @@ cloud_capacity:
       sample: 24
     used_memory_gb:
       description: Currently used memory in GB.
-      type: int
+      type: float
       returned: always
       sample: 128
     used_storage_gb:

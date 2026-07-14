@@ -74,7 +74,7 @@ Builds a result hashtable from an SCVMM object using a property map.
 
 .PARAMETER PropertyMap
 Array of hashtables. Each must contain 'Param' (Ansible return key) and 'Property' (SCVMM object property).
-Supported Type values: 'string', 'bool', 'enum', 'int', 'id', 'bytes_to_gb', 'name_list', 'nested_name', 'datetime_iso'.
+Supported Type values: 'string', 'bool', 'enum', 'int', 'id', 'bytes_to_gb', 'mb_to_gb', 'name_list', 'nested_name', 'datetime_iso'.
 
 .PARAMETER CurrentObject
 The SCVMM object to extract properties from.
@@ -109,6 +109,9 @@ function Get-SCVMMResultFromMap {
             }
             "bytes_to_gb" {
                 $result.($map.Param) = if ($null -ne $val) { [math]::Round($val / 1GB, 2) } else { $null }
+            }
+            "mb_to_gb" {
+                $result.($map.Param) = if ($null -ne $val) { [math]::Round($val / 1024, 2) } else { $null }
             }
             "name_list" {
                 $result.($map.Param) = if ($val) { @($val | ForEach-Object { $_.Name }) } else { @() }
@@ -151,6 +154,10 @@ function Test-SCVMMPropertyChanged {
         }
         "bytes_to_gb" {
             $curGb = if ($null -ne $CurrentValue) { [math]::Round($CurrentValue / 1GB, 2) } else { $null }
+            return $curGb -ne $DesiredValue
+        }
+        "mb_to_gb" {
+            $curGb = if ($null -ne $CurrentValue) { [math]::Round($CurrentValue / 1024, 2) } else { $null }
             return $curGb -ne $DesiredValue
         }
         default {
@@ -220,7 +227,11 @@ function Get-SCVMMParametersFromMap {
         }
 
         $targetParam = if ($null -ne $map.CmdletParam) { $map.CmdletParam } else { $map.Property }
-        $outParams.($targetParam) = $paramValue
+        switch ($map.Type) {
+            "mb_to_gb" { $outParams.($targetParam) = $paramValue * 1024 }
+            "bytes_to_gb" { $outParams.($targetParam) = [long]($paramValue * 1GB) }
+            default { $outParams.($targetParam) = $paramValue }
+        }
     }
     return $outParams
 }

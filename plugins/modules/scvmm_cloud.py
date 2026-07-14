@@ -7,6 +7,7 @@ __metaclass__ = type
 DOCUMENTATION = r'''
 ---
 module: scvmm_cloud
+version_added: "1.0.0"
 short_description: Manage private clouds in System Center Virtual Machine Manager
 description:
   - Create, update, or remove private clouds in SCVMM.
@@ -23,6 +24,7 @@ options:
     description:
       - Name of the host group that backs this cloud.
       - Required when creating a new cloud.
+      - This is a create-only parameter and is ignored when updating an existing cloud.
     type: str
   description:
     description:

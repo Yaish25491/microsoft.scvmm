@@ -14,6 +14,7 @@ $spec = @{
         vm_count = @{ type = 'int' }
         vmm_server = @{ type = 'str' }
     }
+    required_one_of = @(, @('cpu_count', 'memory_gb', 'storage_gb', 'vm_count'))
     supports_check_mode = $true
 }
 

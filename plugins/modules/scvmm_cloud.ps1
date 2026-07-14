@@ -42,6 +42,7 @@ $cloud = Get-SCVMMObject -Module $module -VMMConnection $vmmConnection `
 
 if ($module.Params.state -eq 'present') {
     if (-not $cloud) {
+        $module.Diff.before = @{}
         if (-not $module.Params.host_group) {
             $module.FailJson("'host_group' is required when creating a new cloud")
         }
@@ -100,10 +101,12 @@ if ($module.Params.state -eq 'present') {
     }
     elseif ($module.CheckMode) {
         $module.Result.cloud = @{
+            id = $null
             name = $module.Params.name
             description = $module.Params.description
             host_groups = @($module.Params.host_group)
         }
+        $module.Diff.after = $module.Result.cloud
     }
 }
 else {

@@ -7,6 +7,7 @@ __metaclass__ = type
 DOCUMENTATION = r'''
 ---
 module: scvmm_cloud_capacity
+version_added: "1.0.0"
 short_description: Manage cloud capacity limits in System Center Virtual Machine Manager
 description:
   - Configure capacity limits for an SCVMM private cloud.
@@ -78,7 +79,7 @@ cloud_capacity:
       sample: 100
     memory_gb:
       description: Maximum memory in GB.
-      type: int
+      type: float
       returned: always
       sample: 512
     storage_gb:

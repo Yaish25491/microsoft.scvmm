@@ -1,0 +1,53 @@
+---
+# ── Get all host groups ──
+- name: Get all host groups
+  microsoft.scvmm.scvmm_host_group_info:
+    vmm_server: "{{ scvmm_server }}"
+  register: all_groups
+
+- name: Assert host groups were returned
+  assert:
+    that:
+      - all_groups.host_groups is defined
+      - all_groups.host_groups | length > 0
+      - all_groups is not changed
+
+# ── Verify test host group exists in results ──
+- name: Find test host group
+  set_fact:
+    found_group: "{{ all_groups.host_groups | selectattr('name', 'equalto', test_host_group_name) | first }}"
+
+- name: Assert test host group has expected properties
+  assert:
+    that:
+      - found_group.id is defined
+      - found_group.name == test_host_group_name
+      - found_group.path is defined
+      - found_group.child_host_groups is defined
+      - found_group.hosts is defined
+      - found_group.clouds is defined
+
+# ── Get specific host group by name ──
+- name: Get test host group by name
+  microsoft.scvmm.scvmm_host_group_info:
+    name: "{{ test_host_group_name }}"
+    vmm_server: "{{ scvmm_server }}"
+  register: specific_group
+
+- name: Assert specific group returned
+  assert:
+    that:
+      - specific_group.host_groups | length == 1
+      - specific_group.host_groups[0].name == test_host_group_name
+
+# ── Query non-existent group ──
+- name: Get non-existent host group
+  microsoft.scvmm.scvmm_host_group_info:
+    name: "NonExistentGroup12345"
+    vmm_server: "{{ scvmm_server }}"
+  register: missing_group
+
+- name: Assert empty list for non-existent group
+  assert:
+    that:
+      - missing_group.host_groups | length == 0

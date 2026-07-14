@@ -1,0 +1,86 @@
+---
+# ── Query existing host (idempotent, no changes) ──
+- name: Manage existing host with no changes
+  microsoft.scvmm.scvmm_host:
+    name: "{{ test_host_name }}"
+    state: present
+    vmm_server: "{{ scvmm_server }}"
+  register: host_noop
+
+- name: Assert no change on existing host
+  assert:
+    that:
+      - host_noop is not changed
+      - host_noop.host is defined
+      - host_noop.host.name == test_host_name
+
+# ── Verify host properties ──
+- name: Assert host has expected properties
+  assert:
+    that:
+      - host_noop.host.id is defined
+      - host_noop.host.description is defined
+      - host_noop.host.maintenance_mode is defined
+      - host_noop.host.available_for_placement is defined
+      - host_noop.host.overall_state is defined
+
+# ── Check mode for description update ──
+- name: Update host description in check mode
+  microsoft.scvmm.scvmm_host:
+    name: "{{ test_host_name }}"
+    description: "Managed by Ansible - check mode"
+    vmm_server: "{{ scvmm_server }}"
+  check_mode: true
+  register: check_result
+
+- name: Assert check mode reports change
+  assert:
+    that:
+      - check_result is changed
+
+# ── Set description ──
+- name: Set host description
+  microsoft.scvmm.scvmm_host:
+    name: "{{ test_host_name }}"
+    description: "Managed by Ansible"
+    vmm_server: "{{ scvmm_server }}"
+  register: set_desc
+
+- name: Assert description was set
+  assert:
+    that:
+      - set_desc is changed
+      - set_desc.host.description == "Managed by Ansible"
+
+# ── Idempotent description ──
+- name: Set same description again
+  microsoft.scvmm.scvmm_host:
+    name: "{{ test_host_name }}"
+    description: "Managed by Ansible"
+    vmm_server: "{{ scvmm_server }}"
+  register: set_desc_again
+
+- name: Assert no change on idempotent description
+  assert:
+    that:
+      - set_desc_again is not changed
+
+# ── Absent on non-existent host ──
+- name: Remove non-existent host
+  microsoft.scvmm.scvmm_host:
+    name: nonexistent.host.local
+    state: absent
+    vmm_server: "{{ scvmm_server }}"
+  register: absent_noop
+
+- name: Assert no change when removing non-existent host
+  assert:
+    that:
+      - absent_noop is not changed
+
+# ── Cleanup description ──
+- name: Reset host description
+  microsoft.scvmm.scvmm_host:
+    name: "{{ test_host_name }}"
+    description: ""
+    vmm_server: "{{ scvmm_server }}"

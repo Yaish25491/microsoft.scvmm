@@ -1,0 +1,41 @@
+---
+# ── Get host ratings for the test VM ──
+- name: Get host ratings for VM
+  microsoft.scvmm.scvmm_host_rating_info:
+    vm_name: "{{ test_vm }}"
+    vmm_server: "{{ scvmm_server }}"
+  register: ratings
+
+- name: Assert ratings were returned
+  assert:
+    that:
+      - ratings.host_ratings is defined
+      - ratings.host_ratings | length > 0
+      - ratings is not changed
+
+# ── Verify rating properties ──
+- name: Assert rating has expected properties
+  assert:
+    that:
+      - ratings.host_ratings[0].host_name is defined
+      - ratings.host_ratings[0].rating is defined
+      - ratings.host_ratings[0].description is defined
+      - ratings.host_ratings[0].transfer_type is defined
+      - ratings.host_ratings[0].zero_rating_reasons is defined
+      - ratings.host_ratings[0].warnings is defined
+      - ratings.host_ratings[0].estimated_disk_remaining_gb is defined
+      - ratings.host_ratings[0].estimated_memory_remaining_mb is defined
+
+# ── Get host ratings with specific host group ──
+- name: Get host ratings for specific host group
+  microsoft.scvmm.scvmm_host_rating_info:
+    vm_name: "{{ test_vm }}"
+    host_group: "All Hosts"
+    vmm_server: "{{ scvmm_server }}"
+  register: ratings_group
+
+- name: Assert ratings with host group were returned
+  assert:
+    that:
+      - ratings_group.host_ratings is defined
+      - ratings_group.host_ratings | length > 0

@@ -95,6 +95,7 @@ if ($module.Params.state -eq 'present') {
     }
     elseif ($module.CheckMode) {
         $module.Result.port_classification = @{
+            id = $null
             name = $module.Params.name
             description = $module.Params.description
         }

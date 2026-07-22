@@ -120,6 +120,7 @@ if ($module.Params.state -eq 'present') {
     }
     elseif ($module.CheckMode) {
         $module.Result.mac_address_pool = @{
+            id = $null
             name = $module.Params.name
             description = $module.Params.description
             mac_address_range_start = $module.Params.mac_address_range_start

@@ -127,6 +127,7 @@ if ($module.Params.state -eq 'present') {
     }
     elseif ($module.CheckMode) {
         $module.Result.vm_subnet = @{
+            id = $null
             name = $module.Params.name
             description = $module.Params.description
             vm_network = $module.Params.vm_network

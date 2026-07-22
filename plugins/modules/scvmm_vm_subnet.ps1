@@ -32,29 +32,44 @@ $module.Result.changed = $false
 
 $vmmConnection = Connect-SCVMMServerSession -Module $module -VMMServer $module.Params.vmm_server
 
+$propertyMap = @(
+    @{ Param = "id"; Property = "ID"; Type = "id" }
+    @{ Param = "name"; Property = "Name"; Type = "string" }
+    @{ Param = "description"; Property = "Description"; Type = "string" }
+    @{ Param = "vm_network"; Property = "VMNetwork"; Type = "nested_name" }
+    @{ Param = "logical_network_definition"; Property = "LogicalNetworkDefinition"; Type = "nested_name" }
+)
+
+$updateMap = @(
+    @{ Param = "description"; Property = "Description"; Type = "string" }
+)
+
 function Get-SubnetResult {
     param($Subnet)
-    $result = @{
-        id = $Subnet.ID.ToString()
-        name = $Subnet.Name
-        description = $Subnet.Description
-        vm_network = $Subnet.VMNetwork.Name
-        subnet_vlans = @($Subnet.SubnetVLans | ForEach-Object {
-                @{
-                    subnet = $_.Subnet
-                    vlan_id = $_.VLanID
-                }
-            })
-    }
-    if ($Subnet.LogicalNetworkDefinition) {
-        $result['logical_network_definition'] = $Subnet.LogicalNetworkDefinition.Name
-    }
+    $result = Get-SCVMMResultFromMap -PropertyMap $propertyMap -CurrentObject $Subnet
+    $result['subnet_vlans'] = @($Subnet.SubnetVLans | ForEach-Object {
+            @{
+                subnet = $_.Subnet
+                vlan_id = $_.VLanID
+            }
+        })
     return $result
 }
 
-$vmSubnet = Get-SCVMMObject -Module $module -VMMConnection $vmmConnection `
-    -CmdletName 'Get-SCVMSubnet' -Name $module.Params.name `
-    -ObjectType 'VM subnet'
+$vmSubnet = $null
+$vmNet = $null
+if ($module.Params.vm_network) {
+    $vmNet = Get-SCVMNetwork -VMMServer $vmmConnection -Name $module.Params.vm_network -ErrorAction SilentlyContinue
+    if ($vmNet) {
+        $subnets = @(Get-SCVMSubnet -VMMServer $vmmConnection -VMNetwork $vmNet -ErrorAction Stop)
+        $vmSubnet = $subnets | Where-Object { $_.Name -eq $module.Params.name } | Select-Object -First 1
+    }
+}
+else {
+    $vmSubnet = Get-SCVMMObject -Module $module -VMMConnection $vmmConnection `
+        -CmdletName 'Get-SCVMSubnet' -Name $module.Params.name `
+        -ObjectType 'VM subnet'
+}
 
 if ($module.Params.state -eq 'present') {
     if (-not $vmSubnet) {
@@ -62,9 +77,11 @@ if ($module.Params.state -eq 'present') {
         $module.Result.changed = $true
         if (-not $module.CheckMode) {
             try {
-                $vmNet = Get-SCVMNetwork -VMMServer $vmmConnection -Name $module.Params.vm_network -ErrorAction Stop
                 if (-not $vmNet) {
-                    $module.FailJson("VM network '$($module.Params.vm_network)' not found")
+                    $vmNet = Get-SCVMNetwork -VMMServer $vmmConnection -Name $module.Params.vm_network -ErrorAction Stop
+                    if (-not $vmNet) {
+                        $module.FailJson("VM network '$($module.Params.vm_network)' not found")
+                    }
                 }
 
                 $subnetVlan = New-SCSubnetVLan -Subnet $module.Params.subnet -VLanID $module.Params.vlan_id
@@ -80,7 +97,8 @@ if ($module.Params.state -eq 'present') {
                     $newParams['Description'] = $module.Params.description
                 }
                 if ($module.Params.logical_network_definition) {
-                    $lnd = Get-SCLogicalNetworkDefinition -VMMServer $vmmConnection -Name $module.Params.logical_network_definition -ErrorAction Stop
+                    $lnd = Get-SCLogicalNetworkDefinition -VMMServer $vmmConnection `
+                        -Name $module.Params.logical_network_definition -ErrorAction Stop
                     if (-not $lnd) {
                         $module.FailJson("Logical network definition '$($module.Params.logical_network_definition)' not found")
                     }
@@ -88,51 +106,69 @@ if ($module.Params.state -eq 'present') {
                 }
 
                 $vmSubnet = New-SCVMSubnet @newParams
+                $module.Result.vm_subnet = Get-SubnetResult -Subnet $vmSubnet
+                $module.Diff.after = $module.Result.vm_subnet
             }
             catch {
                 $module.FailJson("Failed to create VM subnet '$($module.Params.name)': $($_.Exception.Message)", $_)
             }
         }
+        else {
+            $module.Result.vm_subnet = @{
+                id = $null
+                name = $module.Params.name
+                description = $module.Params.description
+                vm_network = $module.Params.vm_network
+                subnet_vlans = @(@{ subnet = $module.Params.subnet; vlan_id = $module.Params.vlan_id })
+                logical_network_definition = $module.Params.logical_network_definition
+            }
+            $module.Diff.after = $module.Result.vm_subnet
+        }
     }
     else {
-        $needsUpdate = $false
-        $updateParams = @{}
+        $module.Diff.before = Get-SubnetResult -Subnet $vmSubnet
 
-        if ($null -ne $module.Params.description -and $module.Params.description -ne $vmSubnet.Description) {
-            $needsUpdate = $true
-            $updateParams['Description'] = $module.Params.description
+        $currentSubnet = if ($vmSubnet.SubnetVLans) { $vmSubnet.SubnetVLans[0].Subnet } else { $null }
+        if ($null -ne $module.Params.subnet -and $currentSubnet -ne $module.Params.subnet) {
+            $module.Warn("Cannot change 'subnet' after creation (current: '$currentSubnet', requested: '$($module.Params.subnet)'). Delete and recreate to change.")
+        }
+        $currentVlan = if ($vmSubnet.SubnetVLans) { $vmSubnet.SubnetVLans[0].VLanID } else { 0 }
+        if ($currentVlan -ne $module.Params.vlan_id) {
+            $module.Warn("Cannot change 'vlan_id' after creation (current: $currentVlan, requested: $($module.Params.vlan_id)). Delete and recreate to change.")
+        }
+        if ($null -ne $module.Params.logical_network_definition) {
+            $currentLnd = if ($vmSubnet.LogicalNetworkDefinition) { $vmSubnet.LogicalNetworkDefinition.Name } else { $null }
+            if ($currentLnd -ne $module.Params.logical_network_definition) {
+                $module.Warn("Cannot change 'logical_network_definition' after creation (current: '$currentLnd', requested: '$($module.Params.logical_network_definition)'). Delete and recreate to change.")
+            }
         }
 
+        $needsUpdate = Test-SCVMMPropertiesChanged -PropertyMap $updateMap `
+            -CurrentObject $vmSubnet -AnsibleParams $module.Params
+
         if ($needsUpdate) {
-            $module.Diff.before = Get-SubnetResult -Subnet $vmSubnet
+            $setParams = Get-SCVMMParametersFromMap -PropertyMap $updateMap `
+                -AnsibleParams $module.Params -CurrentObject $vmSubnet
             $module.Result.changed = $true
             if (-not $module.CheckMode) {
-                $updateParams['VMSubnet'] = $vmSubnet
-                $updateParams['ErrorAction'] = 'Stop'
                 try {
-                    $vmSubnet = Set-SCVMSubnet @updateParams
+                    $vmSubnet = Set-SCVMSubnet -VMSubnet $vmSubnet @setParams -ErrorAction Stop
                 }
                 catch {
                     $module.FailJson("Failed to update VM subnet '$($module.Params.name)': $($_.Exception.Message)", $_)
                 }
             }
         }
-    }
 
-    if ($vmSubnet) {
         $module.Result.vm_subnet = Get-SubnetResult -Subnet $vmSubnet
-        if ($module.Result.changed -and $module.Diff.before) {
+        if ($needsUpdate -and $module.CheckMode) {
+            $module.Diff.after = Get-SCVMMCheckModeDiff -Before $module.Diff.before `
+                -UpdateMap $updateMap -AnsibleParams $module.Params `
+                -CurrentObject $vmSubnet
+        }
+        else {
             $module.Diff.after = $module.Result.vm_subnet
         }
-    }
-    elseif ($module.CheckMode) {
-        $module.Result.vm_subnet = @{
-            id = $null
-            name = $module.Params.name
-            description = $module.Params.description
-            vm_network = $module.Params.vm_network
-        }
-        $module.Diff.after = $module.Result.vm_subnet
     }
 }
 else {

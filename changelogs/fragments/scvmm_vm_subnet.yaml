@@ -1,4 +1,0 @@
----
-minor_changes:
-  - scvmm_vm_subnet - Manage VM subnets in SCVMM.
-  - scvmm_vm_subnet_info - Query VM subnets in SCVMM.

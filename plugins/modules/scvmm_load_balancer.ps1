@@ -121,6 +121,7 @@ if ($module.Params.state -eq 'present') {
     }
     elseif ($module.CheckMode) {
         $module.Result.load_balancer = @{
+            id = $null
             address = $module.Params.address
             port = $module.Params.port
             manufacturer = $module.Params.manufacturer

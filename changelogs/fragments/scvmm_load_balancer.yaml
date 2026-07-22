@@ -1,4 +1,0 @@
----
-minor_changes:
-  - scvmm_load_balancer - Manage load balancers in SCVMM.
-  - scvmm_load_balancer_info - Query load balancers in SCVMM.

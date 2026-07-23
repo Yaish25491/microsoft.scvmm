@@ -37,7 +37,14 @@ if ($module.Params.name) {
 }
 
 $module.Result.mac_address_pools = @($pools | ForEach-Object {
-        Get-SCVMMResultFromMap -PropertyMap $propertyMap -CurrentObject $_
+        $result = Get-SCVMMResultFromMap -PropertyMap $propertyMap -CurrentObject $_
+        if ($result['mac_address_range_start']) {
+            $result['mac_address_range_start'] = $result['mac_address_range_start'].Replace(':', '-')
+        }
+        if ($result['mac_address_range_end']) {
+            $result['mac_address_range_end'] = $result['mac_address_range_end'].Replace(':', '-')
+        }
+        $result
     })
 
 $module.ExitJson()

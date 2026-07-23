@@ -56,7 +56,14 @@ $updateMap = @(
 
 function Get-PoolResult {
     param($Pool)
-    return Get-SCVMMResultFromMap -PropertyMap $propertyMap -CurrentObject $Pool
+    $result = Get-SCVMMResultFromMap -PropertyMap $propertyMap -CurrentObject $Pool
+    if ($result['mac_address_range_start']) {
+        $result['mac_address_range_start'] = $result['mac_address_range_start'].Replace(':', '-')
+    }
+    if ($result['mac_address_range_end']) {
+        $result['mac_address_range_end'] = $result['mac_address_range_end'].Replace(':', '-')
+    }
+    return $result
 }
 
 $pool = Get-SCVMMObject -Module $module -VMMConnection $vmmConnection `
@@ -119,15 +126,17 @@ if ($module.Params.state -eq 'present') {
     else {
         $module.Diff.before = Get-PoolResult -Pool $pool
 
+        $currentStart = if ($pool.MACAddressRangeStart) { $pool.MACAddressRangeStart.Replace(':', '-') } else { $null }
+        $currentEnd = if ($pool.MACAddressRangeEnd) { $pool.MACAddressRangeEnd.Replace(':', '-') } else { $null }
         if ($null -ne $module.Params.mac_address_range_start -and
-            $pool.MACAddressRangeStart -ne $module.Params.mac_address_range_start) {
-            $cur = $pool.MACAddressRangeStart
+            $currentStart -ne $module.Params.mac_address_range_start) {
+            $cur = $currentStart
             $req = $module.Params.mac_address_range_start
             $module.Warn("Cannot change 'mac_address_range_start' after creation (current: '$cur', requested: '$req'). Delete and recreate.")
         }
         if ($null -ne $module.Params.mac_address_range_end -and
-            $pool.MACAddressRangeEnd -ne $module.Params.mac_address_range_end) {
-            $cur = $pool.MACAddressRangeEnd
+            $currentEnd -ne $module.Params.mac_address_range_end) {
+            $cur = $currentEnd
             $req = $module.Params.mac_address_range_end
             $module.Warn("Cannot change 'mac_address_range_end' after creation (current: '$cur', requested: '$req'). Delete and recreate.")
         }

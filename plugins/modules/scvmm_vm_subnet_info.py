@@ -72,4 +72,5 @@ vm_subnets:
     logical_network_definition:
       description: Associated logical network definition name.
       type: str
+      returned: always
 '''

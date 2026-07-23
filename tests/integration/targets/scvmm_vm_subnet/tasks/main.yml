@@ -5,6 +5,8 @@
     test_vmnet_name: "AnsibleTest_VMSub_VMNet_{{ 99999 | random }}"
     test_subnet_name: "AnsibleTest_VMSubnet_{{ 99999 | random }}"
     test_subnet_cidr: "10.99.1.0/24"
+    test_logical_network_definition: "{{ test_ln_name }}_LND"
+    test_vlan_id: 100
 
 - block:
     - name: Setup - Create logical network via PowerShell

@@ -5,8 +5,11 @@
     test_vmnet_name: "AnsibleTest_VMSub_VMNet_{{ 99999 | random }}"
     test_subnet_name: "AnsibleTest_VMSubnet_{{ 99999 | random }}"
     test_subnet_cidr: "10.99.1.0/24"
-    test_logical_network_definition: "{{ test_ln_name }}_LND"
     test_vlan_id: 100
+
+- name: Derive dependent test variables
+  ansible.builtin.set_fact:
+    test_logical_network_definition: "{{ test_ln_name }}_LND"
 
 - block:
     - name: Setup - Create logical network via PowerShell
@@ -50,7 +53,7 @@
 
     - name: Teardown - Remove logical network via PowerShell
       ansible.windows.win_shell: |
-        $vmmServer = Get-SCVMMServer "{{ scvmm_server }}"
+        $vmmServer = Get-SCVMMServer -ComputerName "{{ scvmm_server }}"
         $ln = Get-SCLogicalNetwork -VMMServer $vmmServer -Name "{{ test_ln_name }}"
         if ($ln) {
           Get-SCLogicalNetworkDefinition -LogicalNetwork $ln | ForEach-Object { Remove-SCLogicalNetworkDefinition -LogicalNetworkDefinition $_ -Force | Out-Null }
@@ -58,3 +61,4 @@
         }
         "done"
       ignore_errors: true
+

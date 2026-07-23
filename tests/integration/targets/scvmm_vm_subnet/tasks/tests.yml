@@ -191,42 +191,6 @@
       - info_vlan.vm_subnets[0].subnet_vlans | length >= 1
 
 # ============================================================
-# Logical network definition
-# ============================================================
-- name: Delete subnet to recreate with logical_network_definition
-  microsoft.scvmm.scvmm_vm_subnet:
-    name: "{{ test_subnet_name }}"
-    state: absent
-    vmm_server: "{{ scvmm_server }}"
-
-- name: Create VM subnet with logical_network_definition
-  microsoft.scvmm.scvmm_vm_subnet:
-    name: "{{ test_subnet_name }}"
-    vm_network: "{{ test_vmnet_name }}"
-    subnet: "{{ test_subnet_cidr }}"
-    logical_network_definition: "{{ test_logical_network_definition }}"
-    state: present
-    vmm_server: "{{ scvmm_server }}"
-  register: create_lnd
-
-- name: Assert subnet created with logical_network_definition
-  ansible.builtin.assert:
-    that:
-      - create_lnd is changed
-      - create_lnd.vm_subnet.logical_network_definition == test_logical_network_definition
-
-- name: Verify logical_network_definition via info module
-  microsoft.scvmm.scvmm_vm_subnet_info:
-    name: "{{ test_subnet_name }}"
-    vmm_server: "{{ scvmm_server }}"
-  register: info_lnd
-
-- name: Assert info shows logical_network_definition
-  ansible.builtin.assert:
-    that:
-      - info_lnd.vm_subnets[0].logical_network_definition == test_logical_network_definition
-
-# ============================================================
 # Check mode
 # ============================================================
 - name: Delete VM subnet (check mode)

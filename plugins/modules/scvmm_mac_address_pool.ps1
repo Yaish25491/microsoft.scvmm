@@ -70,9 +70,9 @@ if ($module.Params.state -eq 'present') {
         if (-not $module.CheckMode) {
             try {
                 $hostGroups = @($module.Params.host_groups | ForEach-Object {
-                        $hg = Get-SCVMHostGroup -VMMServer $vmmConnection -Name $_ -ErrorAction Stop
-                        if (-not $hg) { $module.FailJson("Host group '$_' not found") }
-                        $hg
+                        Get-SCVMMObject -Module $module -VMMConnection $vmmConnection `
+                            -CmdletName 'Get-SCVMHostGroup' -Name $_ `
+                            -ObjectType 'Host group' -FailIfNotFound $true
                     })
 
                 $newParams = @{

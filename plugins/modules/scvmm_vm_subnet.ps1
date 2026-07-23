@@ -130,7 +130,9 @@ if ($module.Params.state -eq 'present') {
 
         $currentSubnet = if ($vmSubnet.SubnetVLans) { $vmSubnet.SubnetVLans[0].Subnet } else { $null }
         if ($null -ne $module.Params.subnet -and $currentSubnet -ne $module.Params.subnet) {
-            $module.Warn("Cannot change 'subnet' after creation (current: '$currentSubnet', requested: '$($module.Params.subnet)'). Delete and recreate to change.")
+            $cur = $currentSubnet
+            $req = $module.Params.subnet
+            $module.Warn("Cannot change 'subnet' after creation (current: '$cur', requested: '$req'). Delete and recreate.")
         }
         $currentVlan = if ($vmSubnet.SubnetVLans) { $vmSubnet.SubnetVLans[0].VLanID } else { 0 }
         if ($currentVlan -ne $module.Params.vlan_id) {
@@ -139,7 +141,9 @@ if ($module.Params.state -eq 'present') {
         if ($null -ne $module.Params.logical_network_definition) {
             $currentLnd = if ($vmSubnet.LogicalNetworkDefinition) { $vmSubnet.LogicalNetworkDefinition.Name } else { $null }
             if ($currentLnd -ne $module.Params.logical_network_definition) {
-                $module.Warn("Cannot change 'logical_network_definition' after creation (current: '$currentLnd', requested: '$($module.Params.logical_network_definition)'). Delete and recreate to change.")
+                $cur = $currentLnd
+                $req = $module.Params.logical_network_definition
+                $module.Warn("Cannot change 'logical_network_definition' after creation (current: '$cur', requested: '$req'). Delete and recreate.")
             }
         }
 

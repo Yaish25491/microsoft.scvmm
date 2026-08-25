@@ -2,13 +2,41 @@
 
 **Topics**
 
+- <a href="#v1-2-0">v1\.2\.0</a>
+    - <a href="#minor-changes">Minor Changes</a>
+    - <a href="#bugfixes">Bugfixes</a>
+    - <a href="#new-plugins">New Plugins</a>
+        - <a href="#inventory">Inventory</a>
 - <a href="#v1-1-0">v1\.1\.0</a>
     - <a href="#release-summary">Release Summary</a>
     - <a href="#new-modules">New Modules</a>
 - <a href="#v1-0-1">v1\.0\.1</a>
 - <a href="#v1-0-0">v1\.0\.0</a>
-    - <a href="#minor-changes">Minor Changes</a>
+    - <a href="#minor-changes-1">Minor Changes</a>
     - <a href="#new-modules-1">New Modules</a>
+
+<a id="v1-2-0"></a>
+## v1\.2\.0
+
+<a id="minor-changes"></a>
+### Minor Changes
+
+* Add indirect node counting event query for infrastructure resource tracking across 5 taxonomy buckets \([https\://github\.com/ansible\-collections/microsoft\.scvmm/pull/87](https\://github\.com/ansible\-collections/microsoft\.scvmm/pull/87)\)\.
+* scvmm\_hardware\_profile\, scvmm\_hardware\_profile\_info \- add <code>ha\_vm\_priority</code> option to set and report the highly available VM restart priority \(High 3000\, Medium 2000\, Low 1000\, 0 disables automatic restart\)\.
+* scvmm\_inventory \- new dynamic inventory plugin that discovers SCVMM managed virtual machines and Hyper\-V hosts over PSRP and exposes them with metadata and network details as host variables\. Virtual machines and hosts are grouped into the <code>virtual\_machines</code> and <code>hyperv\_hosts</code> groups and tagged with a <code>scvmm\_object\_type</code> variable\; inclusion of each is controlled by the <code>include\_vms</code> and <code>include\_hosts</code> options\. Duplicate SCVMM object names are disambiguated with a short ID suffix \(with a warning\) so no host is silently dropped \([https\://github\.com/ansible\-collections/microsoft\.scvmm/pull/88](https\://github\.com/ansible\-collections/microsoft\.scvmm/pull/88)\)\.
+
+<a id="bugfixes"></a>
+### Bugfixes
+
+* scvmm\_hardware\_profile\, scvmm\_hardware\_profile\_info \- fix <code>highly\_available</code> always being reported as <code>false</code> by reading the correct <code>IsHighlyAvailable</code> object property\.
+
+<a id="new-plugins"></a>
+### New Plugins
+
+<a id="inventory"></a>
+#### Inventory
+
+* microsoft\.scvmm\.scvmm\_inventory \- SCVMM dynamic inventory source\.
 
 <a id="v1-1-0"></a>
 ## v1\.1\.0
@@ -53,7 +81,7 @@ Added new modules for bare metal provisioning\, inventory\, jobs\, servicing win
 <a id="v1-0-0"></a>
 ## v1\.0\.0
 
-<a id="minor-changes"></a>
+<a id="minor-changes-1"></a>
 ### Minor Changes
 
 * scvmm\_vm \- Manage the creation\, update\, and removal of Virtual Machines on SCVMM 2022\.

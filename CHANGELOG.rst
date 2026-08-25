@@ -4,6 +4,29 @@ Microsoft SCVMM Collection Release Notes
 
 .. contents:: Topics
 
+v1.2.0
+======
+
+Minor Changes
+-------------
+
+- Add indirect node counting event query for infrastructure resource tracking across 5 taxonomy buckets (https://github.com/ansible-collections/microsoft.scvmm/pull/87).
+- scvmm_hardware_profile, scvmm_hardware_profile_info - add ``ha_vm_priority`` option to set and report the highly available VM restart priority (High 3000, Medium 2000, Low 1000, 0 disables automatic restart).
+- scvmm_inventory - new dynamic inventory plugin that discovers SCVMM managed virtual machines and Hyper-V hosts over PSRP and exposes them with metadata and network details as host variables. Virtual machines and hosts are grouped into the ``virtual_machines`` and ``hyperv_hosts`` groups and tagged with a ``scvmm_object_type`` variable; inclusion of each is controlled by the ``include_vms`` and ``include_hosts`` options. Duplicate SCVMM object names are disambiguated with a short ID suffix (with a warning) so no host is silently dropped (https://github.com/ansible-collections/microsoft.scvmm/pull/88).
+
+Bugfixes
+--------
+
+- scvmm_hardware_profile, scvmm_hardware_profile_info - fix ``highly_available`` always being reported as ``false`` by reading the correct ``IsHighlyAvailable`` object property.
+
+New Plugins
+-----------
+
+Inventory
+~~~~~~~~~
+
+- microsoft.scvmm.scvmm_inventory - SCVMM dynamic inventory source.
+
 v1.1.0
 ======
 

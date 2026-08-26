@@ -242,6 +242,8 @@ ansible-inventory -i demo.scvmm.yml --graph
 
 As Red Hat Ansible Certified Content, this collection is entitled to support through the Ansible Automation Platform (AAP).
 
+This collection is maintained by the Red Hat **Ansible Ecosystem Engineering** team ([@eco-ansible-content](https://github.com/eco-ansible-content)), which owns the content and handles issue routing.
+
 *   **Certified Support:** If you have an active Red Hat subscription, you can open a support case via the [Red Hat Customer Portal](https://access.redhat.com/support/cases/#/case/combine) or by using the **Create issue** button on the top right corner of the collection page in Automation Hub.
 *   **Community Support:** If this collection was obtained via Ansible Galaxy or GitHub and a Red Hat support case cannot be opened, community assistance is available on the [Ansible Forum](https://forum.ansible.com/).
 *   **Supported Versions:** Support is provided for the current major version and the previous major version of this collection.

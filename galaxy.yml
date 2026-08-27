@@ -1,6 +1,6 @@
 namespace: microsoft
 name: scvmm
-version: 1.2.0
+version: 1.2.1
 readme: README.md
 authors:
   - Hen Yaish <github.com/yaish25491>

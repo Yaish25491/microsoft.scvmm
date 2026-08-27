@@ -4,6 +4,15 @@ Microsoft SCVMM Collection Release Notes
 
 .. contents:: Topics
 
+v1.2.1
+======
+
+Bugfixes
+--------
+
+- collection packaging - exclude development-only directories (``.github``, ``.azure-pipelines``, ``.claude``, ``.claude-flow``, ``.vscode``) and the internal ``docs/plans`` and ``tests/output`` paths from the built tarball. The previous ``build_ignore`` patterns had trailing slashes and did not match, so these artifacts were shipped to users (https://github.com/ansible-collections/microsoft.scvmm/pull/92).
+- scvmm_mac_address_pool - add the missing PowerShell implementation file (``scvmm_mac_address_pool.ps1``) so the module can execute on the target host. Previously only the Python documentation wrapper shipped, leaving the module non-functional (https://github.com/ansible-collections/microsoft.scvmm/pull/92).
+
 v1.2.0
 ======
 

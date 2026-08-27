@@ -2,9 +2,11 @@
 
 **Topics**
 
+- <a href="#v1-2-1">v1\.2\.1</a>
+    - <a href="#bugfixes">Bugfixes</a>
 - <a href="#v1-2-0">v1\.2\.0</a>
     - <a href="#minor-changes">Minor Changes</a>
-    - <a href="#bugfixes">Bugfixes</a>
+    - <a href="#bugfixes-1">Bugfixes</a>
     - <a href="#new-plugins">New Plugins</a>
         - <a href="#inventory">Inventory</a>
 - <a href="#v1-1-0">v1\.1\.0</a>
@@ -14,6 +16,15 @@
 - <a href="#v1-0-0">v1\.0\.0</a>
     - <a href="#minor-changes-1">Minor Changes</a>
     - <a href="#new-modules-1">New Modules</a>
+
+<a id="v1-2-1"></a>
+## v1\.2\.1
+
+<a id="bugfixes"></a>
+### Bugfixes
+
+* collection packaging \- exclude development\-only directories \(<code>\.github</code>\, <code>\.azure\-pipelines</code>\, <code>\.claude</code>\, <code>\.claude\-flow</code>\, <code>\.vscode</code>\) and the internal <code>docs/plans</code> and <code>tests/output</code> paths from the built tarball\. The previous <code>build\_ignore</code> patterns had trailing slashes and did not match\, so these artifacts were shipped to users \([https\://github\.com/ansible\-collections/microsoft\.scvmm/pull/92](https\://github\.com/ansible\-collections/microsoft\.scvmm/pull/92)\)\.
+* scvmm\_mac\_address\_pool \- add the missing PowerShell implementation file \(<code>scvmm\_mac\_address\_pool\.ps1</code>\) so the module can execute on the target host\. Previously only the Python documentation wrapper shipped\, leaving the module non\-functional \([https\://github\.com/ansible\-collections/microsoft\.scvmm/pull/92](https\://github\.com/ansible\-collections/microsoft\.scvmm/pull/92)\)\.
 
 <a id="v1-2-0"></a>
 ## v1\.2\.0
@@ -25,7 +36,7 @@
 * scvmm\_hardware\_profile\, scvmm\_hardware\_profile\_info \- add <code>ha\_vm\_priority</code> option to set and report the highly available VM restart priority \(High 3000\, Medium 2000\, Low 1000\, 0 disables automatic restart\)\.
 * scvmm\_inventory \- new dynamic inventory plugin that discovers SCVMM managed virtual machines and Hyper\-V hosts over PSRP and exposes them with metadata and network details as host variables\. Virtual machines and hosts are grouped into the <code>virtual\_machines</code> and <code>hyperv\_hosts</code> groups and tagged with a <code>scvmm\_object\_type</code> variable\; inclusion of each is controlled by the <code>include\_vms</code> and <code>include\_hosts</code> options\. Duplicate SCVMM object names are disambiguated with a short ID suffix \(with a warning\) so no host is silently dropped \([https\://github\.com/ansible\-collections/microsoft\.scvmm/pull/88](https\://github\.com/ansible\-collections/microsoft\.scvmm/pull/88)\)\.
 
-<a id="bugfixes"></a>
+<a id="bugfixes-1"></a>
 ### Bugfixes
 
 * scvmm\_hardware\_profile\, scvmm\_hardware\_profile\_info \- fix <code>highly\_available</code> always being reported as <code>false</code> by reading the correct <code>IsHighlyAvailable</code> object property\.
